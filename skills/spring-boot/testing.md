@@ -2,6 +2,7 @@
 name: spring-boot-testing
 description: Testing guide for Spring Boot projects. Unit tests, integration tests, controller slice tests, and Testcontainers setup.
 stack: spring-boot
+versions: "Java 21+, Spring Boot 3.x, JUnit 5, Testcontainers"
 ---
 
 # Spring Boot Testing
