@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate-and-generate:
+    name: Validate & Generate Skills
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate skill files
+        run: make validate
+
+      - name: Generate .toml files
+        run: make generate
+
+      - name: Check no uncommitted .toml changes
+        run: |
+          if [ -n "$(git status --porcelain '*.toml')" ]; then
+            echo "❌ Generated .toml files are out of sync. Run 'make generate' and commit the changes."
+            git diff --name-only
+            exit 1
+          fi
+          echo "✔ All .toml files are up to date"
+
+      - name: Validate install script (dry run)
+        run: |
+          mkdir -p /tmp/test-spring /tmp/test-dotnet
+          bash scripts/install.sh spring-boot /tmp/test-spring agent "$(pwd)"
+          bash scripts/install.sh dotnet      /tmp/test-dotnet agent "$(pwd)"
+          echo "✔ Install scripts work correctly"
+
+      - name: Check required files in install output
+        run: |
+          for f in SKILLS.md skills/spring-boot/SKILL.md skills/shared/api-design.md; do
+            [ -f "/tmp/test-spring/.agent/$f" ] || { echo "❌ Missing: $f"; exit 1; }
+          done
+          for f in SKILLS.md skills/dotnet/SKILL.md skills/shared/api-design.md; do
+            [ -f "/tmp/test-dotnet/.agent/$f" ] || { echo "❌ Missing: $f"; exit 1; }
+          done
+          echo "✔ All required files present after install"

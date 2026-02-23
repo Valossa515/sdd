@@ -1,0 +1,68 @@
+# Auto-generated from skills/spring-boot/SKILL.md
+# Run 'make generate' to rebuild — do not edit manually
+
+[skill]
+name        = "spring-boot"
+description = "Use this skill for any Spring Boot task — APIs, services, repositories, config, tests, or refactoring. Targets Spring Boot 3.x with Java 21+."
+stack       = "spring-boot"
+source      = "skills/spring-boot/SKILL.md"
+
+[skill.architecture]
+rules = [
+  "Controllers depend on Application services only — never on repositories directly",
+  "Domain layer has zero Spring dependencies",
+  "Use interfaces in domain/repository/, implement in infrastructure/persistence/",
+]
+
+[[skill.naming]]
+  [[skill.naming]]
+  artifact   = "Controller"
+  convention = "`{Resource}Controller`"
+  example    = "OrderController"
+  [[skill.naming]]
+  artifact   = "Service interface"
+  convention = "`{Resource}Service`"
+  example    = "OrderService"
+  [[skill.naming]]
+  artifact   = "Service impl"
+  convention = "`{Resource}ServiceImpl`"
+  example    = "OrderServiceImpl"
+  [[skill.naming]]
+  artifact   = "Repository (interface)"
+  convention = "`{Resource}Repository`"
+  example    = "OrderRepository"
+  [[skill.naming]]
+  artifact   = "JPA Repository"
+  convention = "`Jpa{Resource}Repository`"
+  example    = "JpaOrderRepository"
+  [[skill.naming]]
+  artifact   = "DTO (request)"
+  convention = "`{Resource}Request`"
+  example    = "CreateOrderRequest"
+  [[skill.naming]]
+  artifact   = "DTO (response)"
+  convention = "`{Resource}Response`"
+  example    = "OrderResponse"
+  [[skill.naming]]
+  artifact   = "Exception"
+  convention = "`{Resource}NotFoundException`"
+  example    = "OrderNotFoundException"
+
+[skill.antipatterns]
+rules = [
+  "@Autowired on fields — always constructor injection",
+  "Optional.get() without isPresent() check — use orElseThrow()",
+  "Business logic in controllers",
+  "@Transactional on the whole class",
+  "String as primary key — use UUID",
+  "javax.* imports — use jakarta.* (Spring Boot 3+)",
+  "Returning raw entities from controllers — always use DTOs",
+]
+
+[skill.testing]
+rules = [
+  "Unit tests: JUnit 5 + Mockito, no Spring context",
+  "Integration tests: @SpringBootTest + Testcontainers for DB",
+  "Controller tests: @WebMvcTest + MockMvc",
+  "Minimum coverage: 80% on application/ and domain/",
+]
