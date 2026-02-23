@@ -23,11 +23,19 @@ Before writing any code, read and follow all the skills listed below.
 | Testing | [skills/dotnet/testing.md](skills/dotnet/testing.md) | Test files |
 | REST & API design | [skills/shared/api-design.md](skills/shared/api-design.md) | Controllers, DTOs |
 | Database | [skills/shared/database.md](skills/shared/database.md) | Entities, DbContext |
+| Bootstrap de contexto | [skills/shared/bootstrap.md](skills/shared/bootstrap.md) | Setup e manutenção de contexto do projeto |
 
-## Project Overrides
+## Overrides específicos do projeto
 
 > ✏️ **Edit this section** with your project's specific conventions.
 > Rules here take precedence over the base skills above.
+
+
+### Documentos de contexto
+- [context.md](context.md)
+- [architecture.md](architecture.md)
+- [runbook.md](runbook.md)
+- [glossary.md](glossary.md)
 
 ### Solution structure
 ```

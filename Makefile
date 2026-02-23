@@ -15,6 +15,7 @@ SDD_DIR     := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 SKILLS_DIR  := $(SDD_DIR)skills
 SCRIPTS_DIR := $(SDD_DIR)scripts
 TEMPLATES   := $(SDD_DIR)templates
+OUTPUTS     := $(SDD_DIR)outputs
 
 STACK  ?= spring-boot
 TARGET ?= $(CURDIR)
@@ -51,14 +52,14 @@ help: ## Show this help
 .PHONY: validate
 validate: ## Validate all skill files (frontmatter + required sections)
 	@echo "$(CYAN)▶ Validating skill files...$(RESET)"
-	@bash $(SCRIPTS_DIR)/validate.sh $(SKILLS_DIR)
+	@bash $(SCRIPTS_DIR)/validate.sh $(SKILLS_DIR) $(TEMPLATES)
 	@echo "$(GREEN)✔ All skills valid$(RESET)"
 
 # ─── Generate ─────────────────────────────────────────────────────────────────
 .PHONY: generate
 generate: ## Generate .toml files from all .md skill files
 	@echo "$(CYAN)▶ Generating .toml files...$(RESET)"
-	@bash $(SCRIPTS_DIR)/generate.sh $(SKILLS_DIR)
+	@bash $(SCRIPTS_DIR)/generate.sh $(SKILLS_DIR) $(OUTPUTS)
 	@echo "$(GREEN)✔ Generation complete$(RESET)"
 
 # ─── Install ──────────────────────────────────────────────────────────────────
@@ -120,7 +121,7 @@ new: ## Scaffold a new skill (STACK=<stack> NAME=<name>)
 
 # ─── Clean generated ──────────────────────────────────────────────────────────
 .PHONY: clean
-clean: ## Remove all generated .toml files
+clean: ## Remove generated outputs
 	@echo "$(CYAN)▶ Cleaning generated files...$(RESET)"
-	@find $(SKILLS_DIR) -name "*.toml" -delete
+	@rm -rf $(OUTPUTS)
 	@echo "$(GREEN)✔ Cleaned$(RESET)"
