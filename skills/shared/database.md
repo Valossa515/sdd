@@ -1,6 +1,8 @@
 ---
 name: database
 description: Database conventions for Spring Boot (JPA/Hibernate) and .NET (EF Core) projects. Covers schema design, migrations, query patterns, and performance.
+stack: shared
+versions: "PostgreSQL 16+, Flyway or EF Migrations"
 ---
 
 # Database — Shared Conventions
