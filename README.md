@@ -82,8 +82,6 @@ Or:
 
 ```bash
 make install STACK=spring-boot TARGET=$(pwd)
-# or run full bootstrap (validate + generate + install)
-make bootstrap STACK=spring-boot TARGET=$(pwd)
 ```
 
 ## Commands
@@ -92,7 +90,6 @@ make bootstrap STACK=spring-boot TARGET=$(pwd)
 make validate      # validates frontmatter + required context templates
 make generate      # generates .toml files into outputs/
 make install       # installs .agent/ for chosen stack
-make bootstrap     # validate + generate + install in one flow
 make check         # validate + generate
 ```
 
