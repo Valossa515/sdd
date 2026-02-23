@@ -22,7 +22,7 @@ This creates `skills/<stack>/<name>.md` with the right template.
 
 Every skill must have:
 
-- **Frontmatter** (`name`, `description`, `stack`)
+- **Frontmatter** (`name`, `description`, `stack`, `versions`)
 - At least one `## ` section with real content
 - **Code examples** — prose is not enough
 - **`## What NOT to do`** — anti-patterns matter as much as patterns
@@ -54,7 +54,7 @@ If your skill should be active by default for a stack, add it to `templates/<sta
 
 Before opening a PR, verify:
 
-- [ ] Frontmatter is complete (`name`, `description`, `stack`)
+- [ ] Frontmatter is complete (`name`, `description`, `stack`, `versions`)
 - [ ] At least one code example per major concept
 - [ ] `## What NOT to do` section present
 - [ ] Version-specific (e.g., "Spring Boot 3.x" not just "Spring Boot")
@@ -73,6 +73,7 @@ description: >
   One or two lines. Start with "Use this skill when..."
   Be specific about what triggers it.
 stack: spring-boot                 # spring-boot | dotnet | shared
+versions: "Java 21+, Spring Boot 3.x"
 ---
 ```
 

@@ -28,6 +28,7 @@ description: >
   Use this skill when working with ${NAME} in ${STACK} projects.
   [TODO: Describe when this skill should be activated.]
 stack: ${STACK}
+versions: "[TODO: versions supported]"
 ---
 
 # ${NAME^} — ${STACK}
