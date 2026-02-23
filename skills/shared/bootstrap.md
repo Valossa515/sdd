@@ -42,11 +42,21 @@ Ensure these files exist in `.agent/`:
    - A section **Overrides específicos do projeto**
    - Links to `context.md`, `architecture.md`, and `runbook.md`
 5. Add or update ADRs for key architecture decisions.
+6. Run Makefile validations as part of bootstrap (do not skip):
+   - `make validate`
+   - `make check`
+   - If installing context in repo root: `make bootstrap STACK=<stack> TARGET=$(pwd)`
 
 ## Quick command
 
 ```text
 @bootstrap
+```
+
+Or run the repository bootstrap flow:
+
+```bash
+make bootstrap STACK=spring-boot TARGET=$(pwd)
 ```
 
 ## Output quality rules
