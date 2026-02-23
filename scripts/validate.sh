@@ -5,6 +5,7 @@
 set -euo pipefail
 
 SKILLS_DIR="${1:?Skills directory required}"
+TEMPLATES_DIR="${2:-}"
 ERRORS=0
 FILES_CHECKED=0
 
@@ -35,7 +36,43 @@ check_frontmatter() {
     return 1
   fi
 
+  # Must have 'stack:' field
+  if ! grep -q "^stack:" "$file"; then
+    echo -e "  ${RED}✘${RESET} $rel — missing 'stack:' in frontmatter"
+    return 1
+  fi
+
+  # Must have 'versions:' field
+  if ! grep -q "^versions:" "$file"; then
+    echo -e "  ${RED}✘${RESET} $rel — missing 'versions:' in frontmatter"
+    return 1
+  fi
+
   return 0
+}
+
+check_required_templates() {
+  local base="$1"
+  local required=(
+    "context.md"
+    "architecture.md"
+    "decisions.md"
+    "conventions.md"
+    "runbook.md"
+    "glossary.md"
+    "backlog_rules.md"
+  )
+
+  echo ""
+  echo "Checking required project context templates in: $base"
+  for f in "${required[@]}"; do
+    if [ ! -f "$base/$f" ]; then
+      echo -e "  ${RED}✘${RESET} missing template: $f"
+      ERRORS=$((ERRORS + 1))
+    else
+      echo -e "  ${GREEN}✔${RESET} $f"
+    fi
+  done
 }
 
 check_structure() {
@@ -102,6 +139,10 @@ done < <(find "$SKILLS_DIR" -name "*.md" -print0 | sort -z)
 
 echo "───────────────────────────────────────"
 echo "Files checked: $FILES_CHECKED"
+
+if [ -n "$TEMPLATES_DIR" ] && [ -d "$TEMPLATES_DIR/common" ]; then
+  check_required_templates "$TEMPLATES_DIR/common"
+fi
 
 if [ "$ERRORS" -gt 0 ]; then
   echo -e "${RED}Errors: $ERRORS — fix the issues above before generating.${RESET}"

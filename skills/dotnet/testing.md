@@ -2,6 +2,7 @@
 name: dotnet-testing
 description: Testing guide for .NET projects. Unit tests with xUnit + NSubstitute, integration tests with WebApplicationFactory and Testcontainers.
 stack: dotnet
+versions: ".NET 8/9, xUnit, NSubstitute, Testcontainers"
 ---
 
 # .NET Testing

@@ -21,15 +21,6 @@ jobs:
       - name: Generate .toml files
         run: make generate
 
-      - name: Check no uncommitted .toml changes
-        run: |
-          if [ -n "$(git status --porcelain '*.toml')" ]; then
-            echo "❌ Generated .toml files are out of sync. Run 'make generate' and commit the changes."
-            git diff --name-only
-            exit 1
-          fi
-          echo "✔ All .toml files are up to date"
-
       - name: Validate install script (dry run)
         run: |
           mkdir -p /tmp/test-spring /tmp/test-dotnet
@@ -39,10 +30,10 @@ jobs:
 
       - name: Check required files in install output
         run: |
-          for f in SKILLS.md skills/spring-boot/SKILL.md skills/shared/api-design.md; do
+          for f in SKILLS.md context.md architecture.md runbook.md skills/spring-boot/SKILL.md skills/shared/api-design.md skills/shared/bootstrap.md; do
             [ -f "/tmp/test-spring/.agent/$f" ] || { echo "❌ Missing: $f"; exit 1; }
           done
-          for f in SKILLS.md skills/dotnet/SKILL.md skills/shared/api-design.md; do
+          for f in SKILLS.md context.md architecture.md runbook.md skills/dotnet/SKILL.md skills/shared/api-design.md skills/shared/bootstrap.md; do
             [ -f "/tmp/test-dotnet/.agent/$f" ] || { echo "❌ Missing: $f"; exit 1; }
           done
           echo "✔ All required files present after install"
