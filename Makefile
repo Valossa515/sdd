@@ -19,7 +19,8 @@ OUTPUTS     := $(SDD_DIR)outputs
 
 STACK  ?= spring-boot
 TARGET ?= $(CURDIR)
-FORMAT ?= agent   # agent | kiro
+FORMAT ?= agent
+# FORMAT: agent | kiro
 
 GREEN  := \033[0;32m
 YELLOW := \033[1;33m
@@ -43,6 +44,7 @@ help: ## Show this help
 	@echo ""
 	@echo "  $(CYAN)Examples:$(RESET)"
 	@echo "    make install STACK=spring-boot TARGET=~/projects/my-api"
+	@echo "    make bootstrap STACK=spring-boot TARGET=~/projects/my-api"
 	@echo "    make install STACK=dotnet TARGET=~/projects/my-app FORMAT=kiro"
 	@echo "    make generate"
 	@echo "    make validate"
@@ -81,6 +83,12 @@ install: validate generate ## Install skills into a project (.agent/ or .kiro/st
 	fi
 	@echo "  3. Commit the .agent/ folder alongside your source code"
 	@echo ""
+
+
+# ─── Bootstrap ────────────────────────────────────────────────────────────────
+.PHONY: bootstrap
+bootstrap: check install ## Bootstrap workflow: validate, generate and install .agent context
+	@echo "$(GREEN)✔ Bootstrap completed (validation + install)$(RESET)"
 
 # ─── Update ───────────────────────────────────────────────────────────────────
 .PHONY: update
