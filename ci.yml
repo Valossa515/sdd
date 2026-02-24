@@ -30,10 +30,56 @@ jobs:
 
       - name: Check required files in install output
         run: |
-          for f in SKILLS.md context.md architecture.md runbook.md skills/spring-boot/SKILL.md skills/shared/api-design.md skills/shared/bootstrap.md; do
-            [ -f "/tmp/test-spring/.agent/$f" ] || { echo "❌ Missing: $f"; exit 1; }
+          SPRING_REQUIRED=(
+            SKILLS.md
+            context.md
+            architecture.md
+            decisions.md
+            conventions.md
+            runbook.md
+            glossary.md
+            backlog_rules.md
+            skills/spring-boot/SKILL.md
+            skills/spring-boot/testing.md
+            skills/shared/api-design.md
+            skills/shared/database.md
+            skills/shared/security.md
+            skills/shared/observability.md
+            skills/shared/error-handling.md
+            skills/shared/bootstrap.md
+          )
+          DOTNET_REQUIRED=(
+            SKILLS.md
+            context.md
+            architecture.md
+            decisions.md
+            conventions.md
+            runbook.md
+            glossary.md
+            backlog_rules.md
+            skills/dotnet/SKILL.md
+            skills/dotnet/testing.md
+            skills/shared/api-design.md
+            skills/shared/database.md
+            skills/shared/security.md
+            skills/shared/observability.md
+            skills/shared/error-handling.md
+            skills/shared/bootstrap.md
+          )
+          FAILED=0
+          for f in "${SPRING_REQUIRED[@]}"; do
+            [ -f "/tmp/test-spring/.agent/$f" ] || { echo "❌ Missing (spring-boot): $f"; FAILED=1; }
           done
-          for f in SKILLS.md context.md architecture.md runbook.md skills/dotnet/SKILL.md skills/shared/api-design.md skills/shared/bootstrap.md; do
-            [ -f "/tmp/test-dotnet/.agent/$f" ] || { echo "❌ Missing: $f"; exit 1; }
+          for f in "${DOTNET_REQUIRED[@]}"; do
+            [ -f "/tmp/test-dotnet/.agent/$f" ] || { echo "❌ Missing (dotnet): $f"; FAILED=1; }
           done
+          [ "$FAILED" -eq 0 ] || exit 1
           echo "✔ All required files present after install"
+
+      - name: Verify skill count
+        run: |
+          EXPECTED=8
+          ACTUAL=$(find skills -name "*.md" | wc -l)
+          echo "Skills found: $ACTUAL (expected: $EXPECTED)"
+          [ "$ACTUAL" -ge "$EXPECTED" ] || { echo "❌ Expected at least $EXPECTED skill files"; exit 1; }
+          echo "✔ Skill count OK"

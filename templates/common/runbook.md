@@ -1,24 +1,24 @@
 # Runbook
 
-## Pré-requisitos
-- [linguagem/runtime]
-- [banco/serviços locais]
+## Prerequisites
+- [Language / runtime]
+- [Database / local services]
 
-## Como rodar
+## How to Run
 ```bash
-# comando principal
+# main command
 ```
 
-## Como testar
+## How to Test
 ```bash
-# comando de testes
+# test command
 ```
 
-## Build e release
+## Build and Release
 ```bash
 # build
-# migrações
+# migrations
 ```
 
 ## Troubleshooting
-- [erro comum 1] -> [solução]
+- [Common error 1] -> [solution]

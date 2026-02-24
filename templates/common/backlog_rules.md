@@ -1,18 +1,18 @@
-# Regras de Backlog
+# Backlog Rules
 
-## Formato de User Story
-- Como [persona], quero [capacidade], para [benefício].
+## User Story Format
+- As a [persona], I want [capability], so that [benefit].
 
-## Critérios de Aceite
+## Acceptance Criteria
 - [Given/When/Then]
-- [cenários de sucesso e erro]
+- [Success and error scenarios]
 
 ## Definition of Ready
-- [contexto suficiente]
-- [dependências mapeadas]
-- [critérios de aceite definidos]
+- [Sufficient context]
+- [Dependencies mapped]
+- [Acceptance criteria defined]
 
 ## Definition of Done
-- [código + testes]
-- [documentação atualizada]
-- [métricas/observabilidade quando aplicável]
+- [Code + tests]
+- [Documentation updated]
+- [Metrics / observability when applicable]

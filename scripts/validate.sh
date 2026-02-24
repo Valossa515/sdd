@@ -24,9 +24,25 @@ check_frontmatter() {
     return 1
   fi
 
+  # Must have closing --- for frontmatter
+  local fm_end
+  fm_end=$(awk 'NR>1 && /^---/{print NR; exit}' "$file")
+  if [ -z "$fm_end" ]; then
+    echo -e "  ${RED}✘${RESET} $rel — frontmatter not closed (missing second ---)"
+    return 1
+  fi
+
   # Must have 'name:' field
   if ! grep -q "^name:" "$file"; then
     echo -e "  ${RED}✘${RESET} $rel — missing 'name:' in frontmatter"
+    return 1
+  fi
+
+  # Name must be kebab-case
+  local name_val
+  name_val=$(grep -m1 "^name:" "$file" | sed 's/^name: *//')
+  if ! echo "$name_val" | grep -qE '^[a-z][a-z0-9-]*$'; then
+    echo -e "  ${RED}✘${RESET} $rel — 'name:' must be kebab-case (got: $name_val)"
     return 1
   fi
 
@@ -42,10 +58,25 @@ check_frontmatter() {
     return 1
   fi
 
+  # Stack must be a valid value
+  local stack_val
+  stack_val=$(grep -m1 "^stack:" "$file" | sed 's/^stack: *//')
+  if ! echo "$stack_val" | grep -qE '^(spring-boot|dotnet|shared)$'; then
+    echo -e "  ${RED}✘${RESET} $rel — 'stack:' must be spring-boot, dotnet, or shared (got: $stack_val)"
+    return 1
+  fi
+
   # Must have 'versions:' field
   if ! grep -q "^versions:" "$file"; then
     echo -e "  ${RED}✘${RESET} $rel — missing 'versions:' in frontmatter"
     return 1
+  fi
+
+  # Skill file must be in the matching stack directory
+  local dir_stack
+  dir_stack=$(echo "$rel" | cut -d'/' -f1)
+  if [ "$dir_stack" != "$stack_val" ]; then
+    echo -e "  ${YELLOW}⚠${RESET}  $rel — stack '$stack_val' does not match directory '$dir_stack'"
   fi
 
   return 0
@@ -89,6 +120,18 @@ check_structure() {
   # Should have code examples
   if ! grep -q '```' "$file"; then
     echo -e "  ${YELLOW}⚠${RESET}  $rel — no code examples found (skills work best with examples)"
+    warn=1
+  fi
+
+  # Should have a "What NOT to do" section (recommended for all skills)
+  if ! grep -qi "## What NOT to do" "$file"; then
+    echo -e "  ${YELLOW}⚠${RESET}  $rel — missing 'What NOT to do' section (recommended)"
+    warn=1
+  fi
+
+  # Should have a top-level # heading
+  if ! grep -q "^# " "$file"; then
+    echo -e "  ${YELLOW}⚠${RESET}  $rel — missing top-level '# ' heading"
     warn=1
   fi
 

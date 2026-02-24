@@ -1,11 +1,11 @@
-# Decisões Arquiteturais
+# Architecture Decision Records
 
-Registre aqui decisões relevantes enquanto o projeto evolui.
+Record relevant decisions here as the project evolves.
 
-## Formato sugerido
-- **Data:** YYYY-MM-DD
-- **Decisão:** [resumo]
-- **Contexto:** [por que era necessário decidir]
-- **Alternativas:** [opções avaliadas]
-- **Escolha:** [opção escolhida]
-- **Consequências:** [trade-offs]
+## Suggested Format
+- **Date:** YYYY-MM-DD
+- **Decision:** [summary]
+- **Context:** [why a decision was needed]
+- **Alternatives:** [options evaluated]
+- **Choice:** [option chosen]
+- **Consequences:** [trade-offs]

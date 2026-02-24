@@ -1,5 +1,5 @@
-# Glossário de Domínio
+# Domain Glossary
 
-- **Termo 1:** [definição]
-- **Termo 2:** [definição]
-- **Pedido vs Ordem:** [diferença, se aplicável]
+- **Term 1:** [definition]
+- **Term 2:** [definition]
+- **Order vs Request:** [difference, if applicable]

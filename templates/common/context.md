@@ -1,21 +1,21 @@
-# Contexto do Projeto
+# Project Context
 
-## Problema
-- [Descreva o problema principal que o produto resolve]
+## Problem
+- [Describe the main problem this product solves]
 
-## Objetivos
-- [Objetivo 1]
-- [Objetivo 2]
+## Objectives
+- [Objective 1]
+- [Objective 2]
 
 ## Personas
-- [Persona principal]
-- [Persona secundária]
+- [Primary persona]
+- [Secondary persona]
 
-## Fluxos principais
-1. [Fluxo principal A]
-2. [Fluxo principal B]
+## Main Flows
+1. [Main flow A]
+2. [Main flow B]
 
-## Restrições
-- [Regulatórias]
-- [Tecnológicas]
-- [Prazo/equipe]
+## Constraints
+- [Regulatory]
+- [Technological]
+- [Timeline / team]
