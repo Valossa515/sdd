@@ -1,16 +1,16 @@
-# Convenções do Projeto
+# Project Conventions
 
-## Nomenclatura
-- [padrões de nomes para classes, métodos, arquivos]
+## Naming
+- [Naming patterns for classes, methods, files]
 
-## Estrutura de pastas/pacotes
-- [layout oficial do projeto]
+## Folder / Package Structure
+- [Official project layout]
 
 ## APIs
-- [padrão de versionamento, erro, paginação]
+- [Versioning pattern, error format, pagination]
 
-## Banco de dados
-- [convenções de migrations, índices, soft delete]
+## Database
+- [Migration conventions, indexes, soft delete]
 
-## Testes
-- [pirâmide de testes, padrões de nomenclatura, tooling]
+## Testing
+- [Test pyramid, naming patterns, tooling]

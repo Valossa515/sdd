@@ -1,22 +1,22 @@
-# Arquitetura
+# Architecture
 
-## Visão geral
-- [Descrição de alto nível da arquitetura]
+## Overview
+- [High-level architecture description]
 
-## Camadas e responsabilidades
+## Layers and Responsibilities
 - API / Presentation
 - Application
 - Domain
 - Infrastructure
 
-## Limites de domínio
+## Domain Boundaries
 - [Bounded context 1]
 - [Bounded context 2]
 
-## C4 (resumo)
-- Contexto: [sistemas e atores]
-- Containers: [apps, DB, filas]
-- Componentes: [módulos-chave]
+## C4 Summary
+- Context: [systems and actors]
+- Containers: [apps, DB, queues]
+- Components: [key modules]
 
-## Integrações externas
-- [Serviço externo] — [finalidade]
+## External Integrations
+- [External service] — [purpose]

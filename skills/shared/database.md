@@ -179,12 +179,103 @@ builder.HasQueryFilter(o => o.DeletedAt == null);
 
 ---
 
+## Transaction Management
+
+### Rules
+- Keep transactions short — do DB work only, avoid calling external APIs inside a transaction
+- Use `readOnly = true` / `AsNoTracking()` for read-only operations
+- Set explicit isolation levels only when needed (default `READ COMMITTED` is usually fine)
+- Handle optimistic concurrency with version columns
+
+### Spring Boot — @Transactional
+
+```java
+// Read-only: no dirty checking, better performance
+@Transactional(readOnly = true)
+public OrderResponse findById(UUID id) {
+    return orderRepository.findById(id)
+        .map(OrderResponse::from)
+        .orElseThrow(() -> new OrderNotFoundException(id));
+}
+
+// Write: default isolation, rolls back on RuntimeException
+@Transactional
+public OrderResponse create(CreateOrderRequest request) {
+    Order order = Order.create(request);
+    return OrderResponse.from(orderRepository.save(order));
+}
+
+// Explicit rollback rules
+@Transactional(rollbackFor = PaymentException.class, noRollbackFor = NotificationException.class)
+public void processPayment(UUID orderId) { ... }
+```
+
+**Anti-patterns:**
+- Never use `@Transactional` at class level — be explicit per method
+- Never call a `@Transactional` method from another method in the same class (proxy bypass)
+- Never make external HTTP calls inside a transaction
+
+### .NET — EF Core Unit of Work
+
+```csharp
+// The DbContext IS the Unit of Work — call SaveChangesAsync once at the end
+public async Task<OrderResponse> Handle(CreateOrderCommand request, CancellationToken ct)
+{
+    var order = Order.Create(request);
+    await _context.Orders.AddAsync(order, ct);
+    await _context.SaveChangesAsync(ct); // Single commit point
+    return OrderResponse.FromDomain(order);
+}
+
+// Explicit transaction for multi-step operations
+await using var transaction = await _context.Database.BeginTransactionAsync(ct);
+try
+{
+    await _context.Orders.AddAsync(order, ct);
+    await _context.SaveChangesAsync(ct);
+
+    await _context.Payments.AddAsync(payment, ct);
+    await _context.SaveChangesAsync(ct);
+
+    await transaction.CommitAsync(ct);
+}
+catch
+{
+    await transaction.RollbackAsync(ct);
+    throw;
+}
+```
+
+### Optimistic Concurrency
+
+Use a version column to prevent lost updates.
+
+**SQL:**
+```sql
+ALTER TABLE orders ADD COLUMN version INTEGER NOT NULL DEFAULT 0;
+```
+
+**Spring Boot:**
+```java
+@Version
+private Integer version;
+```
+
+**.NET:**
+```csharp
+builder.Property(o => o.Version).IsConcurrencyToken();
+// Or use xmin for PostgreSQL:
+builder.UseXminAsConcurrencyToken();
+```
+
+---
+
 ## Performance Rules
 
-- ✅ Always add indexes on FK columns and columns used in `WHERE` / `ORDER BY`
-- ✅ Use `EXPLAIN ANALYZE` to verify query plans on complex queries
-- ✅ Use `readOnly = true` / `AsNoTracking()` for read-only queries
-- ✅ Batch inserts when inserting many rows
-- ❌ Never `SELECT *` in projections — always specify columns
-- ❌ Never load a collection just to call `.size()` / `.Count` — use `COUNT` query
-- ❌ Never use `LIKE '%term%'` on large tables — use full-text search
+- Always add indexes on FK columns and columns used in `WHERE` / `ORDER BY`
+- Use `EXPLAIN ANALYZE` to verify query plans on complex queries
+- Use `readOnly = true` / `AsNoTracking()` for read-only queries
+- Batch inserts when inserting many rows
+- Never `SELECT *` in projections — always specify columns
+- Never load a collection just to call `.size()` / `.Count` — use `COUNT` query
+- Never use `LIKE '%term%'` on large tables — use full-text search
