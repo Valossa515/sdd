@@ -28,6 +28,17 @@ read and follow all the skills listed below.
 | Error handling | [skills/shared/error-handling.md](skills/shared/error-handling.md) | Exception mapping, RFC 7807 |
 | Bootstrap | [skills/shared/bootstrap.md](skills/shared/bootstrap.md) | Project context setup and maintenance |
 
+## Invocable Skills (@ commands)
+
+| Command | File | What it does |
+|---------|------|-------------|
+| `@planning` | [skills/shared/planning.md](skills/shared/planning.md) | Plan a feature before writing code |
+| `@implementation` | [skills/shared/implementation.md](skills/shared/implementation.md) | Implement the plan from `@planning` |
+| `@test-plan` | [skills/shared/test-plan.md](skills/shared/test-plan.md) | Generate a structured test plan |
+| `@test` | [skills/shared/test.md](skills/shared/test.md) | Implement the plan from `@test-plan` |
+| `@review` | [skills/shared/review.md](skills/shared/review.md) | Run a structured code review |
+| `@refactor` | [skills/shared/refactor.md](skills/shared/refactor.md) | Analyze and apply safe refactorings |
+
 ## Project Overrides
 
 > ✏️ **Edit this section** with your project's specific conventions.
