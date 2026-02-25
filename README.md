@@ -10,8 +10,8 @@
   Skill-Driven Development
 ```
 
-**Specialized skill files for AI coding agents**  
-*Spring Boot · .NET · REST APIs · Database · Testing · Bootstrap*
+**Specialized skill files for AI coding agents**
+*Spring Boot · .NET · REST APIs · Database · Testing · Bootstrap · Planning · Review · Refactor*
 
 </div>
 
@@ -32,7 +32,16 @@ skills/
 └── shared/
     ├── api-design.md
     ├── database.md
-    └── bootstrap.md
+    ├── security.md
+    ├── observability.md
+    ├── error-handling.md
+    ├── bootstrap.md
+    ├── planning.md          # @planning → @implementation flow
+    ├── implementation.md    # @planning → @implementation flow
+    ├── test-plan.md         # @test-plan → @test flow
+    ├── test.md              # @test-plan → @test flow
+    ├── review.md            # independent
+    └── refactor.md          # independent
 
 scripts/
 ├── install.sh
@@ -178,6 +187,57 @@ This guarantees validation and generation happen before installation.
 3. Register key architectural choices in `.agent/decisions.md` or `.agent/adr/`.
 4. Update `.agent/glossary.md` with domain terminology.
 5. Commit `.agent/` together with code changes.
+
+## Invocable skills
+
+SDD includes 6 invocable workflow skills organized in two flows plus two independent skills:
+
+### Feature flow: `@planning` → `@implementation`
+
+| Command | Skill | Purpose |
+|---------|-------|---------|
+| `@planning` | [planning.md](skills/shared/planning.md) | Design a feature before coding — produces a plan document |
+| `@implementation` | [implementation.md](skills/shared/implementation.md) | Execute a plan — implements tasks in order following conventions |
+
+```text
+@planning
+Plan the feature: user registration with email verification
+
+# After plan review:
+@implementation
+Execute the plan in .agent/plans/user-registration.md
+```
+
+### Test flow: `@test-plan` → `@test`
+
+| Command | Skill | Purpose |
+|---------|-------|---------|
+| `@test-plan` | [test-plan.md](skills/shared/test-plan.md) | Design a testing strategy — produces a test plan document |
+| `@test` | [test.md](skills/shared/test.md) | Write all tests from the plan — unit, integration, edge cases |
+
+```text
+@test-plan
+Plan tests for the Order module
+
+# After test plan review:
+@test
+Execute the test plan in .agent/plans/order-tests.md
+```
+
+### Independent skills: `@review` and `@refactor`
+
+| Command | Skill | Purpose |
+|---------|-------|---------|
+| `@review` | [review.md](skills/shared/review.md) | Structured code review against project skills and conventions |
+| `@refactor` | [refactor.md](skills/shared/refactor.md) | Restructure code to align with conventions without changing behavior |
+
+```text
+@review
+Review the changes in the current branch against main.
+
+@refactor
+Refactor the Order module to follow skills/spring-boot/SKILL.md layer separation.
+```
 
 ## Frontmatter required in all skills
 
