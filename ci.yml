@@ -47,6 +47,12 @@ jobs:
             skills/shared/observability.md
             skills/shared/error-handling.md
             skills/shared/bootstrap.md
+            skills/shared/planning.md
+            skills/shared/implementation.md
+            skills/shared/test-plan.md
+            skills/shared/test.md
+            skills/shared/review.md
+            skills/shared/refactor.md
           )
           DOTNET_REQUIRED=(
             SKILLS.md
@@ -65,6 +71,12 @@ jobs:
             skills/shared/observability.md
             skills/shared/error-handling.md
             skills/shared/bootstrap.md
+            skills/shared/planning.md
+            skills/shared/implementation.md
+            skills/shared/test-plan.md
+            skills/shared/test.md
+            skills/shared/review.md
+            skills/shared/refactor.md
           )
           FAILED=0
           for f in "${SPRING_REQUIRED[@]}"; do
@@ -78,7 +90,7 @@ jobs:
 
       - name: Verify skill count
         run: |
-          EXPECTED=8
+          EXPECTED=16
           ACTUAL=$(find skills -name "*.md" | wc -l)
           echo "Skills found: $ACTUAL (expected: $EXPECTED)"
           [ "$ACTUAL" -ge "$EXPECTED" ] || { echo "❌ Expected at least $EXPECTED skill files"; exit 1; }
