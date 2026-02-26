@@ -101,6 +101,11 @@ update: ## Pull latest skills and regenerate (for projects that already have SDD
 	@$(MAKE) generate
 	@echo "$(GREEN)✔ SDD updated$(RESET)"
 
+# ─── Upgrade ─────────────────────────────────────────────────────────────────
+.PHONY: upgrade
+upgrade: update install ## Pull latest skills, regenerate, and reinstall into TARGET project
+	@echo "$(GREEN)✔ SDD upgraded in: $(TARGET)$(RESET)"
+
 # ─── Check (CI) ───────────────────────────────────────────────────────────────
 .PHONY: check
 check: validate generate ## Run all checks (for CI)

@@ -96,6 +96,8 @@ make validate      # validates frontmatter + required context templates
 make generate      # generates .toml files into outputs/
 make install       # installs .agent/ for chosen stack
 make bootstrap     # validate + generate + install in one flow
+make update        # pull latest skills and regenerate
+make upgrade       # update + install (update SDD in an existing project)
 make check         # validate + generate
 ```
 
