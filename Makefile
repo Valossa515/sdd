@@ -15,6 +15,9 @@ SDD_DIR     := $(dir $(abspath $(lastword $(MAKEFILE_LIST))))
 SKILLS_DIR  := $(SDD_DIR)skills
 SCRIPTS_DIR := $(SDD_DIR)scripts
 TEMPLATES   := $(SDD_DIR)templates
+AGENTS_DIR  := $(SDD_DIR)agents
+PROMPTS_DIR := $(SDD_DIR)prompts
+SPECS_DIR   := $(SDD_DIR)specs
 OUTPUTS     := $(SDD_DIR)outputs
 
 STACK  ?= spring-boot
@@ -108,8 +111,73 @@ upgrade: update install ## Pull latest skills, regenerate, and reinstall into TA
 
 # ─── Check (CI) ───────────────────────────────────────────────────────────────
 .PHONY: check
-check: validate generate ## Run all checks (for CI)
+check: validate generate validate-agents ## Run all checks (for CI)
 	@echo "$(GREEN)✔ All checks passed$(RESET)"
+
+# ─── Validate Agents ──────────────────────────────────────────────────────────
+.PHONY: validate-agents
+validate-agents: ## Validate agent, prompt, and spec files (frontmatter check)
+	@echo "$(CYAN)▶ Validating agents...$(RESET)"
+	@errors=0; \
+	for f in $(AGENTS_DIR)/*.md; do \
+		[ -f "$$f" ] || continue; \
+		bname=$$(basename "$$f"); \
+		[ "$$bname" = "README.md" ] && continue; \
+		if ! head -1 "$$f" | grep -q "^---"; then \
+			echo "  $(RED)✘$(RESET) agents/$$bname — missing frontmatter"; \
+			errors=$$((errors+1)); \
+		fi; \
+	done; \
+	echo "$(CYAN)▶ Validating prompts...$(RESET)"; \
+	for f in $(PROMPTS_DIR)/*.md; do \
+		[ -f "$$f" ] || continue; \
+		bname=$$(basename "$$f"); \
+		[ "$$bname" = "README.md" ] && continue; \
+		if ! head -1 "$$f" | grep -q "^---"; then \
+			echo "  $(RED)✘$(RESET) prompts/$$bname — missing frontmatter"; \
+			errors=$$((errors+1)); \
+		fi; \
+	done; \
+	echo "$(CYAN)▶ Validating spec schemas...$(RESET)"; \
+	for f in $(SPECS_DIR)/*.schema.md; do \
+		[ -f "$$f" ] || continue; \
+		bname=$$(basename "$$f"); \
+		if ! head -1 "$$f" | grep -q "^---"; then \
+			echo "  $(RED)✘$(RESET) specs/$$bname — missing frontmatter"; \
+			errors=$$((errors+1)); \
+		fi; \
+	done; \
+	if [ $$errors -gt 0 ]; then \
+		echo "$(RED)✘ $$errors file(s) failed validation$(RESET)"; exit 1; \
+	fi
+	@echo "$(GREEN)✔ All agents, prompts, and specs valid$(RESET)"
+
+# ─── Structure ────────────────────────────────────────────────────────────────
+.PHONY: structure
+structure: ## Show the full SDD project structure
+	@echo ""
+	@echo "  $(BOLD)SDD Project Structure$(RESET)"
+	@echo ""
+	@echo "  $(CYAN)Skills:$(RESET)"
+	@find $(SKILLS_DIR) -name "*.md" 2>/dev/null | sort | while read f; do \
+		printf "    %s\n" "$${f#$(SDD_DIR)}"; \
+	done
+	@echo ""
+	@echo "  $(CYAN)Agents:$(RESET)"
+	@find $(AGENTS_DIR) -name "*.md" 2>/dev/null | sort | while read f; do \
+		printf "    %s\n" "$${f#$(SDD_DIR)}"; \
+	done
+	@echo ""
+	@echo "  $(CYAN)Prompts:$(RESET)"
+	@find $(PROMPTS_DIR) -name "*.md" 2>/dev/null | sort | while read f; do \
+		printf "    %s\n" "$${f#$(SDD_DIR)}"; \
+	done
+	@echo ""
+	@echo "  $(CYAN)Specs:$(RESET)"
+	@find $(SPECS_DIR) -name "*.md" 2>/dev/null | sort | while read f; do \
+		printf "    %s\n" "$${f#$(SDD_DIR)}"; \
+	done
+	@echo ""
 
 # ─── List skills ──────────────────────────────────────────────────────────────
 .PHONY: list

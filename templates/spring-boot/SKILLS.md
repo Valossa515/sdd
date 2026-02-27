@@ -17,6 +17,8 @@ read and follow all the skills listed below.
 
 ## Active Skills
 
+### Stack Skills
+
 | Skill | File | Scope |
 |-------|------|-------|
 | Architecture & patterns | [skills/spring-boot/SKILL.md](skills/spring-boot/SKILL.md) | All code |
@@ -33,6 +35,30 @@ read and follow all the skills listed below.
 | Test | [skills/shared/test.md](skills/shared/test.md) | Test implementation (`@test-plan` → `@test`) |
 | Review | [skills/shared/review.md](skills/shared/review.md) | Structured code review |
 | Refactor | [skills/shared/refactor.md](skills/shared/refactor.md) | Convention-aligned refactoring |
+
+### Agent Guardrails
+
+| Skill | File | Scope |
+|-------|------|-------|
+| Anti-invention | [skills/shared/anti-invention.md](skills/shared/anti-invention.md) | All tasks — prevents hallucination |
+| Pattern analysis | [skills/shared/pattern-analysis.md](skills/shared/pattern-analysis.md) | All generation — 3-example rule |
+| Gap analysis | [skills/shared/gap-analysis.md](skills/shared/gap-analysis.md) | Planning — detects missing info |
+| Spec validation | [skills/shared/spec-validation.md](skills/shared/spec-validation.md) | Specs — validates structure |
+| Definition of Ready | [skills/shared/dor.md](skills/shared/dor.md) | Pre-implementation gate |
+| Definition of Done | [skills/shared/dod.md](skills/shared/dod.md) | Post-implementation gate |
+
+### Agent Roles
+
+For pipeline-driven development, see [agents/README.md](agents/README.md):
+
+| Role | File | When to use |
+|------|------|-------------|
+| Planner | [agents/planner.md](agents/planner.md) | Convert requirement → spec |
+| Architect | [agents/architect.md](agents/architect.md) | Convert spec → contract |
+| Builder | [agents/builder.md](agents/builder.md) | Generate production code |
+| Tester | [agents/tester.md](agents/tester.md) | Generate tests |
+| Reviewer | [agents/reviewer.md](agents/reviewer.md) | Validate + review |
+| Conductor | [agents/conductor.md](agents/conductor.md) | Run full pipeline |
 
 ## Project Overrides
 

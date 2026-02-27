@@ -133,6 +133,44 @@ install_agent_format() {
   esac
 
   echo -e "  ${CYAN}→${RESET} .agent/SKILLS.md"
+
+  # ── Agents ────────────────────────────────────────────────────────────────
+  if [ -d "$src/agents" ]; then
+    mkdir -p "$dest/agents"
+    echo -e "  ${CYAN}→${RESET} .agent/agents/"
+    for f in "$src/agents/"*.md; do
+      [ -f "$f" ] || continue
+      cp "$f" "$dest/agents/"
+    done
+  fi
+
+  # ── Prompts ───────────────────────────────────────────────────────────────
+  if [ -d "$src/prompts" ]; then
+    mkdir -p "$dest/prompts"
+    echo -e "  ${CYAN}→${RESET} .agent/prompts/"
+    for f in "$src/prompts/"*.md; do
+      [ -f "$f" ] || continue
+      cp "$f" "$dest/prompts/"
+    done
+  fi
+
+  # ── Spec schemas ──────────────────────────────────────────────────────────
+  if [ -d "$src/specs" ]; then
+    mkdir -p "$dest/specs"
+    echo -e "  ${CYAN}→${RESET} .agent/specs/"
+    for f in "$src/specs/"*.md; do
+      [ -f "$f" ] || continue
+      cp "$f" "$dest/specs/"
+    done
+  fi
+
+  # ── PR template ───────────────────────────────────────────────────────────
+  if [ -f "$src/templates/PULL_REQUEST_TEMPLATE.md" ]; then
+    mkdir -p "$dest/templates"
+    cp "$src/templates/PULL_REQUEST_TEMPLATE.md" "$dest/templates/"
+    echo -e "  ${CYAN}→${RESET} .agent/templates/PULL_REQUEST_TEMPLATE.md"
+  fi
+
   echo ""
   echo -e "${GREEN}✔ Installed to: ${dest}${RESET}"
 }
@@ -164,6 +202,37 @@ install_kiro_format() {
     echo -e "     ${STACK}-$(basename $f)"
   done
 
+  # Also copy .toml if they exist
+  for f in "$stack_dir/"*.toml; do
+    [ -f "$f" ] || continue
+    cp "$f" "$dest/${STACK}-$(basename $f)"
+    echo -e "     ${STACK}-$(basename $f)"
+  done
+
+  # Copy agents (flattened with agent- prefix)
+  if [ -d "$src/agents" ]; then
+    echo -e "  ${CYAN}→${RESET} .kiro/steering/ (agents)"
+    for f in "$src/agents/"*.md; do
+      [ -f "$f" ] || continue
+      bname=$(basename "$f")
+      [ "$bname" = "README.md" ] && continue
+      cp "$f" "$dest/agent-$bname"
+      echo -e "     agent-$bname"
+    done
+  fi
+
+  # Copy prompts (flattened with prompt- prefix)
+  if [ -d "$src/prompts" ]; then
+    echo -e "  ${CYAN}→${RESET} .kiro/steering/ (prompts)"
+    for f in "$src/prompts/"*.md; do
+      [ -f "$f" ] || continue
+      bname=$(basename "$f")
+      [ "$bname" = "README.md" ] && continue
+      cp "$f" "$dest/prompt-$bname"
+      echo -e "     prompt-$bname"
+    done
+  fi
+
   echo ""
   echo -e "${GREEN}✔ Installed to: ${dest}${RESET}"
 }
@@ -192,11 +261,13 @@ post_install_summary() {
     echo "  │  1. Open .kiro/steering/ and review the skills          │"
     echo "  │  2. Edit ${STACK}-SKILL.md to add project conventions   │"
   else
-    echo "  │  1. Open .agent/SKILLS.md                               │"
+    echo "  │  1. Open .agent/SKILLS.md and review the active skills  │"
     echo "  │  2. Fill in the '## Project Overrides' section          │"
+    echo "  │  3. Review .agent/agents/ for the agent pipeline        │"
+    echo "  │  4. Review .agent/prompts/ for action templates         │"
   fi
-  echo "  │  3. Commit the folder alongside your source code        │"
-  echo "  │  4. Tell your agent: 'Read .agent/SKILLS.md before      │"
+  echo "  │  5. Commit the folder alongside your source code        │"
+  echo "  │  6. Tell your agent: 'Read .agent/SKILLS.md before      │"
   echo "  │     every task'  (or set up auto-context loading)       │"
   echo "  └─────────────────────────────────────────────────────────┘"
   echo ""

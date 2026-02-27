@@ -114,3 +114,65 @@ Always target these unless creating a version-specific skill:
 ## Questions or ideas?
 
 Open an issue! Skill suggestions, real-world war stories, anti-patterns you've seen in the wild — all welcome.
+
+---
+
+## Adding or editing agents
+
+Agent files live in `agents/` and define the behavior of each pipeline role.
+
+### Guidelines
+
+- Each agent has **one job** — never overlap responsibilities
+- Agent files use the same frontmatter format: `name`, `description`, `role`
+- Include a clear `## Inputs`, `## Outputs`, and `## Workflow` section
+- Always reference the relevant skills (anti-invention, pattern-analysis, DoR/DoD)
+- Include a `## What NOT to do` section
+
+### Quality checklist for agents
+
+- [ ] Frontmatter has `name`, `description`, `role`
+- [ ] Inputs and outputs are clearly defined
+- [ ] Workflow is numbered and unambiguous
+- [ ] Cross-cutting rules (anti-invention, pattern analysis) are referenced
+- [ ] Constraints and anti-patterns are documented
+
+---
+
+## Adding or editing prompts
+
+Prompt files live in `prompts/` and provide step-by-step generation guides for specific artifacts.
+
+### Guidelines
+
+- One prompt per artifact type (endpoint, entity, service, etc.)
+- Use the `## Steps` format: numbered actions the agent follows
+- Always start with "Analyze existing examples" as step 1
+- Include a `## Verify` section with a confirmation checklist
+- Include realistic examples where helpful
+
+---
+
+## Adding or editing spec schemas
+
+Spec schemas live in `specs/` and define the YAML structure for feature, acceptance, and contract files.
+
+### Guidelines
+
+- Show the complete YAML schema with comments
+- Document required vs optional fields in a table
+- Include validation rules
+- Keep examples realistic (not toy cases)
+
+---
+
+## Adding shared skills
+
+Shared skills (`skills/shared/`) apply across all stacks. Examples: anti-invention, gap-analysis, DoR, DoD.
+
+### Guidelines
+
+- Use `stack: shared` in the frontmatter
+- Focus on **process** rather than code (these are methodology skills, not tech skills)
+- Include clear decision criteria (when to stop, when to proceed)
+- Anti-patterns are especially important for process skills
