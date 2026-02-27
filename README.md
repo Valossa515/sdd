@@ -167,6 +167,14 @@ your-project/
 │       ├── features/              ← feature specs (.spec.yml)
 │       ├── acceptance/            ← acceptance criteria (.acceptance.yml)
 │       └── contracts/             ← architecture contracts (.contract.yml)
+├── .github/
+│   └── agents/                    ← Copilot custom agents (auto-generated)
+│       ├── conductor.agent.md
+│       ├── planner.agent.md
+│       ├── architect.agent.md
+│       ├── builder.agent.md
+│       ├── tester.agent.md
+│       └── reviewer.agent.md
 ├── src/
 └── ...
 ```
@@ -230,6 +238,21 @@ Use the full pipeline for new features, or shortcut for simpler tasks:
 | Refactor | builder → tester → reviewer |
 
 See [agents/README.md](agents/README.md) for full documentation.
+
+### Using agents in GitHub Copilot (VS Code)
+
+When you install SDD, the script automatically creates `.github/agents/*.agent.md` files in your project. These are **custom agents** recognized natively by GitHub Copilot in VS Code.
+
+After installation:
+
+1. Open the Copilot Chat panel
+2. Click the **agent dropdown** (where it says "Agent", "Ask", or "Plan")
+3. You will see the SDD agents listed: **conductor**, **planner**, **architect**, **builder**, **tester**, **reviewer**
+4. Select an agent and start chatting — it will follow its role instructions automatically
+
+> **Tip:** If agents don't appear, reload the VS Code window (`Cmd+Shift+P` → `Developer: Reload Window`).
+
+Each agent file includes the full role instructions plus a directive to read `.agent/SKILLS.md` before every task, so your project conventions are always respected.
 
 ---
 
@@ -321,6 +344,7 @@ make install STACK=spring-boot TARGET=/path/to/your/project
 | `prompts/*` | ✅ Yes | Action prompt templates |
 | `specs/*` | ✅ Yes | Specification schemas |
 | `SKILLS.md` | ✅ Yes | Regenerated from template |
+| `.github/agents/*` | ✅ Yes | Copilot custom agents (auto-generated) |
 | Your project overrides in `SKILLS.md` | ⚠️ Overwritten | Back up before updating |
 
 > **Tip:** Before upgrading, commit your current `.agent/` folder so you can diff the changes and restore any custom overrides.
