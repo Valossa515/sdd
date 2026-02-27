@@ -20,9 +20,14 @@ Use this skill when the user asks for `@bootstrap` or wants full project context
 
 Create/update a minimal project knowledge base in `.agent/` so future tasks have domain context and not only generic coding rules.
 
+> **CRITICAL — File creation is MANDATORY.**
+> This skill MUST produce real files on disk inside the `.agent/` directory.
+> Presenting content only in chat is NOT acceptable — every document listed below MUST be written to the filesystem using file-creation tools.
+> At the end of execution the agent MUST confirm which files were created/updated and their paths.
+
 ## Required files
 
-Ensure these files exist in `.agent/`:
+Ensure these files exist in `.agent/` (create them if they don't):
 
 - `project-reference.md` ← **single-file consolidated reference** (overview, architecture, class map, conventions, glossary)
 - `context.md`
@@ -52,20 +57,24 @@ Before creating any file, the agent MUST scan the codebase and collect real info
 
 > The agent MUST NOT leave placeholders like `[describe...]` when the information can be discovered from the code. Use `TODO` only for genuinely unknowable information (business context, roadmap, personas).
 
-### Phase 2 — Generate Context Documents
+### Phase 2 — Write Context Documents to Disk
+
+> **You MUST write each file to the `.agent/` directory using file-creation/editing tools.**
+> Do NOT just display the content in the chat. The deliverable of this skill is FILES, not chat messages.
 
 1. Read existing `.agent/SKILLS.md` and active skills.
-2. **Generate `project-reference.md` first** — this is the consolidated single-file reference.
+2. **Write `.agent/project-reference.md` first** — this is the consolidated single-file reference.
    - Follow the template in `templates/common/project-reference.md`.
    - Populate ALL sections with real data from Phase 1.
    - Include: project overview, architecture style, full class/module map with responsibilities, available endpoints, database schema, conventions, domain glossary, dependencies, and run commands.
    - This file must be self-sufficient — anyone reading only this file should understand the entire project.
-3. Create or refresh the individual context files (`context.md`, `architecture.md`, `conventions.md`, etc.), **populating them with real data from Phase 1**.
-4. Update `.agent/SKILLS.md` with:
+3. **Write or update** each individual context file to `.agent/` (`context.md`, `architecture.md`, `conventions.md`, `runbook.md`, `glossary.md`, `decisions.md`, `backlog_rules.md`), **populating them with real data from Phase 1**.
+4. **Write or update** `.agent/SKILLS.md` with:
    - Active skills only
    - A section **Overrides específicos do projeto**
    - Links to `project-reference.md`, `context.md`, `architecture.md`, and `runbook.md`
 5. Add or update ADRs for key architecture decisions discovered in the code (e.g., chosen database, ORM, auth mechanism).
+6. **After all files are written**, list every file created/updated with its absolute path as confirmation.
 
 ### Phase 3 — Validate
 
@@ -98,6 +107,10 @@ make bootstrap STACK=spring-boot TARGET=$(pwd)
 - Architecture docs must reflect the actual folder structure and class relationships found in the code.
 
 ## What NOT to do
+
+- **NEVER present the bootstrap output only in the chat** — all content MUST be written to `.agent/` files on disk.
+- **NEVER skip file creation** — if Phase 1 collected data, Phase 2 must write it to files.
+- **NEVER ask the user if they want the files created** — file creation is the default and expected outcome of `@bootstrap`.
 
 - ❌ Do not keep only generic stack text when project context is known.
 - ❌ Do not duplicate entire skills inside context documents.
