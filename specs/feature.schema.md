@@ -1,74 +1,59 @@
 ---
 name: feature-schema
-description: Schema definition for feature specification files (.spec.yml)
+description: Schema definition for feature specification files (.spec.toon)
 ---
 
 # Feature Specification Schema
 
 Feature specs define **WHAT** the system should do in business terms. They contain no technical decisions — only behavior.
 
+## Format
+
+All feature specs use **TOON v3.0** (Token-Oriented Object Notation) — a compact, token-efficient format optimized for LLM consumption. See `specs/README.md` for the TOON syntax reference.
+
 ## Schema
 
-```yaml
-# .agent/specs/features/{feature-name}.spec.yml
+```toon
+# TOON v3.0 – Feature Specification
+# .agent/specs/features/{feature-name}.spec.toon
 
 feature:
-  id: "FT-001"                        # Unique ID (FT-NNN)
-  name: "Create Order"                 # Human-readable name
-  version: "1.0"                       # Spec revision
-  status: draft | ready | approved     # Lifecycle status
+  id: FT-001
+  name: Create Order
+  version: 1.0
+  status: draft
 
 requirement:
-  summary: |
-    One paragraph describing the feature from the user's perspective.
-  actor: "Authenticated User"          # Who triggers this
-  trigger: "POST /api/v1/orders"       # How it starts (optional)
+  summary: One paragraph describing the feature from the user's perspective.
+  actor: Authenticated User
+  trigger: POST /api/v1/orders
 
-inputs:
-  - name: customer_id
-    type: UUID
-    required: true
-    constraints: "Must reference an existing customer"
-  - name: items
-    type: list
-    required: true
-    constraints: "At least 1 item, max 50 items"
+inputs[2]{name,type,required,constraints}:
+  customer_id,UUID,true,Must reference an existing customer
+  items,list,true,At least 1 item and max 50 items
 
 outputs:
   success:
-    description: "Order is created and returned with generated ID"
+    description: Order is created and returned with generated ID
     status: 201
-    body:
-      - name: id
-        type: UUID
-      - name: status
-        type: string
-        value: "PENDING"
-  errors:
-    - code: "CUSTOMER_NOT_FOUND"
-      status: 404
-      when: "customer_id does not exist"
-    - code: "EMPTY_ORDER"
-      status: 422
-      when: "items list is empty"
+    body[2]{name,type,value}:
+      id,UUID,
+      status,string,PENDING
+  errors[2]{code,status,when}:
+    CUSTOMER_NOT_FOUND,404,customer_id does not exist
+    EMPTY_ORDER,422,items list is empty
 
-business-rules:
-  - id: "BR-001"
-    rule: "Order total must be recalculated from item prices × quantities"
-  - id: "BR-002"
-    rule: "Stock must be validated before accepting the order"
+business-rules[2]{id,rule}:
+  BR-001,Order total must be recalculated from item prices × quantities
+  BR-002,Stock must be validated before accepting the order
 
-assumptions:
-  - "Currency is always BRL"
-  - "Prices are stored in cents (integer)"
+assumptions[2]:
+  Currency is always BRL
+  Prices are stored in cents (integer)
 
-batches:
-  - id: "BATCH-01"
-    scope: "Core order creation (happy path)"
-    estimate: "1-2 days"
-  - id: "BATCH-02"
-    scope: "Error handling and edge cases"
-    estimate: "1 day"
+batches[2]{id,scope,estimate}:
+  BATCH-01,Core order creation (happy path),1-2 days
+  BATCH-02,Error handling and edge cases,1 day
 ```
 
 ## Required Fields

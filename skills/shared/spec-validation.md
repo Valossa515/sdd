@@ -11,6 +11,8 @@ versions: "SDD 1.x"
 
 Validate spec files before they are consumed by downstream agents. A spec that fails validation must be fixed before proceeding.
 
+All specs use **TOON v3.0** format. Validation rules apply to the parsed TOON structure.
+
 ---
 
 ## Validation Levels
@@ -20,7 +22,7 @@ Validate spec files before they are consumed by downstream agents. A spec that f
 Check that required fields are present:
 
 ```
-Feature spec (.spec.yml):
+Feature spec (.spec.toon):
   ✓ feature.id exists and matches pattern FT-NNN
   ✓ feature.name is not empty
   ✓ requirement.summary is not empty
@@ -28,17 +30,20 @@ Feature spec (.spec.yml):
   ✓ outputs.success is defined
   ✓ outputs.errors has at least 1 entry
   ✓ business-rules has at least 1 entry
+  ✓ Tabular array counts match declared [N]
 
-Acceptance criteria (.acceptance.yml):
+Acceptance criteria (.acceptance.toon):
   ✓ acceptance.feature-ref matches an existing feature spec
   ✓ criteria[] has at least 1 entry
   ✓ Each criterion has id, scenario, given, when, then
+  ✓ Tabular array column count matches {header} declaration
 
-Architecture contract (.contract.yml):
+Architecture contract (.contract.toon):
   ✓ contract.feature-ref matches an existing feature spec
   ✓ At least 1 layer has files defined
   ✓ Each file has path and action
   ✓ test-strategy section is present
+  ✓ Tabular array counts match declared [N]
 ```
 
 ### Level 2: Completeness

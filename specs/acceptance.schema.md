@@ -1,50 +1,31 @@
 ---
 name: acceptance-schema
-description: Schema definition for acceptance criteria files (.acceptance.yml)
+description: Schema definition for acceptance criteria files (.acceptance.toon)
 ---
 
 # Acceptance Criteria Schema
 
 Acceptance criteria define the testable conditions that prove a feature works correctly. Each criterion maps to at least one test.
 
+## Format
+
+All acceptance specs use **TOON v3.0** (Token-Oriented Object Notation) — a compact, token-efficient format optimized for LLM consumption. See `specs/README.md` for the TOON syntax reference.
+
 ## Schema
 
-```yaml
-# .agent/specs/acceptance/{feature-name}.acceptance.yml
+```toon
+# TOON v3.0 – Acceptance Criteria
+# .agent/specs/acceptance/{feature-name}.acceptance.toon
 
 acceptance:
-  feature-ref: "FT-001"               # Links to feature spec
-  version: "1.0"
+  feature-ref: FT-001
+  version: 1.0
 
-criteria:
-  - id: "AC-001"
-    scenario: "Create order with valid data"
-    given: "A customer with ID exists and items are in stock"
-    when: "POST /api/v1/orders with valid body"
-    then: "Returns 201 with new order ID and status PENDING"
-    priority: must-have
-
-  - id: "AC-002"
-    scenario: "Reject order for non-existent customer"
-    given: "customer_id does not exist in the database"
-    when: "POST /api/v1/orders with invalid customer_id"
-    then: "Returns 404 with error code CUSTOMER_NOT_FOUND"
-    priority: must-have
-
-  - id: "AC-003"
-    scenario: "Reject order with empty items"
-    given: "items list is empty"
-    when: "POST /api/v1/orders with empty items"
-    then: "Returns 422 with error code EMPTY_ORDER"
-    priority: must-have
-
-  - id: "AC-004"
-    scenario: "Verify order total calculation"
-    given: "Order with 2 items: item A (qty 3, price 1000) and item B (qty 1, price 2500)"
-    when: "Order is created"
-    then: "Order total equals 5500"
-    priority: must-have
-    business-rule-ref: "BR-001"
+criteria[4]{id,scenario,given,when,then,priority,business-rule-ref}:
+  AC-001,Create order with valid data,A customer with ID exists and items are in stock,POST /api/v1/orders with valid body,Returns 201 with new order ID and status PENDING,must-have,
+  AC-002,Reject order for non-existent customer,customer_id does not exist in the database,POST /api/v1/orders with invalid customer_id,Returns 404 with error code CUSTOMER_NOT_FOUND,must-have,
+  AC-003,Reject order with empty items,items list is empty,POST /api/v1/orders with empty items,Returns 422 with error code EMPTY_ORDER,must-have,
+  AC-004,Verify order total calculation,Order with 2 items: item A (qty 3 price 1000) and item B (qty 1 price 2500),Order is created,Order total equals 5500,must-have,BR-001
 ```
 
 ## Required Fields

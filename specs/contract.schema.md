@@ -1,94 +1,75 @@
 ---
 name: contract-schema
-description: Schema definition for architecture contract files (.contract.yml)
+description: Schema definition for architecture contract files (.contract.toon)
 ---
 
 # Architecture Contract Schema
 
 Contracts define the technical implementation plan for a feature. They are **binding**: the builder creates exactly what the contract specifies, nothing more.
 
+## Format
+
+All contract specs use **TOON v3.0** (Token-Oriented Object Notation) — a compact, token-efficient format optimized for LLM consumption. See `specs/README.md` for the TOON syntax reference.
+
 ## Schema
 
-```yaml
-# .agent/specs/contracts/{feature-name}.contract.yml
+```toon
+# TOON v3.0 – Architecture Contract
+# .agent/specs/contracts/{feature-name}.contract.toon
 
 contract:
-  feature-ref: "FT-001"               # Links to feature spec
-  version: "1.0"
+  feature-ref: FT-001
+  version: 1.0
 
 layers:
   api:
-    files:
-      - path: "src/main/java/com/example/api/controller/OrderController.java"
-        action: create
-        description: "REST endpoint for order creation"
-      - path: "src/main/java/com/example/api/dto/CreateOrderRequest.java"
-        action: create
-        description: "Request DTO with validation"
-      - path: "src/main/java/com/example/api/dto/OrderResponse.java"
-        action: create
-        description: "Response DTO"
-
+    files[3]{path,action,description}:
+      src/main/java/com/example/api/controller/OrderController.java,create,REST endpoint for order creation
+      src/main/java/com/example/api/dto/CreateOrderRequest.java,create,Request DTO with validation
+      src/main/java/com/example/api/dto/OrderResponse.java,create,Response DTO
   application:
-    files:
-      - path: "src/main/java/com/example/application/service/OrderService.java"
-        action: create
-        description: "Service interface"
-      - path: "src/main/java/com/example/application/service/OrderServiceImpl.java"
-        action: create
-        description: "Service implementation with business logic"
-
+    files[2]{path,action,description}:
+      src/main/java/com/example/application/service/OrderService.java,create,Service interface
+      src/main/java/com/example/application/service/OrderServiceImpl.java,create,Service implementation with business logic
   domain:
-    files:
-      - path: "src/main/java/com/example/domain/model/Order.java"
-        action: create
-        description: "Order entity with invariants"
-      - path: "src/main/java/com/example/domain/repository/OrderRepository.java"
-        action: create
-        description: "Repository port (interface)"
-
+    files[2]{path,action,description}:
+      src/main/java/com/example/domain/model/Order.java,create,Order entity with invariants
+      src/main/java/com/example/domain/repository/OrderRepository.java,create,Repository port (interface)
   infrastructure:
-    files:
-      - path: "src/main/java/com/example/infrastructure/persistence/JpaOrderRepository.java"
-        action: create
-        description: "JPA repository adapter"
+    files[1]{path,action,description}:
+      src/main/java/com/example/infrastructure/persistence/JpaOrderRepository.java,create,JPA repository adapter
 
-migrations:
-  - file: "V3__create_orders_table.sql"
-    description: "Create orders table with indexes"
+migrations[1]{file,description}:
+  V3__create_orders_table.sql,Create orders table with indexes
 
 dependencies:
-  uses:
-    - "CustomerRepository (existing)"
-    - "StockService (existing)"
-  introduces: []    # empty = no new external dependencies
+  uses[2]:
+    CustomerRepository (existing)
+    StockService (existing)
+  introduces[0]:
 
 test-strategy:
   unit-tests:
-    - target: "OrderServiceImpl"
-      scenarios:
-        - "create-order-happy-path"
-        - "customer-not-found"
-        - "empty-items-rejected"
-        - "total-calculated-correctly"
-
+    - target: OrderServiceImpl
+      scenarios[4]:
+        create-order-happy-path
+        customer-not-found
+        empty-items-rejected
+        total-calculated-correctly
   integration-tests:
-    - target: "OrderController"
-      type: "controller-slice"
-      scenarios:
-        - "post-order-returns-201"
-        - "post-order-invalid-customer-returns-404"
-        - "post-order-empty-items-returns-422"
-    - target: "JpaOrderRepository"
-      type: "database"
-      scenarios:
-        - "save-and-find-by-id"
-
-  excluded:
-    - target: "CreateOrderRequest"
-      reason: "Pure data class with no logic"
-    - target: "OrderResponse"
-      reason: "Pure data class with no logic"
+    - target: OrderController
+      type: controller-slice
+      scenarios[3]:
+        post-order-returns-201
+        post-order-invalid-customer-returns-404
+        post-order-empty-items-returns-422
+    - target: JpaOrderRepository
+      type: database
+      scenarios[1]:
+        save-and-find-by-id
+  excluded[2]{target,reason}:
+    CreateOrderRequest,Pure data class with no logic
+    OrderResponse,Pure data class with no logic
 ```
 
 ## Required Fields

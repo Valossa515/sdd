@@ -47,11 +47,11 @@ skills/
     ├── observability.md
     ├── error-handling.md
     ├── bootstrap.md
-    ├── planning.md          # @planning → @implementation flow
-    ├── implementation.md    # @planning → @implementation flow
-    ├── test-plan.md         # @test-plan → @test flow
-    ├── test.md              # @test-plan → @test flow
-    ├── review.md            # independent
+    ├── planning.md          # @planning → planner agent (redirect)
+    ├── implementation.md    # @implementation → builder agent (redirect)
+    ├── test-plan.md         # @test-plan → tester agent (redirect)
+    ├── test.md              # @test → tester agent (redirect)
+    ├── review.md            # @review → reviewer agent (redirect)
     ├── refactor.md          # independent
     ├── anti-invention.md    # guardrails against hallucination
     ├── pattern-analysis.md  # 3-example rule before generating
@@ -76,9 +76,9 @@ prompts/
 └── test-suite.md            # generate test suite
 
 specs/
-├── feature.schema.md        # .spec.yml schema
-├── acceptance.schema.md     # .acceptance.yml schema
-└── contract.schema.md       # .contract.yml schema
+├── feature.schema.md        # .spec.toon schema
+├── acceptance.schema.md     # .acceptance.toon schema
+└── contract.schema.md       # .contract.toon schema
 
 scripts/
 ├── install.sh
@@ -164,9 +164,9 @@ your-project/
 │   │   ├── repository-impl.md
 │   │   └── test-suite.md
 │   └── specs/                     ← specification schemas
-│       ├── features/              ← feature specs (.spec.yml)
-│       ├── acceptance/            ← acceptance criteria (.acceptance.yml)
-│       └── contracts/             ← architecture contracts (.contract.yml)
+│       ├── features/              ← feature specs (.spec.toon)
+│       ├── acceptance/            ← acceptance criteria (.acceptance.toon)
+│       └── contracts/             ← architecture contracts (.contract.toon)
 ├── .github/
 │   └── agents/                    ← Copilot custom agents (auto-generated)
 │       ├── conductor.agent.md
@@ -223,9 +223,9 @@ Requirement → planner → architect → builder → tester → reviewer
 |------|------|----------------|
 | **planner** | [agents/planner.md](agents/planner.md) | Convert requirement into feature spec + acceptance criteria |
 | **architect** | [agents/architect.md](agents/architect.md) | Convert spec into architecture contract (layers, files, test strategy) |
-| **builder** | [agents/builder.md](agents/builder.md) | Generate production code from the contract — nothing else |
-| **tester** | [agents/tester.md](agents/tester.md) | Generate tests from the contract's test strategy — nothing else |
-| **reviewer** | [agents/reviewer.md](agents/reviewer.md) | Validate code against spec + contract + DoD |
+| **builder** | [agents/builder.md](agents/builder.md) | Generate production code from contract or plan (absorbs `@implementation`) |
+| **tester** | [agents/tester.md](agents/tester.md) | Design test strategy + generate tests (absorbs `@test-plan` + `@test`) |
+| **reviewer** | [agents/reviewer.md](agents/reviewer.md) | Validate code against spec + contract + DoD (absorbs `@review`) |
 | **conductor** | [agents/conductor.md](agents/conductor.md) | Orchestrate the full pipeline with confirmation gates |
 
 Use the full pipeline for new features, or shortcut for simpler tasks:
@@ -261,7 +261,7 @@ Each agent file includes the full role instructions plus a directive to read `.a
 Specs create a traceability chain from requirement to code:
 
 ```
-requirement → feature.spec.yml → acceptance.spec.yml → contract.spec.yml → code
+requirement → feature.spec.toon → acceptance.toon → contract.toon → code
 ```
 
 | Schema | Purpose | Created by |
@@ -440,14 +440,14 @@ This guarantees validation and generation happen before installation.
 
 ## Invocable skills
 
-SDD includes 6 invocable workflow skills organized in two flows plus two independent skills:
+SDD includes 6 invocable workflow commands. Most are now handled by their corresponding agents — the skill files remain as lightweight **redirects** for backward compatibility:
 
 ### Feature flow: `@planning` → `@implementation`
 
-| Command | Skill | Purpose |
-|---------|-------|---------|
-| `@planning` | [planning.md](skills/shared/planning.md) | Design a feature before coding — produces a plan document |
-| `@implementation` | [implementation.md](skills/shared/implementation.md) | Execute a plan — implements tasks in order following conventions |
+| Command | Agent / Skill | Purpose |
+|---------|---------------|----------|
+| `@planning` | → **planner** agent | Design a feature — produces plan.md + .spec.toon + .acceptance.toon |
+| `@implementation` | → **builder** agent | Execute a plan — implements tasks in order following conventions |
 
 ```text
 @planning
@@ -460,25 +460,25 @@ Execute the plan in .agent/plans/user-registration.md
 
 ### Test flow: `@test-plan` → `@test`
 
-| Command | Skill | Purpose |
-|---------|-------|---------|
-| `@test-plan` | [test-plan.md](skills/shared/test-plan.md) | Design a testing strategy — produces a test plan document |
-| `@test` | [test.md](skills/shared/test.md) | Write all tests from the plan — unit, integration, edge cases |
+| Command | Agent / Skill | Purpose |
+|---------|---------------|----------|
+| `@test-plan` | → **tester** agent | Design testing strategy + produce test plan document |
+| `@test` | → **tester** agent | Write all tests from the plan — unit, integration, edge cases |
 
 ```text
 @test-plan
 Plan tests for the Order module
 
-# After test plan review:
+# The tester agent handles both planning and writing:
 @test
-Execute the test plan in .agent/plans/order-tests.md
+Write tests for the Order module following the testing skill.
 ```
 
 ### Independent skills: `@review` and `@refactor`
 
-| Command | Skill | Purpose |
-|---------|-------|---------|
-| `@review` | [review.md](skills/shared/review.md) | Structured code review against project skills and conventions |
+| Command | Agent / Skill | Purpose |
+|---------|---------------|----------|
+| `@review` | → **reviewer** agent | Structured code review with 🔴🟡🔵 severity classification |
 | `@refactor` | [refactor.md](skills/shared/refactor.md) | Restructure code to align with conventions without changing behavior |
 
 ```text

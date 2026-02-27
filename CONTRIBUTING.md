@@ -155,11 +155,11 @@ Prompt files live in `prompts/` and provide step-by-step generation guides for s
 
 ## Adding or editing spec schemas
 
-Spec schemas live in `specs/` and define the YAML structure for feature, acceptance, and contract files.
+Spec schemas live in `specs/` and define the TOON structure for feature, acceptance, and contract files.
 
 ### Guidelines
 
-- Show the complete YAML schema with comments
+- Show the complete TOON schema with examples
 - Document required vs optional fields in a table
 - Include validation rules
 - Keep examples realistic (not toy cases)

@@ -1,14 +1,22 @@
 ---
 name: planning
-description: Use this skill when the user asks for @planning or wants to plan a new feature, epic, or user story before implementation. It produces a structured plan document that feeds into @implementation.
+description: >
+  Redirects to the planner agent. The @planning command triggers the planner,
+  which produces the plan document (.md) and TOON specs (.spec.toon + .acceptance.toon)
+  together in one step.
 stack: shared
 versions: "SDD 1.x"
 ---
 
-# Planning — Feature & Task Planning
+# Planning — Integrated into Planner Agent
 
-Use this skill when the user asks for `@planning` or wants to design a feature before writing code.
-This is the **first step** of the feature flow: `@planning` → `@implementation`.
+The `@planning` command is now handled by the **planner agent** (`agents/planner.md`), which produces all planning artifacts in one step:
+
+| Artifact | Format | Location |
+|----------|--------|----------|
+| Plan document | `.md` | `.agent/plans/` |
+| Feature specification | `.spec.toon` | `.agent/specs/features/` |
+| Acceptance criteria | `.acceptance.toon` | `.agent/specs/acceptance/` |
 
 ## Trigger phrases
 
@@ -18,57 +26,6 @@ This is the **first step** of the feature flow: `@planning` → `@implementation
 - "create a plan for..."
 - "break down this task"
 
-## Goal
-
-Produce a structured **plan document** (`.agent/plans/<feature-name>.md`) that covers scope, approach, affected files, risks, and acceptance criteria — so the implementation phase has no ambiguity.
-
-## Workflow
-
-1. **Understand the request** — read the feature description, related issues, or user story.
-2. **Read context** — load `.agent/SKILLS.md`, `context.md`, `architecture.md`, and `conventions.md`.
-3. **Identify scope** — list which layers, modules, and files will be affected.
-4. **Design the approach** — describe the solution at the architectural level:
-   - New entities, DTOs, endpoints, services, or commands.
-   - Database changes (new tables, columns, migrations).
-   - Integration points (external APIs, events, queues).
-5. **Define tasks** — break the work into ordered, implementable tasks.
-6. **List risks and open questions** — flag unknowns as `TODO`.
-7. **Write acceptance criteria** — concrete, testable conditions.
-8. **Save the plan** — write to `.agent/plans/<feature-name>.md`.
-
-## Plan document template
-
-```markdown
-# Plan: <Feature Name>
-
-## Summary
-One paragraph describing what will be built and why.
-
-## Scope
-- **Layers affected**: API / Application / Domain / Infrastructure
-- **New files**: list expected new files
-- **Modified files**: list files that will change
-
-## Approach
-Describe the technical design. Reference skills and conventions.
-
-## Tasks
-1. [ ] Task 1 — description
-2. [ ] Task 2 — description
-3. [ ] Task 3 — description
-
-## Database changes
-- New table: `table_name` (columns...)
-- New migration: `V<N>__description` or EF migration name
-
-## Risks & open questions
-- TODO: ...
-
-## Acceptance criteria
-- [ ] Criterion 1
-- [ ] Criterion 2
-```
-
 ## Quick command
 
 ```text
@@ -76,24 +33,22 @@ Describe the technical design. Reference skills and conventions.
 Plan the feature: <describe feature here>
 ```
 
-## Output quality rules
-
-- Keep plans concise — one page, not ten.
-- Every task must be small enough to implement in a single commit.
-- Reference specific skill files for conventions (e.g., "follow `api-design.md` for endpoint structure").
-- Mark unknowns as `TODO` instead of guessing.
-- Include database migration details when schema changes are needed.
+This produces the plan `.md`, `.spec.toon`, and `.acceptance.toon` together.
 
 ## Handoff to @implementation
 
-After the plan is reviewed and approved, use:
+After the plan and specs are reviewed and approved, use:
 
 ```text
 @implementation
 Execute the plan in .agent/plans/<feature-name>.md
 ```
 
-The `@implementation` skill reads the plan and executes tasks in order.
+The `@implementation` command is now handled by the **builder agent** (`agents/builder.md`).
+
+## Full reference
+
+See `agents/planner.md` for the complete workflow, gap analysis protocol, decomposition rules, and constraints.
 
 ## What NOT to do
 
@@ -102,3 +57,4 @@ The `@implementation` skill reads the plan and executes tasks in order.
 - ❌ Do not create plans without acceptance criteria.
 - ❌ Do not leave scope ambiguous — list affected layers and files explicitly.
 - ❌ Do not plan tasks that are too large to implement atomically.
+- ❌ Do not generate the plan without the TOON specs or vice-versa.

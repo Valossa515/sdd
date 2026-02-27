@@ -30,27 +30,27 @@ You orchestrate the development pipeline by coordinating each agent role in orde
 ┌──────────────────────────────────────────────────────────┐
 │ 1. PLANNER                                                │
 │    Input:  User's requirement                            │
-│    Output: .spec.yml + .acceptance.yml                   │
-│    Gate:   User confirms spec is correct → proceed       │
+│    Output: plan.md + .spec.toon + .acceptance.toon       │
+│    Gate:   User confirms plan and spec → proceed         │
 ├──────────────────────────────────────────────────────────┤
 │ 2. ARCHITECT                                              │
-│    Input:  .spec.yml + .acceptance.yml                   │
-│    Output: .contract.yml                                 │
+│    Input:  .spec.toon + .acceptance.toon + plan.md       │
+│    Output: architecture.md + .contract.toon              │
 │    Gate:   User confirms contract → proceed              │
 ├──────────────────────────────────────────────────────────┤
 │ 3. BUILDER                                                │
-│    Input:  .contract.yml + .spec.yml                     │
+│    Input:  .contract.toon + .spec.toon + architecture.md │
 │    Output: Production source files                       │
 │    Gate:   Code compiles → proceed                       │
 ├──────────────────────────────────────────────────────────┤
 │ 4. TESTER                                                 │
-│    Input:  .contract.yml + production code               │
-│    Output: Test source files                             │
-│    Gate:   Tests compile → proceed                       │
+│    Input:  .contract.toon + production code               │
+│    Output: test-plan.md + test source files               │
+│    Gate:   Tests compile & pass → proceed                │
 ├──────────────────────────────────────────────────────────┤
 │ 5. REVIEWER                                               │
-│    Input:  Everything above                              │
-│    Output: Review verdict                                │
+│    Input:  Everything above (specs + code + plans)       │
+│    Output: Review verdict (🔴🟡🔵 findings)              │
 │    Gate:   ✅ Approved → Done  |  🔄 Changes → loop back │
 └──────────────────────────────────────────────────────────┘
 ```
