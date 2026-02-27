@@ -61,11 +61,11 @@ skills/
     └── dod.md               # Definition of Done gate
 
 agents/
-├── planner.md               # requirement → spec
-├── architect.md             # spec → contract
-├── builder.md               # contract → production code
-├── tester.md                # contract → tests
-├── reviewer.md              # code review + DoD
+├── planner.md               # requirement → plan.md + .spec.toon + .acceptance.toon
+├── architect.md             # spec → architecture.md + .contract.toon
+├── builder.md               # contract/plan → production code (absorbs @implementation)
+├── tester.md                # contract + code → test-plan.md + tests (absorbs @test-plan + @test)
+├── reviewer.md              # code review + DoD (absorbs @review)
 └── conductor.md             # pipeline orchestration
 
 prompts/
@@ -151,12 +151,16 @@ your-project/
 │   │       ├── dor.md             ← Definition of Ready gate
 │   │       └── dod.md             ← Definition of Done gate
 │   ├── agents/                    ← agent role definitions
-│   │   ├── planner.md             ← requirement → spec
-│   │   ├── architect.md           ← spec → contract
-│   │   ├── builder.md             ← contract → production code
-│   │   ├── tester.md              ← contract → tests
-│   │   ├── reviewer.md            ← code review + DoD
+│   │   ├── planner.md             ← requirement → plan + specs
+│   │   ├── architect.md           ← spec → architecture decisions + contract
+│   │   ├── builder.md             ← contract/plan → production code
+│   │   ├── tester.md              ← contract + code → test plan + tests
+│   │   ├── reviewer.md            ← code review + DoD verdict
 │   │   └── conductor.md           ← pipeline orchestration
+│   ├── plans/                     ← generated artifacts
+│   │   ├── <feature>.md           ← plan document (planner)
+│   │   ├── <feature>-architecture.md ← architecture decisions (architect)
+│   │   └── <feature>-tests.md     ← test plan (tester)
 │   ├── prompts/                   ← step-by-step generation guides
 │   │   ├── endpoint.md
 │   │   ├── entity.md
@@ -349,49 +353,55 @@ make install STACK=spring-boot TARGET=/path/to/your/project
 
 > **Tip:** Before upgrading, commit your current `.agent/` folder so you can diff the changes and restore any custom overrides.
 
-## How to use skills in your project
+## How to use
 
-After installation, your project will have `.agent/SKILLS.md` plus stack/shared skills.
+After installation, your project will have `.agent/SKILLS.md`, agent definitions, and stack/shared skills.
 
-### 1) Instruct your agent to always load `.agent/SKILLS.md`
+### 1) Agent-driven workflow (recommended)
 
-Use prompts like:
+Use the agents directly — each one reads `.agent/SKILLS.md` automatically:
 
 ```text
-Read .agent/SKILLS.md and all linked skills before writing code.
+# Full pipeline (new feature):
+Act as the conductor defined in .agent/agents/conductor.md
+Implement: order creation with validation and stock check
+
+# Or invoke agents individually:
+@planning
+Plan the feature: user registration with email verification
+
+@implementation
+Execute the plan in .agent/plans/user-registration.md
+
+@test
+Write tests for the Order module following the testing skill.
+
+@review
+Review the changes in the current branch against main.
+
+@refactor
+Refactor the Order module to follow SKILL.md layer separation.
 ```
 
-### 2) Example prompts for Spring Boot projects
+### 2) Direct skill references (supplementary)
+
+You can also reference skills directly for targeted tasks:
 
 ```text
 Read .agent/SKILLS.md.
 Create endpoint POST /api/v1/orders following skills/shared/api-design.md,
-use validation and RFC7807 errors, and add tests based on skills/spring-boot/testing.md.
+use validation and RFC 7807 errors.
 ```
 
 ```text
 Read .agent/SKILLS.md.
-Refactor Order module to respect layered architecture from skills/spring-boot/SKILL.md
-and database conventions from skills/shared/database.md.
+Refactor Order module to respect skills/spring-boot/SKILL.md
+and skills/shared/database.md conventions.
 ```
 
-### 3) Example prompts for .NET projects
+### 3) Keep project-specific rules in `.agent/SKILLS.md`
 
-```text
-Read .agent/SKILLS.md.
-Implement CreateOrderCommand with MediatR + FluentValidation,
-expose controller endpoint, and add unit/integration tests using skills/dotnet/testing.md.
-```
-
-```text
-Read .agent/SKILLS.md.
-Add pagination and ProblemDetails responses to Orders endpoints
-following skills/shared/api-design.md.
-```
-
-### 4) Keep project-specific rules in `.agent/SKILLS.md`
-
-In **Overrides específicos do projeto**, add concrete rules such as:
+In **Project Overrides**, add concrete rules such as:
 
 - package/solution naming
 - auth strategy
