@@ -4,6 +4,7 @@ description: >
   Guardrails that prevent the AI agent from fabricating requirements, inventing
   APIs, or hallucinating behavior not present in the specification or codebase.
 stack: shared
+versions: "SDD 1.x"
 ---
 
 # Anti-Invention Guardrails

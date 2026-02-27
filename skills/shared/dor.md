@@ -4,6 +4,7 @@ description: >
   Definition of Ready — quality gate checklist that requirements must satisfy
   before implementation begins. Prevents incomplete specs from entering the pipeline.
 stack: shared
+versions: "SDD 1.x"
 ---
 
 # Definition of Ready (DoR)

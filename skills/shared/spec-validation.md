@@ -4,6 +4,7 @@ description: >
   Rules for validating specification files (feature, acceptance, contract)
   against their schemas. Ensures specs are complete before downstream use.
 stack: shared
+versions: "SDD 1.x"
 ---
 
 # Specification Validation

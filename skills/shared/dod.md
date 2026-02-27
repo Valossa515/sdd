@@ -5,6 +5,7 @@ description: >
   before it can be considered complete. Ensures consistent quality across
   all implementations.
 stack: shared
+versions: "SDD 1.x"
 ---
 
 # Definition of Done (DoD)

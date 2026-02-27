@@ -4,6 +4,7 @@ description: >
   Protocol for detecting missing or ambiguous information in requirements
   before any specification or code is generated. Prevents downstream rework.
 stack: shared
+versions: "SDD 1.x"
 ---
 
 # Gap Analysis Protocol

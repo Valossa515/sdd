@@ -4,6 +4,7 @@ description: >
   Requires the agent to study existing codebase patterns before generating
   new code. Ensures consistency by analyzing at least 3 existing examples.
 stack: shared
+versions: "SDD 1.x"
 ---
 
 # Pattern Analysis Protocol
