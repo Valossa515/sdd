@@ -144,11 +144,11 @@ install_agent_format() {
     done
   fi
 
-  # ── Copilot Chat Modes (.github/copilot-chat-modes/) ─────────────────────
+  # ── Copilot Custom Agents (.github/agents/*.agent.md) ──────────────────
   if [ -d "$src/agents" ]; then
-    local modes_dir="$TARGET/.github/copilot-chat-modes"
-    mkdir -p "$modes_dir"
-    echo -e "  ${CYAN}→${RESET} .github/copilot-chat-modes/"
+    local agents_dir="$TARGET/.github/agents"
+    mkdir -p "$agents_dir"
+    echo -e "  ${CYAN}→${RESET} .github/agents/"
     for f in "$src/agents/"*.md; do
       [ -f "$f" ] || continue
       local bname
@@ -164,18 +164,18 @@ install_agent_format() {
       local body
       body=$(awk 'BEGIN{c=0} /^---/{c++; next} c>=2{print}' "$f")
 
-      local cap_name
-      cap_name="$(echo "$agent_name" | awk '{print toupper(substr($0,1,1)) substr($0,2)}')"
-      local mode_file="${modes_dir}/${agent_name}.yml"
+      local agent_file="${agents_dir}/${agent_name}.agent.md"
       {
-        echo "name: \"SDD ${cap_name}\""
+        echo "---"
+        echo "name: ${agent_name}"
         echo "description: \"${agent_desc}\""
-        echo "instructions: |"
-        echo "  Read and follow all skills in .agent/SKILLS.md before any task."
+        echo "---"
         echo ""
-        echo "$body" | sed 's/^/  /'
-      } > "$mode_file"
-      echo -e "     ${agent_name}.yml"
+        echo "Read and follow all skills in .agent/SKILLS.md before any task."
+        echo ""
+        echo "$body"
+      } > "$agent_file"
+      echo -e "     ${agent_name}.agent.md"
     done
   fi
 
