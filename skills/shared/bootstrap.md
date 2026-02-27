@@ -7,7 +7,17 @@ versions: "SDD 1.x"
 
 # Bootstrap — Project Context Initialization
 
-Use this skill when the user asks for `@bootstrap` or wants full project context setup.
+> ## ⚠️ EXECUTION CONTRACT
+>
+> **This skill produces FILES, not chat messages.**
+>
+> When you receive `@bootstrap`, your job is to:
+> 1. Scan the codebase silently (no chat output)
+> 2. Create 9 files inside `.agent/`
+> 3. Report which files were created
+>
+> **You are DONE only when all 9 files exist on disk.**
+> If you find yourself writing project summaries or architecture overviews in the chat — STOP. That content belongs in a file.
 
 ## Trigger phrases
 
@@ -16,124 +26,107 @@ Use this skill when the user asks for `@bootstrap` or wants full project context
 - "initialize project context"
 - "prepare .agent docs"
 
-## Goal
+## Execution steps
 
-Create/update a minimal project knowledge base in `.agent/` so future tasks have domain context and not only generic coding rules.
+Follow these steps in order. Each step ends with a FILE being written to disk.
 
-> **CRITICAL — File creation is MANDATORY.**
-> This skill MUST produce real files on disk inside the `.agent/` directory.
-> Presenting content only in chat is NOT acceptable — every document listed below MUST be written to the filesystem using file-creation tools.
-> At the end of execution the agent MUST confirm which files were created/updated and their paths.
+---
 
-## Required files
+### Step 1 — Scan & write `.agent/project-reference.md`
 
-Ensure these files exist in `.agent/` (create them if they don't):
+**Scan:** Read `README`, build file (`pom.xml`, `build.gradle`, `*.csproj`, `package.json`), CI config, and the full source tree. Map every package/namespace, class, controller, service, repository, entity, and config. Identify architecture style, conventions, integrations, and domain vocabulary.
 
-- `project-reference.md` ← **single-file consolidated reference** (overview, architecture, class map, conventions, glossary)
-- `context.md`
-- `architecture.md`
-- `decisions.md` or `adr/` (preferred)
-- `conventions.md`
-- `runbook.md`
-- `glossary.md`
-- `backlog_rules.md`
+**Write file** at `.agent/project-reference.md` with:
+- Follow template structure from `templates/common/project-reference.md`
+- Project overview (name, type, stack, build tool, runtime version)
+- Architecture style and layer map
+- **Complete class/module map** — every class found, with path and responsibility
+- Available endpoints (from controllers/routes)
+- Database schema (from entities/migrations)
+- Conventions summary (naming, structure, technical choices)
+- Domain glossary (entities, enums, business terms)
+- Dependencies table (from build file)
+- How to build, run, and test
 
-## Workflow
+> This is the PRIMARY deliverable. It must be comprehensive and populated with real data.
+> MUST NOT contain placeholder text like `[project name]` or `[describe...]` — use real values from the scan or `TODO: <reason>` for genuinely unknowable info.
 
-### Phase 1 — Silent Project Discovery
+---
 
-Before creating any file, scan the codebase and collect real information.
+### Step 2 — Write `.agent/context.md`
 
-> **IMPORTANT:** Phase 1 is a SILENT research phase. Do NOT present a summary in the chat.
-> Do NOT output architecture overviews, class lists, or project descriptions as chat messages.
-> ALL collected information goes directly into the files created in Phase 2.
-> The only acceptable chat output during Phase 1 is brief status like "Scanning project..." or "Reading pom.xml...".
+**Write file** at `.agent/context.md` with:
+- Follow template from `templates/common/context.md`
+- Project overview, problem statement, objectives, main flows, endpoints, constraints, dependencies
+- Populate from the data already collected in Step 1
 
-1. **Read project metadata**: `README`, `Makefile`, `build.gradle`, `pom.xml`, `*.csproj`, `package.json`, CI files.
-2. **Map the source tree**: list all packages/namespaces and their top-level classes/files.
-3. **Identify the architecture style**: layered, hexagonal, clean architecture, MVC, etc. — based on folder structure and class naming.
-4. **Catalog modules and classes**: for each main class/file, determine:
-   - Its layer (API, Application, Domain, Infrastructure)
-   - Its responsibility (controller, service, repository, entity, DTO, config, etc.)
-   - Key dependencies it uses
-5. **Detect conventions**: naming patterns, test structure, DI style, error handling approach.
-6. **Discover external integrations**: databases, queues, HTTP clients, cloud services.
-7. **Extract domain vocabulary**: entity names, enum values, business terms from class/method names.
+---
 
-> The agent MUST NOT leave placeholders like `[describe...]` when the information can be discovered from the code. Use `TODO` only for genuinely unknowable information (business context, roadmap, personas).
+### Step 3 — Write `.agent/architecture.md`
 
-**When Phase 1 is complete, proceed IMMEDIATELY to Phase 2. Do not stop. Do not present results in chat.**
+**Write file** at `.agent/architecture.md` with:
+- Follow template from `templates/common/architecture.md`
+- Architecture style, layer responsibilities, package structure, integration points
+- Populate from the data already collected in Step 1
 
-### Phase 2 — Create Files (MANDATORY)
+---
 
-> **⚠️ THIS IS THE CORE DELIVERABLE. If you skip this phase, the bootstrap has FAILED.**
->
-> Execute each step below as a file-creation action. Do NOT display file content in chat instead of writing to disk.
+### Step 4 — Write `.agent/conventions.md`
 
-For each file below, **create or overwrite** the file at the exact path shown.
-If `.agent/` directory does not exist, create it first.
+**Write file** at `.agent/conventions.md` with:
+- Follow template from `templates/common/conventions.md`
+- Naming patterns, code structure, DI style, error handling, test conventions
+- Populate from the data already collected in Step 1
 
-#### Step 2.1 — Write `.agent/project-reference.md`
+---
 
-**Action:** Create file at path `.agent/project-reference.md`
-- Follow the template structure from `templates/common/project-reference.md`
-- Populate ALL sections with real data collected in Phase 1
-- Include: project overview, architecture style, full class/module map, endpoints, database schema, conventions, domain glossary, dependencies, and run commands
-- This file must be self-sufficient — anyone reading only this file should understand the entire project
+### Step 5 — Write `.agent/runbook.md`
 
-#### Step 2.2 — Write `.agent/context.md`
+**Write file** at `.agent/runbook.md` with:
+- Follow template from `templates/common/runbook.md`
+- Build, run, test, deploy, and migration commands
+- Environment setup, required tools, common troubleshooting
 
-**Action:** Create file at path `.agent/context.md`
-- Follow the template structure from `templates/common/context.md`
-- Populate with real project data from Phase 1
+---
 
-#### Step 2.3 — Write `.agent/architecture.md`
+### Step 6 — Write `.agent/glossary.md`
 
-**Action:** Create file at path `.agent/architecture.md`
-- Follow the template structure from `templates/common/architecture.md`
-- Populate with real architecture data from Phase 1
+**Write file** at `.agent/glossary.md` with:
+- Follow template from `templates/common/glossary.md`
+- Domain terms, entity names, enum values, abbreviations from the codebase
 
-#### Step 2.4 — Write `.agent/conventions.md`
+---
 
-**Action:** Create file at path `.agent/conventions.md`
-- Follow the template structure from `templates/common/conventions.md`
-- Populate with real conventions detected in Phase 1
+### Step 7 — Write `.agent/decisions.md`
 
-#### Step 2.5 — Write `.agent/runbook.md`
+**Write file** at `.agent/decisions.md` with:
+- Key architecture decisions found in the code (database choice, ORM, auth mechanism, etc.)
+- Format as lightweight ADRs (context → decision → consequences)
 
-**Action:** Create file at path `.agent/runbook.md`
-- Follow the template structure from `templates/common/runbook.md`
-- Include build, run, test, and deploy commands
+---
 
-#### Step 2.6 — Write `.agent/glossary.md`
+### Step 8 — Write `.agent/backlog_rules.md`
 
-**Action:** Create file at path `.agent/glossary.md`
-- Follow the template structure from `templates/common/glossary.md`
-- Populate with domain vocabulary extracted in Phase 1
+**Write file** at `.agent/backlog_rules.md` with:
+- Follow template from `templates/common/backlog_rules.md`
 
-#### Step 2.7 — Write `.agent/decisions.md`
+---
 
-**Action:** Create file at path `.agent/decisions.md`
-- Document key architecture decisions discovered in the code (database, ORM, auth, etc.)
+### Step 9 — Write `.agent/SKILLS.md`
 
-#### Step 2.8 — Write `.agent/backlog_rules.md`
+**Write file** at `.agent/SKILLS.md` with:
+- Active skills list
+- Section **Overrides específicos do projeto**
+- Links to `project-reference.md`, `context.md`, `architecture.md`, and `runbook.md`
 
-**Action:** Create file at path `.agent/backlog_rules.md`
-- Follow the template structure from `templates/common/backlog_rules.md`
+---
 
-#### Step 2.9 — Write `.agent/SKILLS.md`
+### Step 10 — Report
 
-**Action:** Create or update file at path `.agent/SKILLS.md`
-- List active skills only
-- Add a section **Overrides específicos do projeto**
-- Add links to `project-reference.md`, `context.md`, `architecture.md`, and `runbook.md`
-
-#### Step 2.10 — Confirm file creation
-
-**Action:** After ALL files above are written, output a checklist like this in the chat:
+After all 9 files are written, output ONLY this checklist:
 
 ```
-✅ Files created/updated:
+✅ Bootstrap complete. Files created:
 - .agent/project-reference.md
 - .agent/context.md
 - .agent/architecture.md
@@ -145,51 +138,32 @@ If `.agent/` directory does not exist, create it first.
 - .agent/SKILLS.md
 ```
 
-> **If any file from the list above was NOT created, the bootstrap is INCOMPLETE. Go back and create it.**
+**Self-check:** If any file above was NOT written to disk, go back and write it now before reporting.
 
-### Phase 3 — Validate
+---
 
-1. Run Makefile validations as part of bootstrap (do not skip):
-   - `make validate`
-   - `make check`
-   - If installing context in repo root: `make bootstrap STACK=<stack> TARGET=$(pwd)`
-2. Verify no context file still has only placeholder text — every section must have real content or an explicit `TODO` with reason.
+## Output quality rules
 
-## Quick command
+- Every section must contain **real project data** — scan the codebase before writing.
+- Class/module descriptions must be specific (e.g., "Handles order creation and stock validation") not generic (e.g., "Service layer").
+- Architecture docs must reflect the actual folder structure and class relationships.
+- Use `TODO: <reason>` instead of inventing facts — but only for genuinely unknowable info.
+- Keep docs concise, practical, and project-specific.
+
+## ❌ FORBIDDEN — Common failure modes
+
+1. **Presenting a project summary in chat without creating files.** If you scanned the project and wrote an overview in the chat but created zero files → you FAILED. Go execute Steps 1-9.
+2. **Stopping after scanning the project.** Scanning is Step 1a. Writing the file is Step 1b. You are not done until Step 10.
+3. **Asking "should I create the files?"** — YES. Always. That is the entire point of `@bootstrap`. Just do it.
+4. **Showing file content in a chat code block instead of writing the file.** If you are about to type ` ```markdown ` with the contents of `project-reference.md` in a chat message → STOP → use a file-creation tool instead.
+5. **Leaving placeholder text** like `[project name]` or `[describe...]` when the data is in the codebase.
+
+## Quick reference
 
 ```text
 @bootstrap
 ```
 
-Or run the repository bootstrap flow:
-
 ```bash
 make bootstrap STACK=spring-boot TARGET=$(pwd)
 ```
-
-## Output quality rules
-
-- Keep docs concise, practical, and project-specific.
-- Prefer bullets and short sections.
-- Use explicit defaults (versions, environments, migration tool, test command).
-- Add unknowns as `TODO: <reason>` instead of inventing facts.
-- **Every section must contain real project data** — scan the codebase before writing.
-- Class/module descriptions must be specific (e.g., "Handles order creation and stock validation") not generic (e.g., "Service layer").
-- Architecture docs must reflect the actual folder structure and class relationships found in the code.
-
-## What NOT to do
-
-### ❌ FORBIDDEN — These are the most common failure modes:
-
-1. **NEVER present project analysis only in chat without creating files.** The whole point of `@bootstrap` is to produce files. If you analyzed the project and wrote a summary in the chat but created zero files, you have FAILED. Go back and execute Phase 2.
-2. **NEVER stop after Phase 1.** Phase 1 is research. Phase 2 is the deliverable. You are not done until Phase 2 is complete.
-3. **NEVER ask "Do you want me to create the files?"** — File creation is automatic and expected. Just do it.
-4. **NEVER present file content in a code block in chat as a substitute for writing the actual file.** If you find yourself writing ```markdown in a chat response with the contents of `project-reference.md`, STOP — you should be creating that file on disk instead.
-
-### Other rules:
-
-- ❌ Do not keep only generic stack text when project context is known.
-- ❌ Do not duplicate entire skills inside context documents.
-- ❌ Do not leave `.agent/SKILLS.md` without links to context files.
-- ❌ Do not skip generating `project-reference.md` — it is the primary output of bootstrap.
-- ❌ Do not leave `project-reference.md` with example/placeholder classes — every entry must be real.
