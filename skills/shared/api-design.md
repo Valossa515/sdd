@@ -1,6 +1,8 @@
 ---
 name: api-design
 description: REST API conventions applicable to both Spring Boot and .NET projects. Covers URL structure, HTTP verbs, status codes, pagination, versioning, and OpenAPI.
+stack: shared
+versions: "REST/OpenAPI 3.x"
 ---
 
 # API Design — Shared Conventions

@@ -11,7 +11,7 @@
 ```
 
 **Structured skill files, agent roles, and specification schemas for AI coding agents**  
-*Spring Boot · .NET · REST APIs · Database · Testing · Agent Pipeline · Specs*
+*Spring Boot · .NET · REST APIs · Database · Testing · Bootstrap · Agent Pipeline · Specs*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Skills](https://img.shields.io/badge/skills-12-blue)](#skills)
@@ -22,35 +22,108 @@
 
 </div>
 
----
-
 ## What is SDD?
 
-**Skill-Driven Development** is the practice of providing AI coding agents with persistent, structured context about your project's conventions — so they generate code that fits your codebase from the first attempt.
+SDD (Skill-Driven Development) gives AI agents persistent context via `.agent/` files and stack skills.
 
-Instead of repeating yourself in every prompt, you drop a `.agent/` folder in your project root. The agent reads it before every task and follows your rules.
+## Repository structure
 
 SDD goes beyond static context: it includes **agent roles** (planner, architect, builder, tester, reviewer, conductor) that form a structured development pipeline, **specification schemas** for traceable requirements, and **quality gates** (DoR/DoD) that prevent incomplete work from moving forward.
 
 > Compatible with Claude, GitHub Copilot, Cursor, Kiro, and any agent that reads markdown context files.
 
----
+```text
+skills/
+├── spring-boot/
+│   ├── SKILL.md
+│   └── testing.md
+├── dotnet/
+│   ├── SKILL.md
+│   └── testing.md
+└── shared/
+    ├── api-design.md
+    ├── database.md
+    ├── security.md
+    ├── observability.md
+    ├── error-handling.md
+    ├── bootstrap.md
+    ├── planning.md          # @planning → @implementation flow
+    ├── implementation.md    # @planning → @implementation flow
+    ├── test-plan.md         # @test-plan → @test flow
+    ├── test.md              # @test-plan → @test flow
+    ├── review.md            # independent
+    ├── refactor.md          # independent
+    ├── anti-invention.md    # guardrails against hallucination
+    ├── pattern-analysis.md  # 3-example rule before generating
+    ├── gap-analysis.md      # requirement gap detection
+    ├── spec-validation.md   # spec completeness checks
+    ├── dor.md               # Definition of Ready gate
+    └── dod.md               # Definition of Done gate
 
-## Install in 30 seconds
+agents/
+├── planner.md               # requirement → spec
+├── architect.md             # spec → contract
+├── builder.md               # contract → production code
+├── tester.md                # contract → tests
+├── reviewer.md              # code review + DoD
+└── conductor.md             # pipeline orchestration
+
+prompts/
+├── endpoint.md              # generate REST endpoint
+├── entity.md                # generate domain entity
+├── service.md               # generate application service
+├── repository-impl.md       # generate repository implementation
+└── test-suite.md            # generate test suite
+
+specs/
+├── feature.schema.md        # .spec.yml schema
+├── acceptance.schema.md     # .acceptance.yml schema
+└── contract.schema.md       # .contract.yml schema
+
+scripts/
+├── install.sh
+├── validate.sh
+├── generate.sh
+└── new-skill.sh
+
+templates/
+├── spring-boot/SKILLS.md
+├── dotnet/SKILLS.md
+└── common/
+    ├── context.md
+    ├── architecture.md
+    ├── decisions.md
+    ├── conventions.md
+    ├── runbook.md
+    ├── glossary.md
+    └── backlog_rules.md
+```
+
+## Install
+
+### Option 1: one-line install (curl)
 
 ```bash
-# Spring Boot project
 bash <(curl -fsSL https://raw.githubusercontent.com/valossa515/sdd/main/scripts/install.sh) spring-boot
-
-# .NET project
 bash <(curl -fsSL https://raw.githubusercontent.com/valossa515/sdd/main/scripts/install.sh) dotnet
 ```
 
-Or with `git`:
+### Option 2: install via `git clone` (recommended for teams)
 
 ```bash
 git clone https://github.com/valossa515/sdd.git /tmp/sdd && \
   make -C /tmp/sdd install STACK=spring-boot TARGET=$(pwd)
+
+# .NET
+make -C /tmp/sdd install STACK=dotnet TARGET=$(pwd)
+```
+
+### Option 3: run from local clone
+
+```bash
+make install STACK=spring-boot TARGET=$(pwd)
+# full flow: validate + generate + install
+make bootstrap STACK=spring-boot TARGET=$(pwd)
 ```
 
 This creates a `.agent/` folder in your project with all relevant skills, ready to customize.
@@ -194,80 +267,190 @@ See [prompts/README.md](prompts/README.md) for full documentation.
 
 ---
 
-## Makefile
+## Commands
 
 ```bash
-make help          # show all commands
-make validate      # validate all skill files (frontmatter + structure)
-make generate      # generate .toml files from all .md skills
-make install       # install into a project (STACK=spring-boot|dotnet TARGET=path)
-make check         # validate + generate (CI)
+make validate      # validates frontmatter + required context templates
+make generate      # generates .toml files into outputs/
+make install       # installs .agent/ for chosen stack
+make bootstrap     # validate + generate + install in one flow
+make update        # pull latest skills and regenerate
+make upgrade       # update + install (update SDD in an existing project)
+make check         # validate + generate
 ```
 
----
+## How to use skills in your project
 
-## Output formats
+After installation, your project will have `.agent/SKILLS.md` plus stack/shared skills.
 
-Each skill is available in two formats, both generated from the same source:
+### 1) Instruct your agent to always load `.agent/SKILLS.md`
 
-| Format | Use with |
-|--------|----------|
-| `.md` | Claude, Cursor, Copilot, any markdown-aware agent |
-| `.toml` | Amazon Kiro (`.kiro/steering/`), structured config pipelines |
+Use prompts like:
 
-Run `make generate` to rebuild all `.toml` files after editing a skill.
-
----
-
-## Customizing for your project
-
-After installing, open `.agent/SKILLS.md` and add your project-specific overrides:
-
-```markdown
-## Project-Specific Overrides
-
-### Package structure
-com.mycompany.myapp
-
-### Database
-- PostgreSQL 15 via Flyway
-- Migrations in: src/main/resources/db/migration
-
-### Auth
-- JWT via Spring Security 6, token in Authorization: Bearer header
-
-### Custom rules
-- All monetary values use BigDecimal, never double or float
-- Audit fields (createdBy, updatedBy) on every entity
+```text
+Read .agent/SKILLS.md and all linked skills before writing code.
 ```
 
-These override the base skills — the agent always prioritizes project-specific rules.
+### 2) Example prompts for Spring Boot projects
 
----
+```text
+Read .agent/SKILLS.md.
+Create endpoint POST /api/v1/orders following skills/shared/api-design.md,
+use validation and RFC7807 errors, and add tests based on skills/spring-boot/testing.md.
+```
 
-## Kiro compatibility
+```text
+Read .agent/SKILLS.md.
+Refactor Order module to respect layered architecture from skills/spring-boot/SKILL.md
+and database conventions from skills/shared/database.md.
+```
 
-If you use Amazon Kiro, use the Kiro install command:
+### 3) Example prompts for .NET projects
+
+```text
+Read .agent/SKILLS.md.
+Implement CreateOrderCommand with MediatR + FluentValidation,
+expose controller endpoint, and add unit/integration tests using skills/dotnet/testing.md.
+```
+
+```text
+Read .agent/SKILLS.md.
+Add pagination and ProblemDetails responses to Orders endpoints
+following skills/shared/api-design.md.
+```
+
+### 4) Keep project-specific rules in `.agent/SKILLS.md`
+
+In **Overrides específicos do projeto**, add concrete rules such as:
+
+- package/solution naming
+- auth strategy
+- migration paths
+- non-functional constraints (timeouts, observability, etc.)
+
+## How to use bootstrap (`@bootstrap`)
+
+The shared `bootstrap` skill helps create/update project context docs in `.agent/`:
+
+- `context.md`
+- `architecture.md`
+- `decisions.md` (or `adr/`)
+- `conventions.md`
+- `runbook.md`
+- `glossary.md`
+- `backlog_rules.md`
+
+### Prompt-driven bootstrap
+
+Use in prompt:
+
+```text
+@bootstrap
+Read .agent/SKILLS.md, map the repository context, and update all .agent context files.
+Do not invent facts: add TODOs for unknowns.
+```
+
+### CLI bootstrap (recommended)
 
 ```bash
-make install STACK=spring-boot TARGET=$(pwd) FORMAT=kiro
+make bootstrap STACK=spring-boot TARGET=$(pwd)
+# or
+make bootstrap STACK=dotnet TARGET=$(pwd)
 ```
 
-This puts the skills in `.kiro/steering/` as `.md` files, which Kiro reads automatically.
+This guarantees validation and generation happen before installation.
 
----
+### Suggested bootstrap routine per project
 
-## Contributing
+1. Run `make bootstrap STACK=<stack> TARGET=$(pwd)`.
+2. Open `.agent/context.md` and fill domain/problem details.
+3. Register key architectural choices in `.agent/decisions.md` or `.agent/adr/`.
+4. Update `.agent/glossary.md` with domain terminology.
+5. Commit `.agent/` together with code changes.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md). In short:
+## Invocable skills
 
-1. Edit or create a skill under `skills/`
-2. Run `make validate` to check structure
-3. Run `make generate` to rebuild `.toml` files
-4. Open a PR
+SDD includes 6 invocable workflow skills organized in two flows plus two independent skills:
 
----
+### Feature flow: `@planning` → `@implementation`
+
+| Command | Skill | Purpose |
+|---------|-------|---------|
+| `@planning` | [planning.md](skills/shared/planning.md) | Design a feature before coding — produces a plan document |
+| `@implementation` | [implementation.md](skills/shared/implementation.md) | Execute a plan — implements tasks in order following conventions |
+
+```text
+@planning
+Plan the feature: user registration with email verification
+
+# After plan review:
+@implementation
+Execute the plan in .agent/plans/user-registration.md
+```
+
+### Test flow: `@test-plan` → `@test`
+
+| Command | Skill | Purpose |
+|---------|-------|---------|
+| `@test-plan` | [test-plan.md](skills/shared/test-plan.md) | Design a testing strategy — produces a test plan document |
+| `@test` | [test.md](skills/shared/test.md) | Write all tests from the plan — unit, integration, edge cases |
+
+```text
+@test-plan
+Plan tests for the Order module
+
+# After test plan review:
+@test
+Execute the test plan in .agent/plans/order-tests.md
+```
+
+### Independent skills: `@review` and `@refactor`
+
+| Command | Skill | Purpose |
+|---------|-------|---------|
+| `@review` | [review.md](skills/shared/review.md) | Structured code review against project skills and conventions |
+| `@refactor` | [refactor.md](skills/shared/refactor.md) | Restructure code to align with conventions without changing behavior |
+
+```text
+@review
+Review the changes in the current branch against main.
+
+@refactor
+Refactor the Order module to follow skills/spring-boot/SKILL.md layer separation.
+```
+
+## Frontmatter required in all skills
+
+Every skill markdown must include:
+
+- `name`
+- `description`
+- `stack`
+- `versions`
+
+## ADR and glossary
+
+Document architecture decisions in `decisions.md` (or `.agent/adr/adr-xxxx.md`) and keep domain terms in `glossary.md`.
+
+
+## Troubleshooting: PR merge/diff issues
+
+If a PR was merged with conflicts and your branch did not receive the README updates:
+
+1. Confirm the latest commit contains README changes:
+   - `git log --oneline -n 5`
+   - `git show --name-only <commit_sha>`
+2. Rebase your branch on the target branch (`main` or release branch).
+3. If needed, cherry-pick the README commit:
+   - `git cherry-pick <commit_sha>`
+4. Re-run checks:
+   - `make check`
+5. Open README and confirm sections:
+   - "How to use skills in your project"
+   - "How to use bootstrap (`@bootstrap`)"
+
+This helps guarantee onboarding docs are present after merge.
 
 ## License
 
-[MIT](LICENSE) — use freely in any project, commercial or not.
+MIT.

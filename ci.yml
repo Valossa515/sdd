@@ -21,15 +21,6 @@ jobs:
       - name: Generate .toml files
         run: make generate
 
-      - name: Check no uncommitted .toml changes
-        run: |
-          if [ -n "$(git status --porcelain '*.toml')" ]; then
-            echo "❌ Generated .toml files are out of sync. Run 'make generate' and commit the changes."
-            git diff --name-only
-            exit 1
-          fi
-          echo "✔ All .toml files are up to date"
-
       - name: Validate install script (dry run)
         run: |
           mkdir -p /tmp/test-spring /tmp/test-dotnet
@@ -39,10 +30,68 @@ jobs:
 
       - name: Check required files in install output
         run: |
-          for f in SKILLS.md skills/spring-boot/SKILL.md skills/shared/api-design.md; do
-            [ -f "/tmp/test-spring/.agent/$f" ] || { echo "❌ Missing: $f"; exit 1; }
+          SPRING_REQUIRED=(
+            SKILLS.md
+            context.md
+            architecture.md
+            decisions.md
+            conventions.md
+            runbook.md
+            glossary.md
+            backlog_rules.md
+            skills/spring-boot/SKILL.md
+            skills/spring-boot/testing.md
+            skills/shared/api-design.md
+            skills/shared/database.md
+            skills/shared/security.md
+            skills/shared/observability.md
+            skills/shared/error-handling.md
+            skills/shared/bootstrap.md
+            skills/shared/planning.md
+            skills/shared/implementation.md
+            skills/shared/test-plan.md
+            skills/shared/test.md
+            skills/shared/review.md
+            skills/shared/refactor.md
+          )
+          DOTNET_REQUIRED=(
+            SKILLS.md
+            context.md
+            architecture.md
+            decisions.md
+            conventions.md
+            runbook.md
+            glossary.md
+            backlog_rules.md
+            skills/dotnet/SKILL.md
+            skills/dotnet/testing.md
+            skills/shared/api-design.md
+            skills/shared/database.md
+            skills/shared/security.md
+            skills/shared/observability.md
+            skills/shared/error-handling.md
+            skills/shared/bootstrap.md
+            skills/shared/planning.md
+            skills/shared/implementation.md
+            skills/shared/test-plan.md
+            skills/shared/test.md
+            skills/shared/review.md
+            skills/shared/refactor.md
+          )
+          FAILED=0
+          for f in "${SPRING_REQUIRED[@]}"; do
+            [ -f "/tmp/test-spring/.agent/$f" ] || { echo "❌ Missing (spring-boot): $f"; FAILED=1; }
           done
-          for f in SKILLS.md skills/dotnet/SKILL.md skills/shared/api-design.md; do
-            [ -f "/tmp/test-dotnet/.agent/$f" ] || { echo "❌ Missing: $f"; exit 1; }
+          for f in "${DOTNET_REQUIRED[@]}"; do
+            [ -f "/tmp/test-dotnet/.agent/$f" ] || { echo "❌ Missing (dotnet): $f"; FAILED=1; }
           done
+          [ "$FAILED" -eq 0 ] || exit 1
           echo "✔ All required files present after install"
+
+      - name: Verify skill count
+        run: |
+          EXPECTED=16
+          ACTUAL=$(find skills -name "*.md" | wc -l)
+          echo "Skills found: $ACTUAL (expected: $EXPECTED)"
+          [ "$ACTUAL" -ge "$EXPECTED" ] || { echo "❌ Expected at least $EXPECTED skill files"; exit 1; }
+          echo "✔ Skill count OK"

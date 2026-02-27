@@ -99,10 +99,19 @@ install_agent_format() {
   local src="$1"
   local dest="$TARGET/.agent"
 
-  mkdir -p "$dest/skills/shared"
+  mkdir -p "$dest/skills/shared" "$dest/adr"
 
   echo -e "  ${CYAN}→${RESET} .agent/skills/shared/"
   cp -r "$src/skills/shared/." "$dest/skills/shared/"
+
+  echo -e "  ${CYAN}→${RESET} .agent/context docs"
+  cp "$src/templates/common/context.md" "$dest/context.md"
+  cp "$src/templates/common/architecture.md" "$dest/architecture.md"
+  cp "$src/templates/common/decisions.md" "$dest/decisions.md"
+  cp "$src/templates/common/conventions.md" "$dest/conventions.md"
+  cp "$src/templates/common/runbook.md" "$dest/runbook.md"
+  cp "$src/templates/common/glossary.md" "$dest/glossary.md"
+  cp "$src/templates/common/backlog_rules.md" "$dest/backlog_rules.md"
 
   case "$STACK" in
     spring-boot)

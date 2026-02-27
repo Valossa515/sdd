@@ -18,10 +18,12 @@ TEMPLATES   := $(SDD_DIR)templates
 AGENTS_DIR  := $(SDD_DIR)agents
 PROMPTS_DIR := $(SDD_DIR)prompts
 SPECS_DIR   := $(SDD_DIR)specs
+OUTPUTS     := $(SDD_DIR)outputs
 
 STACK  ?= spring-boot
 TARGET ?= $(CURDIR)
-FORMAT ?= agent   # agent | kiro
+FORMAT ?= agent
+# FORMAT: agent | kiro
 
 GREEN  := \033[0;32m
 YELLOW := \033[1;33m
@@ -45,6 +47,7 @@ help: ## Show this help
 	@echo ""
 	@echo "  $(CYAN)Examples:$(RESET)"
 	@echo "    make install STACK=spring-boot TARGET=~/projects/my-api"
+	@echo "    make bootstrap STACK=spring-boot TARGET=~/projects/my-api"
 	@echo "    make install STACK=dotnet TARGET=~/projects/my-app FORMAT=kiro"
 	@echo "    make generate"
 	@echo "    make validate"
@@ -54,14 +57,14 @@ help: ## Show this help
 .PHONY: validate
 validate: ## Validate all skill files (frontmatter + required sections)
 	@echo "$(CYAN)▶ Validating skill files...$(RESET)"
-	@bash $(SCRIPTS_DIR)/validate.sh $(SKILLS_DIR)
+	@bash $(SCRIPTS_DIR)/validate.sh $(SKILLS_DIR) $(TEMPLATES)
 	@echo "$(GREEN)✔ All skills valid$(RESET)"
 
 # ─── Generate ─────────────────────────────────────────────────────────────────
 .PHONY: generate
 generate: ## Generate .toml files from all .md skill files
 	@echo "$(CYAN)▶ Generating .toml files...$(RESET)"
-	@bash $(SCRIPTS_DIR)/generate.sh $(SKILLS_DIR)
+	@bash $(SCRIPTS_DIR)/generate.sh $(SKILLS_DIR) $(OUTPUTS)
 	@echo "$(GREEN)✔ Generation complete$(RESET)"
 
 # ─── Install ──────────────────────────────────────────────────────────────────
@@ -84,6 +87,12 @@ install: validate generate ## Install skills into a project (.agent/ or .kiro/st
 	@echo "  3. Commit the .agent/ folder alongside your source code"
 	@echo ""
 
+
+# ─── Bootstrap ────────────────────────────────────────────────────────────────
+.PHONY: bootstrap
+bootstrap: check install ## Bootstrap workflow: validate, generate and install .agent context
+	@echo "$(GREEN)✔ Bootstrap completed (validation + install)$(RESET)"
+
 # ─── Update ───────────────────────────────────────────────────────────────────
 .PHONY: update
 update: ## Pull latest skills and regenerate (for projects that already have SDD installed)
@@ -94,6 +103,11 @@ update: ## Pull latest skills and regenerate (for projects that already have SDD
 	git -C $(SDD_DIR) pull --ff-only
 	@$(MAKE) generate
 	@echo "$(GREEN)✔ SDD updated$(RESET)"
+
+# ─── Upgrade ─────────────────────────────────────────────────────────────────
+.PHONY: upgrade
+upgrade: update install ## Pull latest skills, regenerate, and reinstall into TARGET project
+	@echo "$(GREEN)✔ SDD upgraded in: $(TARGET)$(RESET)"
 
 # ─── Check (CI) ───────────────────────────────────────────────────────────────
 .PHONY: check
@@ -188,7 +202,7 @@ new: ## Scaffold a new skill (STACK=<stack> NAME=<name>)
 
 # ─── Clean generated ──────────────────────────────────────────────────────────
 .PHONY: clean
-clean: ## Remove all generated .toml files
+clean: ## Remove generated outputs
 	@echo "$(CYAN)▶ Cleaning generated files...$(RESET)"
-	@find $(SKILLS_DIR) -name "*.toml" -delete
+	@rm -rf $(OUTPUTS)
 	@echo "$(GREEN)✔ Cleaned$(RESET)"
