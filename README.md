@@ -279,6 +279,52 @@ make upgrade       # update + install (update SDD in an existing project)
 make check         # validate + generate
 ```
 
+## Updating SDD
+
+When a new version of SDD is released, you can update your project's `.agent/` folder in two ways:
+
+### Option 1: upgrade from cloned repo (recommended)
+
+If you cloned the SDD repo during initial install:
+
+```bash
+cd /path/to/sdd
+git pull                # fetch latest version
+make upgrade STACK=spring-boot TARGET=/path/to/your/project
+```
+
+`make upgrade` runs `update` (pull + regenerate) then `install` — replacing all skill, agent, prompt, and spec files in your project's `.agent/` folder while preserving your `SKILLS.md` overrides.
+
+### Option 2: one-line reinstall (curl)
+
+Re-run the install command to overwrite with the latest version:
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/valossa515/sdd/main/scripts/install.sh) spring-boot /path/to/your/project
+```
+
+### Option 3: manual update
+
+```bash
+cd /path/to/sdd
+git pull
+make install STACK=spring-boot TARGET=/path/to/your/project
+```
+
+### What gets updated
+
+| Artifact | Updated? | Notes |
+|----------|----------|-------|
+| `skills/shared/*` | ✅ Yes | Guardrails, DoR, DoD, etc. |
+| `skills/<stack>/*` | ✅ Yes | Stack-specific skills |
+| `agents/*` | ✅ Yes | Agent role definitions |
+| `prompts/*` | ✅ Yes | Action prompt templates |
+| `specs/*` | ✅ Yes | Specification schemas |
+| `SKILLS.md` | ✅ Yes | Regenerated from template |
+| Your project overrides in `SKILLS.md` | ⚠️ Overwritten | Back up before updating |
+
+> **Tip:** Before upgrading, commit your current `.agent/` folder so you can diff the changes and restore any custom overrides.
+
 ## How to use skills in your project
 
 After installation, your project will have `.agent/SKILLS.md` plus stack/shared skills.
