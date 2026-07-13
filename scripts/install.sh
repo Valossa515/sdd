@@ -12,6 +12,18 @@
 set -euo pipefail
 
 # ─── Args ─────────────────────────────────────────────────────────────────────
+# Flags may appear anywhere; positional args keep their order.
+REF=""                 # --ref <tag|branch>: version to clone (curl installs)
+POSITIONAL=()
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --ref)   REF="${2:?--ref requires a value (e.g. --ref v1.0.0)}"; shift 2 ;;
+    --ref=*) REF="${1#--ref=}"; shift ;;
+    *)       POSITIONAL+=("$1"); shift ;;
+  esac
+done
+set -- ${POSITIONAL[@]+"${POSITIONAL[@]}"}
+
 STACK="${1:-}"
 TARGET="${2:-$(pwd)}"
 FORMAT="${3:-agent}"   # agent | kiro
@@ -38,17 +50,19 @@ banner() {
 
 usage() {
   echo "Usage:"
-  echo "  $0 <stack> [target_dir] [format]"
+  echo "  $0 <stack> [target_dir] [format] [--ref <tag>]"
   echo ""
   echo "Arguments:"
   echo "  stack       spring-boot | dotnet | any directory under skills/ (except shared)"
   echo "  target_dir  Path to your project (default: current dir)"
   echo "  format      agent | kiro  (default: agent)"
+  echo "  --ref       Tag or branch to install (curl installs only, e.g. --ref v1.0.0)"
   echo ""
   echo "Examples:"
   echo "  $0 spring-boot"
   echo "  $0 dotnet ~/projects/my-api"
   echo "  $0 spring-boot ~/projects/my-api kiro"
+  echo "  $0 spring-boot ~/projects/my-api agent --ref v1.0.0"
   exit 1
 }
 
@@ -72,6 +86,7 @@ cleanup() {
 # ─── Get SDD source ───────────────────────────────────────────────────────────
 ensure_sdd_source() {
   if [ -n "$SDD_SOURCE" ] && [ -d "$SDD_SOURCE/skills" ]; then
+    [ -n "$REF" ] && echo -e "${YELLOW}⚠ --ref is ignored when installing from a local source${RESET}" >&2
     echo "$SDD_SOURCE"
     return
   fi
@@ -82,16 +97,24 @@ ensure_sdd_source() {
   local repo_root
   repo_root="$(cd "$script_dir/.." && pwd)"
   if [ -d "$repo_root/skills" ]; then
+    [ -n "$REF" ] && echo -e "${YELLOW}⚠ --ref is ignored when installing from a local clone (use git checkout $REF)${RESET}" >&2
     echo "$repo_root"
     return
   fi
 
-  # Clone the repo to a temp directory
-  echo -e "${CYAN}▶ Fetching SDD from GitHub...${RESET}" >&2
+  # Clone the repo to a temp directory (optionally pinned to a tag/branch)
+  echo -e "${CYAN}▶ Fetching SDD from GitHub${REF:+ (ref: $REF)}...${RESET}" >&2
   TMPDIR_SDD=$(mktemp -d)
   trap cleanup EXIT
-  git clone --depth=1 --quiet "$SDD_REPO" "$TMPDIR_SDD"
+  git clone --depth=1 --quiet ${REF:+--branch "$REF"} "$SDD_REPO" "$TMPDIR_SDD"
   echo "$TMPDIR_SDD"
+}
+
+# The SDD version being installed, read from the plugin manifest
+sdd_version() {
+  local src="$1"
+  grep -m1 '"version"' "$src/.claude-plugin/plugin.json" 2>/dev/null \
+    | sed 's/.*"version"[^"]*"\([^"]*\)".*/\1/' || true
 }
 
 # ─── Install in .agent/ format ────────────────────────────────────────────────
@@ -130,6 +153,14 @@ install_agent_format() {
   echo -e "  ${CYAN}→${RESET} .agent/skills/$STACK/"
   cp -r "$src/skills/$STACK/." "$dest/skills/$STACK/"
   cp "$src/templates/$STACK/SKILLS.md" "$dest/SKILLS.md"
+
+  # Stamp the real SDD version so projects know what they installed
+  local version
+  version=$(sdd_version "$src")
+  if [ -n "$version" ]; then
+    sed -i.bak "s/^sdd-version: .*/sdd-version: \"$version\"/" "$dest/SKILLS.md" \
+      && rm -f "$dest/SKILLS.md.bak"
+  fi
 
   echo -e "  ${CYAN}→${RESET} .agent/SKILLS.md"
 

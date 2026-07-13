@@ -156,7 +156,14 @@ The plugin works standalone, or together with a `.agent/` folder installed by th
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/valossa515/sdd/main/scripts/install.sh) spring-boot
 bash <(curl -fsSL https://raw.githubusercontent.com/valossa515/sdd/main/scripts/install.sh) dotnet
+
+# pin a released version (recommended for teams):
+bash <(curl -fsSL https://raw.githubusercontent.com/valossa515/sdd/main/scripts/install.sh) spring-boot . agent --ref v1.0.0
 ```
+
+Releases are listed on the [releases page](https://github.com/valossa515/sdd/releases) with
+their changelog; the installed `.agent/SKILLS.md` records which version it came from
+(`sdd-version`).
 
 ### Option 2: install via `git clone` (recommended for teams)
 

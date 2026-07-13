@@ -1,0 +1,47 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify tag matches plugin.json and CHANGELOG
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          PLUGIN_VERSION=$(sed -n 's/.*"version"[^"]*"\([^"]*\)".*/\1/p' .claude-plugin/plugin.json | head -1)
+          if [ "$TAG_VERSION" != "$PLUGIN_VERSION" ]; then
+            echo "❌ Tag v$TAG_VERSION does not match plugin.json version $PLUGIN_VERSION"
+            exit 1
+          fi
+          grep -q "^## \[$TAG_VERSION\]" CHANGELOG.md || {
+            echo "❌ CHANGELOG.md has no section for $TAG_VERSION"
+            exit 1
+          }
+          echo "✔ Tag, plugin.json and CHANGELOG agree on $TAG_VERSION"
+
+      - name: Extract release notes from CHANGELOG
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#v}"
+          awk -v ver="$TAG_VERSION" '
+            $0 ~ "^## \\[" ver "\\]" { found = 1; next }
+            found && /^## \[/ { exit }
+            found { print }
+          ' CHANGELOG.md > RELEASE_NOTES.md
+          echo "Release notes:"
+          cat RELEASE_NOTES.md
+
+      - name: Create release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: RELEASE_NOTES.md
