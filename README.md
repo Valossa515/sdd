@@ -87,7 +87,12 @@ prompts/
 specs/
 ├── feature.schema.md        # .spec.toon schema
 ├── acceptance.schema.md     # .acceptance.toon schema
-└── contract.schema.md       # .contract.toon schema
+├── contract.schema.md       # .contract.toon schema
+└── examples/                # reference specs (also CI fixtures)
+
+examples/
+└── create-order/            # full pipeline run: requirement → reviewer,
+                             # every artifact in its role's format
 
 scripts/
 ├── install.sh
@@ -107,6 +112,16 @@ templates/
     ├── glossary.md
     └── backlog_rules.md
 ```
+
+## See it in action
+
+[`examples/create-order/`](examples/create-order/) is a complete pipeline run
+for one feature — from a one-paragraph requirement to reviewed code. Every
+stage's artifacts are there in the exact format its agent role defines: plan +
+TOON specs (planner), decisions doc + binding contract (architect), the 8
+contracted source files (builder), test plan + one test per contracted
+scenario (tester), and the reviewer's verdict. Five minutes of reading shows
+you what SDD actually produces.
 
 ## Install
 
