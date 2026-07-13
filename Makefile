@@ -65,6 +65,12 @@ validate-specs: ## Validate TOON spec files (SPECS=path, default: specs/examples
 	@bash $(SCRIPTS_DIR)/validate-spec.sh $(or $(SPECS),$(SPECS_DIR)/examples $(SDD_DIR)examples)
 	@echo "$(GREEN)✔ All specs valid$(RESET)"
 
+# ─── Test ─────────────────────────────────────────────────────────────────────
+.PHONY: test
+test: ## Run regression tests (spec validator)
+	@echo "$(CYAN)▶ Running validator regression tests...$(RESET)"
+	@bash $(SDD_DIR)tests/validate-spec-test.sh
+
 # ─── Install ──────────────────────────────────────────────────────────────────
 .PHONY: install
 install: validate ## Install skills into a project (.agent/ or .kiro/steering/)
@@ -108,7 +114,7 @@ upgrade: update install ## Pull latest skills and reinstall into TARGET project
 
 # ─── Check (CI) ───────────────────────────────────────────────────────────────
 .PHONY: check
-check: validate validate-specs validate-agents ## Run all checks (for CI)
+check: validate validate-specs validate-agents test ## Run all checks (for CI)
 	@echo "$(GREEN)✔ All checks passed$(RESET)"
 
 # ─── Validate Agents ──────────────────────────────────────────────────────────

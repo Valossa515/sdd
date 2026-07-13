@@ -1,0 +1,29 @@
+# Valid feature spec — proves the validator still accepts good specs and
+# provides FT-001 for the cross-file feature-ref checks in this directory
+
+feature:
+  id: FT-001
+  name: Reference Feature
+  version: 1.0
+  status: draft
+
+requirement:
+  summary: Minimal valid feature used as a fixture for the validator tests.
+  actor: User
+  trigger: POST /api/v1/things
+
+inputs[1]{name,type,required,constraints}:
+  name,string,true,Non-empty
+
+outputs:
+  success:
+    description: Thing created
+    status: 201
+  errors[1]{code,status,when}:
+    INVALID_NAME,422,name is empty
+
+business-rules[1]{id,rule}:
+  BR-001,Name must be unique
+
+assumptions[1]:
+  Names are case-insensitive

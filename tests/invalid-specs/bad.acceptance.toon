@@ -1,0 +1,10 @@
+# Intentionally invalid acceptance spec — regression fixture for validate-spec.sh
+# Defects: dangling feature-ref, duplicate criterion id, invalid priority,
+# malformed business-rule-ref
+
+acceptance:
+  feature-ref: FT-999
+
+criteria[2]{id,scenario,given,when,then,priority,business-rule-ref}:
+  AC-001,s,g,w,t,urgent,
+  AC-001,s2,g2,w2,t2,must-have,BRX
