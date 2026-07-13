@@ -27,12 +27,19 @@ Before writing any code, read and follow all the skills listed below.
 | Observability | [skills/shared/observability.md](skills/shared/observability.md) | Logging, tracing, health checks |
 | Error handling | [skills/shared/error-handling.md](skills/shared/error-handling.md) | Exception mapping, RFC 7807 |
 | Bootstrap | [skills/shared/bootstrap.md](skills/shared/bootstrap.md) | Project context setup and maintenance |
-| Planning | [skills/shared/planning.md](skills/shared/planning.md) | Feature planning → planner agent (`@planning`) |
-| Implementation | [skills/shared/implementation.md](skills/shared/implementation.md) | Plan execution → builder agent (`@implementation`) |
-| Test Plan | [skills/shared/test-plan.md](skills/shared/test-plan.md) | Test strategy → tester agent (`@test-plan`) |
-| Test | [skills/shared/test.md](skills/shared/test.md) | Test implementation → tester agent (`@test`) |
-| Review | [skills/shared/review.md](skills/shared/review.md) | Code review → reviewer agent (`@review`) |
 | Refactor | [skills/shared/refactor.md](skills/shared/refactor.md) | Convention-aligned refactoring |
+
+### Commands
+
+Workflow commands are handled directly by the agent roles:
+
+| Command | Agent | What it does |
+|---------|-------|--------------|
+| `@planning` | [agents/planner.md](agents/planner.md) | Plan a feature — produces plan.md + .spec.toon + .acceptance.toon |
+| `@implementation` | [agents/builder.md](agents/builder.md) | Execute a plan — implements tasks following conventions |
+| `@test-plan` | [agents/tester.md](agents/tester.md) | Design the testing strategy + test plan document |
+| `@test` | [agents/tester.md](agents/tester.md) | Implement the tests from the test plan |
+| `@review` | [agents/reviewer.md](agents/reviewer.md) | Structured code review with 🔴🟡🔵 severity classification |
 
 ## Project Overrides
 

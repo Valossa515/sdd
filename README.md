@@ -14,7 +14,7 @@
 *Spring Boot · .NET · REST APIs · Database · Testing · Bootstrap · Agent Pipeline · Specs*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-12-blue)](#skills)
+[![Skills](https://img.shields.io/badge/skills-17-blue)](#skills)
 [![Agents](https://img.shields.io/badge/agents-6-orange)](#agent-pipeline)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?logo=springboot&logoColor=white)](#spring-boot)
 [![.NET](https://img.shields.io/badge/.NET-8%2F9-512BD4?logo=dotnet&logoColor=white)](#net)
@@ -47,11 +47,6 @@ skills/
     ├── observability.md
     ├── error-handling.md
     ├── bootstrap.md
-    ├── planning.md          # @planning → planner agent (redirect)
-    ├── implementation.md    # @implementation → builder agent (redirect)
-    ├── test-plan.md         # @test-plan → tester agent (redirect)
-    ├── test.md              # @test → tester agent (redirect)
-    ├── review.md            # @review → reviewer agent (redirect)
     ├── refactor.md          # independent
     ├── anti-invention.md    # guardrails against hallucination
     ├── pattern-analysis.md  # 3-example rule before generating
@@ -61,11 +56,11 @@ skills/
     └── dod.md               # Definition of Done gate
 
 agents/
-├── planner.md               # requirement → plan.md + .spec.toon + .acceptance.toon
+├── planner.md               # requirement → plan.md + .spec.toon + .acceptance.toon (@planning)
 ├── architect.md             # spec → architecture.md + .contract.toon
-├── builder.md               # contract/plan → production code (absorbs @implementation)
-├── tester.md                # contract + code → test-plan.md + tests (absorbs @test-plan + @test)
-├── reviewer.md              # code review + DoD (absorbs @review)
+├── builder.md               # contract/plan → production code (@implementation)
+├── tester.md                # contract + code → test-plan.md + tests (@test-plan + @test)
+├── reviewer.md              # code review + DoD (@review)
 └── conductor.md             # pipeline orchestration
 
 prompts/
@@ -205,6 +200,11 @@ your-project/
 | [`dotnet/testing`](skills/dotnet/testing.md) | 🔷 .NET 8/9 | xUnit, NSubstitute, WebApplicationFactory, Testcontainers, Respawn |
 | [`shared/api-design`](skills/shared/api-design.md) | Both | REST conventions, pagination, RFC 7807 errors, OpenAPI |
 | [`shared/database`](skills/shared/database.md) | Both | Flyway vs EF Migrations, N+1, projections, soft delete, indexing |
+| [`shared/security`](skills/shared/security.md) | Both | Auth, CORS, input validation, secrets handling |
+| [`shared/observability`](skills/shared/observability.md) | Both | Logging, tracing, metrics, health checks |
+| [`shared/error-handling`](skills/shared/error-handling.md) | Both | Exception mapping, RFC 7807 problem details |
+| [`shared/bootstrap`](skills/shared/bootstrap.md) | Both | Create/update project context docs in `.agent/` |
+| [`shared/refactor`](skills/shared/refactor.md) | Both | Convention-aligned refactoring without behavior changes |
 | [`shared/anti-invention`](skills/shared/anti-invention.md) | Both | Guardrails against AI hallucination and scope creep |
 | [`shared/pattern-analysis`](skills/shared/pattern-analysis.md) | Both | 3-example rule: study codebase before generating |
 | [`shared/gap-analysis`](skills/shared/gap-analysis.md) | Both | Detect missing requirement info before writing specs |
@@ -227,9 +227,9 @@ Requirement → planner → architect → builder → tester → reviewer
 |------|------|----------------|
 | **planner** | [agents/planner.md](agents/planner.md) | Convert requirement into feature spec + acceptance criteria |
 | **architect** | [agents/architect.md](agents/architect.md) | Convert spec into architecture contract (layers, files, test strategy) |
-| **builder** | [agents/builder.md](agents/builder.md) | Generate production code from contract or plan (absorbs `@implementation`) |
-| **tester** | [agents/tester.md](agents/tester.md) | Design test strategy + generate tests (absorbs `@test-plan` + `@test`) |
-| **reviewer** | [agents/reviewer.md](agents/reviewer.md) | Validate code against spec + contract + DoD (absorbs `@review`) |
+| **builder** | [agents/builder.md](agents/builder.md) | Generate production code from contract or plan (`@implementation`) |
+| **tester** | [agents/tester.md](agents/tester.md) | Design test strategy + generate tests (`@test-plan` + `@test`) |
+| **reviewer** | [agents/reviewer.md](agents/reviewer.md) | Validate code against spec + contract + DoD (`@review`) |
 | **conductor** | [agents/conductor.md](agents/conductor.md) | Orchestrate the full pipeline with confirmation gates |
 
 Use the full pipeline for new features, or shortcut for simpler tasks:
@@ -448,9 +448,9 @@ This guarantees validation and generation happen before installation.
 4. Update `.agent/glossary.md` with domain terminology.
 5. Commit `.agent/` together with code changes.
 
-## Invocable skills
+## Invocable commands
 
-SDD includes 6 invocable workflow commands. Most are now handled by their corresponding agents — the skill files remain as lightweight **redirects** for backward compatibility:
+SDD includes 6 invocable workflow commands. Each is handled directly by its corresponding agent role:
 
 ### Feature flow: `@planning` → `@implementation`
 

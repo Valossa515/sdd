@@ -16,7 +16,7 @@ RESET='\033[0m'
 
 check_frontmatter() {
   local file="$1"
-  local rel="${file#$SKILLS_DIR/}"
+  local rel="${file#"$SKILLS_DIR"/}"
 
   # Must start with ---
   if ! head -1 "$file" | grep -q "^---"; then
@@ -108,31 +108,26 @@ check_required_templates() {
 
 check_structure() {
   local file="$1"
-  local rel="${file#$SKILLS_DIR/}"
-  local warn=0
+  local rel="${file#"$SKILLS_DIR"/}"
 
   # Should have at least one ## section
   if ! grep -q "^## " "$file"; then
     echo -e "  ${YELLOW}⚠${RESET}  $rel — no '##' sections found (skills should be structured)"
-    warn=1
   fi
 
   # Should have code examples
   if ! grep -q '```' "$file"; then
     echo -e "  ${YELLOW}⚠${RESET}  $rel — no code examples found (skills work best with examples)"
-    warn=1
   fi
 
   # Should have a "What NOT to do" section (recommended for all skills)
   if ! grep -qi "## What NOT to do" "$file"; then
     echo -e "  ${YELLOW}⚠${RESET}  $rel — missing 'What NOT to do' section (recommended)"
-    warn=1
   fi
 
   # Should have a top-level # heading
   if ! grep -q "^# " "$file"; then
     echo -e "  ${YELLOW}⚠${RESET}  $rel — missing top-level '# ' heading"
-    warn=1
   fi
 
   return 0
@@ -140,9 +135,8 @@ check_structure() {
 
 check_no_empty_sections() {
   local file="$1"
-  local rel="${file#$SKILLS_DIR/}"
+  local rel="${file#"$SKILLS_DIR"/}"
   local prev_header=""
-  local in_section=0
   local has_content=0
 
   while IFS= read -r line; do
@@ -165,7 +159,7 @@ echo "Scanning: $SKILLS_DIR"
 echo "───────────────────────────────────────"
 
 while IFS= read -r -d '' file; do
-  rel="${file#$SKILLS_DIR/}"
+  rel="${file#"$SKILLS_DIR"/}"
   FILES_CHECKED=$((FILES_CHECKED + 1))
 
   if ! check_frontmatter "$file"; then
