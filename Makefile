@@ -60,9 +60,9 @@ validate: ## Validate all skill files (frontmatter + required sections)
 
 # ─── Validate specs ───────────────────────────────────────────────────────────
 .PHONY: validate-specs
-validate-specs: ## Validate TOON spec files (SPECS=path, default: specs/examples)
+validate-specs: ## Validate TOON spec files (SPECS=path, default: specs/examples + examples/)
 	@echo "$(CYAN)▶ Validating TOON specs...$(RESET)"
-	@bash $(SCRIPTS_DIR)/validate-spec.sh $(or $(SPECS),$(SPECS_DIR)/examples)
+	@bash $(SCRIPTS_DIR)/validate-spec.sh $(or $(SPECS),$(SPECS_DIR)/examples $(SDD_DIR)examples)
 	@echo "$(GREEN)✔ All specs valid$(RESET)"
 
 # ─── Install ──────────────────────────────────────────────────────────────────
