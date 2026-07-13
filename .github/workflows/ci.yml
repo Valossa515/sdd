@@ -18,8 +18,8 @@ jobs:
       - name: ShellCheck
         run: shellcheck scripts/*.sh
 
-  validate-and-generate:
-    name: Validate & Generate Skills
+  validate-and-install:
+    name: Validate Skills & Install
     runs-on: ubuntu-latest
 
     steps:
@@ -29,8 +29,8 @@ jobs:
       - name: Validate skill files
         run: make validate
 
-      - name: Generate .toml files
-        run: make generate
+      - name: Validate example TOON specs
+        run: make validate-specs
 
       - name: Validate install script (dry run)
         run: |

@@ -84,4 +84,4 @@ EOF
 echo -e "${GREEN}✔ Created: $DEST${RESET}"
 echo ""
 echo -e "${CYAN}Edit the file and fill in the [TODO] sections.${RESET}"
-echo -e "Then run ${CYAN}make validate && make generate${RESET} to check and compile it."
+echo -e "Then run ${CYAN}make validate${RESET} to check it."

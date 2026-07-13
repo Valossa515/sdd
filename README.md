@@ -78,7 +78,7 @@ specs/
 scripts/
 ├── install.sh
 ├── validate.sh
-├── generate.sh
+├── validate-spec.sh
 └── new-skill.sh
 
 templates/
@@ -117,7 +117,7 @@ make -C /tmp/sdd install STACK=dotnet TARGET=$(pwd)
 
 ```bash
 make install STACK=spring-boot TARGET=$(pwd)
-# full flow: validate + generate + install
+# full flow: all checks + install
 make bootstrap STACK=spring-boot TARGET=$(pwd)
 ```
 
@@ -134,7 +134,6 @@ your-project/
 │   ├── skills/
 │   │   ├── spring-boot/
 │   │   │   ├── SKILL.md       ← architecture, patterns, naming, DI rules
-│   │   │   ├── SKILL.toml     ← same skill, TOML format (Kiro-compatible)
 │   │   │   └── testing.md
 │   │   └── shared/
 │   │       ├── api-design.md
@@ -297,13 +296,13 @@ See [prompts/README.md](prompts/README.md) for full documentation.
 ## Commands
 
 ```bash
-make validate      # validates frontmatter + required context templates
-make generate      # generates .toml files into outputs/
-make install       # installs .agent/ for chosen stack
-make bootstrap     # validate + generate + install in one flow
-make update        # pull latest skills and regenerate
-make upgrade       # update + install (update SDD in an existing project)
-make check         # validate + generate
+make validate       # validates frontmatter + required context templates
+make validate-specs # validates TOON spec files against the schemas
+make install        # installs .agent/ for chosen stack
+make bootstrap      # all checks + install in one flow
+make update         # pull latest skills
+make upgrade        # update + install (update SDD in an existing project)
+make check          # validate + validate-specs + validate-agents
 ```
 
 ## Updating SDD
@@ -320,7 +319,7 @@ git pull                # fetch latest version
 make upgrade STACK=spring-boot TARGET=/path/to/your/project
 ```
 
-`make upgrade` runs `update` (pull + regenerate) then `install` — replacing all skill, agent, prompt, and spec files in your project's `.agent/` folder while preserving your `SKILLS.md` overrides.
+`make upgrade` runs `update` (git pull) then `install` — replacing all skill, agent, prompt, and spec files in your project's `.agent/` folder while preserving your `SKILLS.md` overrides.
 
 ### Option 2: one-line reinstall (curl)
 

@@ -74,6 +74,20 @@ When installed in a project:
     └── contracts/       ← architecture contracts (.contract.toon)
 ```
 
+## Validating Specs
+
+`scripts/validate-spec.sh` checks spec files against the schema rules — required blocks and fields, ID formats (`FT-NNN`, `BR-NNN`, `AC-NNN`), unique IDs, declared row counts (`[N]`), allowed enum values, and that `feature-ref` points to an existing feature spec:
+
+```bash
+# In the SDD repo (validates the examples):
+make validate-specs
+
+# In your project (the installer copies the validator to .agent/scripts/):
+bash .agent/scripts/validate-spec.sh .agent/specs
+```
+
+Reference examples live in [`specs/examples/`](examples/) and double as test fixtures for the validator in CI.
+
 ## Principles
 
 1. **Spec before code** — no code without a spec (or at minimum, a contract)

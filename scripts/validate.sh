@@ -9,6 +9,10 @@ TEMPLATES_DIR="${2:-}"
 ERRORS=0
 FILES_CHECKED=0
 
+# Valid stack values are the directories under skills/ — adding a new stack
+# (e.g. skills/node/) makes it valid automatically, no validator change needed.
+VALID_STACKS=$(find "$SKILLS_DIR" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | sort)
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
@@ -58,11 +62,11 @@ check_frontmatter() {
     return 1
   fi
 
-  # Stack must be a valid value
+  # Stack must match one of the skill directories (spring-boot, dotnet, shared, ...)
   local stack_val
   stack_val=$(grep -m1 "^stack:" "$file" | sed 's/^stack: *//')
-  if ! echo "$stack_val" | grep -qE '^(spring-boot|dotnet|shared)$'; then
-    echo -e "  ${RED}✘${RESET} $rel — 'stack:' must be spring-boot, dotnet, or shared (got: $stack_val)"
+  if ! echo "$VALID_STACKS" | grep -qx "$stack_val"; then
+    echo -e "  ${RED}✘${RESET} $rel — 'stack:' must be one of: $(echo "$VALID_STACKS" | tr '\n' ' ' | sed 's/ $//') (got: $stack_val)"
     return 1
   fi
 

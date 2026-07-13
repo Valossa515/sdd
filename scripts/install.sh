@@ -191,12 +191,23 @@ install_agent_format() {
 
   # ── Spec schemas ──────────────────────────────────────────────────────────
   if [ -d "$src/specs" ]; then
-    mkdir -p "$dest/specs"
+    mkdir -p "$dest/specs/features" "$dest/specs/acceptance" "$dest/specs/contracts"
     echo -e "  ${CYAN}→${RESET} .agent/specs/"
     for f in "$src/specs/"*.md; do
       [ -f "$f" ] || continue
       cp "$f" "$dest/specs/"
     done
+    if [ -d "$src/specs/examples" ]; then
+      mkdir -p "$dest/specs/examples"
+      cp "$src/specs/examples/"*.toon "$dest/specs/examples/"
+    fi
+  fi
+
+  # ── Spec validator ────────────────────────────────────────────────────────
+  if [ -f "$src/scripts/validate-spec.sh" ]; then
+    mkdir -p "$dest/scripts"
+    cp "$src/scripts/validate-spec.sh" "$dest/scripts/"
+    echo -e "  ${CYAN}→${RESET} .agent/scripts/validate-spec.sh"
   fi
 
   # ── PR template ───────────────────────────────────────────────────────────
@@ -233,13 +244,6 @@ install_kiro_format() {
 
   echo -e "  ${CYAN}→${RESET} .kiro/steering/ ($STACK)"
   for f in "$stack_dir/"*.md; do
-    cp "$f" "$dest/${STACK}-$(basename "$f")"
-    echo -e "     ${STACK}-$(basename "$f")"
-  done
-
-  # Also copy .toml if they exist
-  for f in "$stack_dir/"*.toml; do
-    [ -f "$f" ] || continue
     cp "$f" "$dest/${STACK}-$(basename "$f")"
     echo -e "     ${STACK}-$(basename "$f")"
   done
