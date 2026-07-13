@@ -1,0 +1,24 @@
+# Intentionally invalid feature spec — regression fixture for validate-spec.sh
+# Defects: bad feature id, missing summary, wrong row count, non-numeric HTTP
+# status, duplicate business-rule id, no assumptions block (warning)
+
+feature:
+  id: FEAT-1
+  name: Broken
+
+requirement:
+  actor: User
+
+inputs[3]{name,type,required}:
+  a,string,true
+  b,int,false
+
+outputs:
+  success:
+    status: 201
+  errors[1]{code,status,when}:
+    NOT_FOUND,quatro,thing missing
+
+business-rules[2]{id,rule}:
+  BR-001,rule one
+  BR-001,rule one again

@@ -41,6 +41,30 @@ Workflow commands are handled directly by the agent roles:
 | `@test` | [agents/tester.md](agents/tester.md) | Implement the tests from the test plan |
 | `@review` | [agents/reviewer.md](agents/reviewer.md) | Structured code review with 🔴🟡🔵 severity classification |
 
+### Agent Guardrails
+
+| Skill | File | Scope |
+|-------|------|-------|
+| Anti-invention | [skills/shared/anti-invention/SKILL.md](skills/shared/anti-invention/SKILL.md) | All tasks — prevents hallucination |
+| Pattern analysis | [skills/shared/pattern-analysis/SKILL.md](skills/shared/pattern-analysis/SKILL.md) | All generation — 3-example rule |
+| Gap analysis | [skills/shared/gap-analysis/SKILL.md](skills/shared/gap-analysis/SKILL.md) | Planning — detects missing info |
+| Spec validation | [skills/shared/spec-validation/SKILL.md](skills/shared/spec-validation/SKILL.md) | Specs — validates structure |
+| Definition of Ready | [skills/shared/dor/SKILL.md](skills/shared/dor/SKILL.md) | Pre-implementation gate |
+| Definition of Done | [skills/shared/dod/SKILL.md](skills/shared/dod/SKILL.md) | Post-implementation gate |
+
+### Agent Roles
+
+For pipeline-driven development, see [agents/README.md](agents/README.md):
+
+| Role | File | When to use |
+|------|------|-------------|
+| Planner | [agents/planner.md](agents/planner.md) | Convert requirement → spec |
+| Architect | [agents/architect.md](agents/architect.md) | Convert spec → contract |
+| Builder | [agents/builder.md](agents/builder.md) | Generate production code |
+| Tester | [agents/tester.md](agents/tester.md) | Generate tests |
+| Reviewer | [agents/reviewer.md](agents/reviewer.md) | Validate + review |
+| Conductor | [agents/conductor.md](agents/conductor.md) | Run full pipeline |
+
 ## Project Overrides
 
 > ✏️ **Edit this section** with your project's specific conventions.

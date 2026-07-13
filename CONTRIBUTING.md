@@ -16,7 +16,11 @@ make new STACK=dotnet NAME=outbox
 make new STACK=shared NAME=security
 ```
 
-This creates `skills/<stack>/<name>.md` with the right template.
+This creates the skill with the right template at the right location:
+
+- Stack skills: `skills/<stack>/<name>.md`
+- Shared skills: `skills/shared/<name>/SKILL.md` — one directory per skill, so
+  each one is auto-discovered by the Claude Code plugin scanner
 
 ### 2. Fill in the [TODO] sections
 
@@ -30,7 +34,8 @@ Every skill must have:
 ### 3. Validate
 
 ```bash
-make validate   # check frontmatter and structure
+make validate        # frontmatter and structure of every skill
+make check           # everything CI runs (skills + specs + agents)
 ```
 
 It must pass cleanly before you open a PR.
@@ -38,6 +43,11 @@ It must pass cleanly before you open a PR.
 ### 4. Update the relevant SKILLS.md template
 
 If your skill should be active by default for a stack, add it to `templates/<stack>/SKILLS.md`.
+
+> The valid `stack:` values are derived from the directories under `skills/` —
+> adding a whole new stack means creating `skills/<stack>/SKILL.md` (+
+> `testing.md`) and `templates/<stack>/SKILLS.md`; the validator and installer
+> pick it up automatically.
 
 ---
 
@@ -162,6 +172,24 @@ Spec schemas live in `specs/` and define the TOON structure for feature, accepta
 - Document required vs optional fields in a table
 - Include validation rules
 - Keep examples realistic (not toy cases)
+- Schema rules are **enforced** by `scripts/validate-spec.sh` — if you add or
+  change a rule, update the validator, the reference specs in
+  `specs/examples/`, and run `make validate-specs`
+
+---
+
+## Claude Code plugin
+
+The repo doubles as a Claude Code plugin (`.claude-plugin/plugin.json`) and its
+own marketplace (`.claude-plugin/marketplace.json`). Keep in mind:
+
+- Shared skills must stay in the `skills/shared/<name>/SKILL.md` layout or the
+  plugin scanner won't find them
+- Slash commands live in `commands/*.md` (`/sdd:plan`, `/sdd:pipeline`, ...) —
+  if you add an agent role, consider adding its command
+- Plugin users only receive updates when `version` in `plugin.json` is bumped,
+  so bump it on user-visible changes
+- Validate with `claude plugin validate .`
 
 ---
 

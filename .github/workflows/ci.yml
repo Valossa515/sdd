@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: ShellCheck
-        run: shellcheck scripts/*.sh
+        run: shellcheck scripts/*.sh tests/*.sh
 
   validate-and-install:
     name: Validate Skills & Install
@@ -31,6 +31,9 @@ jobs:
 
       - name: Validate example TOON specs
         run: make validate-specs
+
+      - name: Spec validator regression tests
+        run: make test
 
       - name: Validate install script (dry run)
         run: |

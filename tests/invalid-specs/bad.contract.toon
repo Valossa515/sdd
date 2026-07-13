@@ -1,0 +1,26 @@
+# Intentionally invalid contract spec — regression fixture for validate-spec.sh
+# Defects: invalid file action, same file in two layers (simulated by duplicate
+# path), excluded entry without a reason
+
+contract:
+  feature-ref: FT-001
+
+layers:
+  api:
+    files[2]{path,action,description}:
+      src/A.java,create,ok
+      src/A.java,delete,duplicate path and bad action
+
+migrations[0]{file,description}:
+
+dependencies:
+  uses[0]:
+  introduces[0]:
+
+test-strategy:
+  unit-tests:
+    - target: A
+  integration-tests:
+    - target: B
+  excluded[1]{target,reason}:
+    Foo,

@@ -41,7 +41,7 @@ usage() {
   echo "  $0 <stack> [target_dir] [format]"
   echo ""
   echo "Arguments:"
-  echo "  stack       spring-boot | dotnet"
+  echo "  stack       spring-boot | dotnet | any directory under skills/ (except shared)"
   echo "  target_dir  Path to your project (default: current dir)"
   echo "  format      agent | kiro  (default: agent)"
   echo ""
@@ -113,24 +113,23 @@ install_agent_format() {
   cp "$src/templates/common/glossary.md" "$dest/glossary.md"
   cp "$src/templates/common/backlog_rules.md" "$dest/backlog_rules.md"
 
-  case "$STACK" in
-    spring-boot)
-      mkdir -p "$dest/skills/spring-boot"
-      echo -e "  ${CYAN}→${RESET} .agent/skills/spring-boot/"
-      cp -r "$src/skills/spring-boot/." "$dest/skills/spring-boot/"
-      cp "$src/templates/spring-boot/SKILLS.md" "$dest/SKILLS.md"
-      ;;
-    dotnet)
-      mkdir -p "$dest/skills/dotnet"
-      echo -e "  ${CYAN}→${RESET} .agent/skills/dotnet/"
-      cp -r "$src/skills/dotnet/." "$dest/skills/dotnet/"
-      cp "$src/templates/dotnet/SKILLS.md" "$dest/SKILLS.md"
-      ;;
-    *)
-      echo -e "${RED}✘ Unknown stack: $STACK. Use spring-boot or dotnet.${RESET}"
-      exit 1
-      ;;
-  esac
+  # Stacks are the directories under skills/ (except shared); each stack needs
+  # a matching templates/<stack>/SKILLS.md entry point.
+  if [ "$STACK" = "shared" ] || [ ! -d "$src/skills/$STACK" ]; then
+    local available
+    available=$(find "$src/skills" -mindepth 1 -maxdepth 1 -type d ! -name shared -exec basename {} \; | sort | tr '\n' ' ')
+    echo -e "${RED}✘ Unknown stack: $STACK. Available: ${available% }${RESET}"
+    exit 1
+  fi
+  if [ ! -f "$src/templates/$STACK/SKILLS.md" ]; then
+    echo -e "${RED}✘ Stack '$STACK' has no templates/$STACK/SKILLS.md entry point.${RESET}"
+    exit 1
+  fi
+
+  mkdir -p "$dest/skills/$STACK"
+  echo -e "  ${CYAN}→${RESET} .agent/skills/$STACK/"
+  cp -r "$src/skills/$STACK/." "$dest/skills/$STACK/"
+  cp "$src/templates/$STACK/SKILLS.md" "$dest/SKILLS.md"
 
   echo -e "  ${CYAN}→${RESET} .agent/SKILLS.md"
 
