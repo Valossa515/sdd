@@ -26,6 +26,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Check version consistency (plugin.json ↔ CHANGELOG)
+        run: |
+          PLUGIN_VERSION=$(sed -n 's/.*"version"[^"]*"\([^"]*\)".*/\1/p' .claude-plugin/plugin.json | head -1)
+          CHANGELOG_VERSION=$(sed -n 's/^## \[\([0-9][^]]*\)\].*/\1/p' CHANGELOG.md | head -1)
+          echo "plugin.json: $PLUGIN_VERSION | CHANGELOG: $CHANGELOG_VERSION"
+          if [ "$PLUGIN_VERSION" != "$CHANGELOG_VERSION" ]; then
+            echo "❌ plugin.json version and latest CHANGELOG entry must match"
+            exit 1
+          fi
+          echo "✔ Versions are consistent"
+
       - name: Validate skill files
         run: make validate
 

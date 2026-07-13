@@ -193,6 +193,23 @@ own marketplace (`.claude-plugin/marketplace.json`). Keep in mind:
 
 ---
 
+## Releasing
+
+1. Bump `version` in `.claude-plugin/plugin.json`
+2. Add a `## [x.y.z] - YYYY-MM-DD` section to `CHANGELOG.md` (CI fails if the
+   latest CHANGELOG entry and `plugin.json` disagree)
+3. Merge to `main`, then tag and push:
+
+   ```bash
+   git tag vx.y.z && git push origin vx.y.z
+   ```
+
+The `Release` workflow verifies tag ↔ `plugin.json` ↔ CHANGELOG consistency
+and publishes a GitHub Release with that version's CHANGELOG section as notes.
+Users can pin installs to any release with `install.sh <stack> ... --ref vx.y.z`.
+
+---
+
 ## Adding shared skills
 
 Shared skills (`skills/shared/`) apply across all stacks. Examples: anti-invention, gap-analysis, DoR, DoD.
