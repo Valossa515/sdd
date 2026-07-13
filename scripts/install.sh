@@ -221,7 +221,7 @@ install_kiro_format() {
   echo -e "  ${CYAN}→${RESET} .kiro/steering/ (shared)"
   for f in "$src/skills/shared/"*.md; do
     cp "$f" "$dest/"
-    echo -e "     $(basename $f)"
+    echo -e "     $(basename "$f")"
   done
 
   # Copy stack-specific skills
@@ -233,15 +233,15 @@ install_kiro_format() {
 
   echo -e "  ${CYAN}→${RESET} .kiro/steering/ ($STACK)"
   for f in "$stack_dir/"*.md; do
-    cp "$f" "$dest/${STACK}-$(basename $f)"
-    echo -e "     ${STACK}-$(basename $f)"
+    cp "$f" "$dest/${STACK}-$(basename "$f")"
+    echo -e "     ${STACK}-$(basename "$f")"
   done
 
   # Also copy .toml if they exist
   for f in "$stack_dir/"*.toml; do
     [ -f "$f" ] || continue
-    cp "$f" "$dest/${STACK}-$(basename $f)"
-    echo -e "     ${STACK}-$(basename $f)"
+    cp "$f" "$dest/${STACK}-$(basename "$f")"
+    echo -e "     ${STACK}-$(basename "$f")"
   done
 
   # Copy agents (flattened with agent- prefix)
@@ -275,7 +275,6 @@ install_kiro_format() {
 # ─── .gitignore hint ──────────────────────────────────────────────────────────
 suggest_gitignore() {
   local gitignore="$TARGET/.gitignore"
-  local comment="# SDD — commit .agent/ to share conventions with your team"
 
   if [ -f "$gitignore" ]; then
     if ! grep -q "\.agent/" "$gitignore" 2>/dev/null; then

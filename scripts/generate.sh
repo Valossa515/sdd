@@ -26,7 +26,7 @@ extract_section() {
 
 generate_toml() {
   local md_file="$1"
-  local rel="${md_file#$SKILLS_DIR/}"
+  local rel="${md_file#"$SKILLS_DIR"/}"
   local toml_file="$OUTPUT_DIR/skills/${rel%.md}.toml"
 
   mkdir -p "$(dirname "$toml_file")"
@@ -47,7 +47,7 @@ generate_toml() {
     echo "source      = \"${rel}\""
   } > "$toml_file"
 
-  echo -e "  ${CYAN}→${RESET} ${toml_file#$(dirname "$SKILLS_DIR")/}"
+  echo -e "  ${CYAN}→${RESET} ${toml_file#"$(dirname "$SKILLS_DIR")"/}"
   GENERATED=$((GENERATED + 1))
 }
 
