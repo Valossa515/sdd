@@ -1,0 +1,25 @@
+{
+  "name": "sdd",
+  "displayName": "SDD — Skill-Driven Development",
+  "version": "1.0.0",
+  "description": "Skill files, agent roles (planner → architect → builder → tester → reviewer) and TOON spec schemas for structured, traceable AI-driven development on Spring Boot and .NET.",
+  "author": {
+    "name": "Valossa515"
+  },
+  "homepage": "https://github.com/valossa515/sdd",
+  "repository": "https://github.com/valossa515/sdd",
+  "license": "MIT",
+  "keywords": [
+    "spring-boot",
+    "dotnet",
+    "agents",
+    "skills",
+    "specs",
+    "pipeline",
+    "quality-gates"
+  ],
+  "skills": [
+    "./skills/",
+    "./skills/shared/"
+  ]
+}

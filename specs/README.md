@@ -93,5 +93,5 @@ Reference examples live in [`specs/examples/`](examples/) and double as test fix
 1. **Spec before code** — no code without a spec (or at minimum, a contract)
 2. **Traceable** — every spec has an `id` that downstream artifacts reference
 3. **Deterministic** — same spec → same code (agents must not add undocumented behavior)
-4. **Validated** — specs are checked against schemas before use (see `skills/shared/spec-validation.md`)
+4. **Validated** — specs are checked against schemas before use (see `skills/shared/spec-validation/SKILL.md`)
 5. **Token-efficient** — TOON format minimizes token usage for LLM agents

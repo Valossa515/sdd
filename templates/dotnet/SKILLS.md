@@ -21,13 +21,13 @@ Before writing any code, read and follow all the skills listed below.
 |-------|------|-------|
 | Architecture & patterns | [skills/dotnet/SKILL.md](skills/dotnet/SKILL.md) | All code |
 | Testing | [skills/dotnet/testing.md](skills/dotnet/testing.md) | Test files |
-| REST & API design | [skills/shared/api-design.md](skills/shared/api-design.md) | Controllers, DTOs |
-| Database | [skills/shared/database.md](skills/shared/database.md) | Entities, DbContext |
-| Security | [skills/shared/security.md](skills/shared/security.md) | Auth, CORS, input validation |
-| Observability | [skills/shared/observability.md](skills/shared/observability.md) | Logging, tracing, health checks |
-| Error handling | [skills/shared/error-handling.md](skills/shared/error-handling.md) | Exception mapping, RFC 7807 |
-| Bootstrap | [skills/shared/bootstrap.md](skills/shared/bootstrap.md) | Project context setup and maintenance |
-| Refactor | [skills/shared/refactor.md](skills/shared/refactor.md) | Convention-aligned refactoring |
+| REST & API design | [skills/shared/api-design/SKILL.md](skills/shared/api-design/SKILL.md) | Controllers, DTOs |
+| Database | [skills/shared/database/SKILL.md](skills/shared/database/SKILL.md) | Entities, DbContext |
+| Security | [skills/shared/security/SKILL.md](skills/shared/security/SKILL.md) | Auth, CORS, input validation |
+| Observability | [skills/shared/observability/SKILL.md](skills/shared/observability/SKILL.md) | Logging, tracing, health checks |
+| Error handling | [skills/shared/error-handling/SKILL.md](skills/shared/error-handling/SKILL.md) | Exception mapping, RFC 7807 |
+| Bootstrap | [skills/shared/bootstrap/SKILL.md](skills/shared/bootstrap/SKILL.md) | Project context setup and maintenance |
+| Refactor | [skills/shared/refactor/SKILL.md](skills/shared/refactor/SKILL.md) | Convention-aligned refactoring |
 
 ### Commands
 

@@ -35,8 +35,8 @@ The **conductor** orchestrates this pipeline end-to-end, or you can invoke each 
 
 ## Cross-Cutting Rules (All Roles)
 
-1. **Anti-invention** — never fabricate requirements (see `skills/shared/anti-invention.md`)
-2. **Pattern analysis** — study 3+ existing examples before generating (see `skills/shared/pattern-analysis.md`)
+1. **Anti-invention** — never fabricate requirements (see `skills/shared/anti-invention/SKILL.md`)
+2. **Pattern analysis** — study 3+ existing examples before generating (see `skills/shared/pattern-analysis/SKILL.md`)
 3. **Scope isolation** — each role does ONLY its job, never another role's work
 4. **Skills compliance** — always follow the active skills in `SKILLS.md`
 

@@ -1,0 +1,25 @@
+{
+  "name": "sdd",
+  "owner": {
+    "name": "Valossa515"
+  },
+  "description": "SDD — Skill-Driven Development: structured skills, agent pipeline and spec schemas for AI coding agents.",
+  "plugins": [
+    {
+      "name": "sdd",
+      "source": "./",
+      "displayName": "SDD — Skill-Driven Development",
+      "description": "Skill files, agent roles (planner → architect → builder → tester → reviewer) and TOON spec schemas for structured, traceable AI-driven development on Spring Boot and .NET.",
+      "category": "development",
+      "keywords": [
+        "spring-boot",
+        "dotnet",
+        "agents",
+        "skills",
+        "specs",
+        "pipeline"
+      ],
+      "license": "MIT"
+    }
+  ]
+}

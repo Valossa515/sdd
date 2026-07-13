@@ -228,11 +228,14 @@ install_kiro_format() {
 
   mkdir -p "$dest"
 
-  # Copy shared skills
+  # Copy shared skills (skills/shared/<name>/SKILL.md → <name>.md, flattened)
   echo -e "  ${CYAN}→${RESET} .kiro/steering/ (shared)"
-  for f in "$src/skills/shared/"*.md; do
-    cp "$f" "$dest/"
-    echo -e "     $(basename "$f")"
+  for d in "$src/skills/shared/"*/; do
+    [ -f "${d}SKILL.md" ] || continue
+    local sname
+    sname=$(basename "$d")
+    cp "${d}SKILL.md" "$dest/${sname}.md"
+    echo -e "     ${sname}.md"
   done
 
   # Copy stack-specific skills

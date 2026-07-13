@@ -23,13 +23,13 @@ read and follow all the skills listed below.
 |-------|------|-------|
 | Architecture & patterns | [skills/spring-boot/SKILL.md](skills/spring-boot/SKILL.md) | All code |
 | Testing | [skills/spring-boot/testing.md](skills/spring-boot/testing.md) | Test files |
-| REST & API design | [skills/shared/api-design.md](skills/shared/api-design.md) | Controllers, DTOs |
-| Database | [skills/shared/database.md](skills/shared/database.md) | Entities, repositories |
-| Security | [skills/shared/security.md](skills/shared/security.md) | Auth, CORS, input validation |
-| Observability | [skills/shared/observability.md](skills/shared/observability.md) | Logging, tracing, health checks |
-| Error handling | [skills/shared/error-handling.md](skills/shared/error-handling.md) | Exception mapping, RFC 7807 |
-| Bootstrap | [skills/shared/bootstrap.md](skills/shared/bootstrap.md) | Project context setup and maintenance |
-| Refactor | [skills/shared/refactor.md](skills/shared/refactor.md) | Convention-aligned refactoring |
+| REST & API design | [skills/shared/api-design/SKILL.md](skills/shared/api-design/SKILL.md) | Controllers, DTOs |
+| Database | [skills/shared/database/SKILL.md](skills/shared/database/SKILL.md) | Entities, repositories |
+| Security | [skills/shared/security/SKILL.md](skills/shared/security/SKILL.md) | Auth, CORS, input validation |
+| Observability | [skills/shared/observability/SKILL.md](skills/shared/observability/SKILL.md) | Logging, tracing, health checks |
+| Error handling | [skills/shared/error-handling/SKILL.md](skills/shared/error-handling/SKILL.md) | Exception mapping, RFC 7807 |
+| Bootstrap | [skills/shared/bootstrap/SKILL.md](skills/shared/bootstrap/SKILL.md) | Project context setup and maintenance |
+| Refactor | [skills/shared/refactor/SKILL.md](skills/shared/refactor/SKILL.md) | Convention-aligned refactoring |
 
 ### Commands
 
@@ -47,12 +47,12 @@ Workflow commands are handled directly by the agent roles:
 
 | Skill | File | Scope |
 |-------|------|-------|
-| Anti-invention | [skills/shared/anti-invention.md](skills/shared/anti-invention.md) | All tasks — prevents hallucination |
-| Pattern analysis | [skills/shared/pattern-analysis.md](skills/shared/pattern-analysis.md) | All generation — 3-example rule |
-| Gap analysis | [skills/shared/gap-analysis.md](skills/shared/gap-analysis.md) | Planning — detects missing info |
-| Spec validation | [skills/shared/spec-validation.md](skills/shared/spec-validation.md) | Specs — validates structure |
-| Definition of Ready | [skills/shared/dor.md](skills/shared/dor.md) | Pre-implementation gate |
-| Definition of Done | [skills/shared/dod.md](skills/shared/dod.md) | Post-implementation gate |
+| Anti-invention | [skills/shared/anti-invention/SKILL.md](skills/shared/anti-invention/SKILL.md) | All tasks — prevents hallucination |
+| Pattern analysis | [skills/shared/pattern-analysis/SKILL.md](skills/shared/pattern-analysis/SKILL.md) | All generation — 3-example rule |
+| Gap analysis | [skills/shared/gap-analysis/SKILL.md](skills/shared/gap-analysis/SKILL.md) | Planning — detects missing info |
+| Spec validation | [skills/shared/spec-validation/SKILL.md](skills/shared/spec-validation/SKILL.md) | Specs — validates structure |
+| Definition of Ready | [skills/shared/dor/SKILL.md](skills/shared/dor/SKILL.md) | Pre-implementation gate |
+| Definition of Done | [skills/shared/dod/SKILL.md](skills/shared/dod/SKILL.md) | Post-implementation gate |
 
 ### Agent Roles
 

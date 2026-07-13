@@ -30,9 +30,23 @@ SDD (Skill-Driven Development) gives AI agents persistent context via `.agent/` 
 
 SDD goes beyond static context: it includes **agent roles** (planner, architect, builder, tester, reviewer, conductor) that form a structured development pipeline, **specification schemas** for traceable requirements, and **quality gates** (DoR/DoD) that prevent incomplete work from moving forward.
 
-> Compatible with Claude, GitHub Copilot, Cursor, Kiro, and any agent that reads markdown context files.
+> Compatible with Claude, GitHub Copilot, Cursor, Kiro, and any agent that reads markdown context files. Also installable as a native **Claude Code plugin** (see [Install](#install)).
 
 ```text
+.claude-plugin/
+├── plugin.json              # Claude Code plugin manifest
+└── marketplace.json         # this repo doubles as its own plugin marketplace
+
+commands/                    # Claude Code slash commands (/sdd:plan, /sdd:pipeline, ...)
+├── plan.md
+├── architect.md
+├── implement.md
+├── test.md
+├── review.md
+├── refactor.md
+├── pipeline.md
+└── bootstrap.md
+
 skills/
 ├── spring-boot/
 │   ├── SKILL.md
@@ -40,20 +54,20 @@ skills/
 ├── dotnet/
 │   ├── SKILL.md
 │   └── testing.md
-└── shared/
-    ├── api-design.md
-    ├── database.md
-    ├── security.md
-    ├── observability.md
-    ├── error-handling.md
-    ├── bootstrap.md
-    ├── refactor.md          # independent
-    ├── anti-invention.md    # guardrails against hallucination
-    ├── pattern-analysis.md  # 3-example rule before generating
-    ├── gap-analysis.md      # requirement gap detection
-    ├── spec-validation.md   # spec completeness checks
-    ├── dor.md               # Definition of Ready gate
-    └── dod.md               # Definition of Done gate
+└── shared/                  # one directory per skill (Claude Code plugin format)
+    ├── api-design/SKILL.md
+    ├── database/SKILL.md
+    ├── security/SKILL.md
+    ├── observability/SKILL.md
+    ├── error-handling/SKILL.md
+    ├── bootstrap/SKILL.md
+    ├── refactor/SKILL.md          # independent
+    ├── anti-invention/SKILL.md    # guardrails against hallucination
+    ├── pattern-analysis/SKILL.md  # 3-example rule before generating
+    ├── gap-analysis/SKILL.md      # requirement gap detection
+    ├── spec-validation/SKILL.md   # spec completeness checks
+    ├── dor/SKILL.md               # Definition of Ready gate
+    └── dod/SKILL.md               # Definition of Done gate
 
 agents/
 ├── planner.md               # requirement → plan.md + .spec.toon + .acceptance.toon (@planning)
@@ -96,6 +110,32 @@ templates/
 
 ## Install
 
+### Option 0: as a Claude Code plugin (recommended for Claude Code users)
+
+```text
+/plugin marketplace add valossa515/sdd
+/plugin install sdd@sdd
+```
+
+This registers everything natively in Claude Code:
+
+- **Skills** — all 15 skills (`sdd:api-design`, `sdd:security`, `sdd:dor`, ...) load on demand
+- **Agents** — the pipeline roles become subagents (`sdd:planner`, `sdd:builder`, ...)
+- **Commands** — the workflow becomes slash commands:
+
+| Command | Role | What it does |
+|---------|------|--------------|
+| `/sdd:plan` | planner | Plan a feature — produces plan.md + .spec.toon + .acceptance.toon |
+| `/sdd:architect` | architect | Turn a spec into an architecture contract (.contract.toon) |
+| `/sdd:implement` | builder | Execute a plan/contract — production code only |
+| `/sdd:test` | tester | Design the test strategy + write the tests |
+| `/sdd:review` | reviewer | Structured review with 🔴🟡🔵 findings + DoD check |
+| `/sdd:refactor` | refactor skill | Convention-aligned refactoring, no behavior change |
+| `/sdd:pipeline` | conductor | Full pipeline with confirmation gates |
+| `/sdd:bootstrap` | bootstrap skill | Create/update the `.agent/` context docs |
+
+The plugin works standalone, or together with a `.agent/` folder installed by the options below (commands read `.agent/SKILLS.md` overrides when present).
+
 ### Option 1: one-line install (curl)
 
 ```bash
@@ -136,14 +176,14 @@ your-project/
 │   │   │   ├── SKILL.md       ← architecture, patterns, naming, DI rules
 │   │   │   └── testing.md
 │   │   └── shared/
-│   │       ├── api-design.md
-│   │       ├── database.md
-│   │       ├── anti-invention.md  ← guardrails against hallucination
-│   │       ├── pattern-analysis.md ← 3-example rule before generating
-│   │       ├── gap-analysis.md    ← requirement gap detection
-│   │       ├── spec-validation.md ← spec completeness checks
-│   │       ├── dor.md             ← Definition of Ready gate
-│   │       └── dod.md             ← Definition of Done gate
+│   │       ├── api-design/SKILL.md
+│   │       ├── database/SKILL.md
+│   │       ├── anti-invention/SKILL.md  ← guardrails against hallucination
+│   │       ├── pattern-analysis/SKILL.md ← 3-example rule before generating
+│   │       ├── gap-analysis/SKILL.md    ← requirement gap detection
+│   │       ├── spec-validation/SKILL.md ← spec completeness checks
+│   │       ├── dor/SKILL.md             ← Definition of Ready gate
+│   │       └── dod/SKILL.md             ← Definition of Done gate
 │   ├── agents/                    ← agent role definitions
 │   │   ├── planner.md             ← requirement → plan + specs
 │   │   ├── architect.md           ← spec → architecture decisions + contract
@@ -197,19 +237,19 @@ your-project/
 | [`spring-boot/testing`](skills/spring-boot/testing.md) | ☕ Spring Boot 3.x | JUnit 5, Mockito, MockMvc, Testcontainers, @WebMvcTest |
 | [`dotnet/SKILL`](skills/dotnet/SKILL.md) | 🔷 .NET 8/9 | Clean Architecture, CQRS/MediatR, FluentValidation, EF Core |
 | [`dotnet/testing`](skills/dotnet/testing.md) | 🔷 .NET 8/9 | xUnit, NSubstitute, WebApplicationFactory, Testcontainers, Respawn |
-| [`shared/api-design`](skills/shared/api-design.md) | Both | REST conventions, pagination, RFC 7807 errors, OpenAPI |
-| [`shared/database`](skills/shared/database.md) | Both | Flyway vs EF Migrations, N+1, projections, soft delete, indexing |
-| [`shared/security`](skills/shared/security.md) | Both | Auth, CORS, input validation, secrets handling |
-| [`shared/observability`](skills/shared/observability.md) | Both | Logging, tracing, metrics, health checks |
-| [`shared/error-handling`](skills/shared/error-handling.md) | Both | Exception mapping, RFC 7807 problem details |
-| [`shared/bootstrap`](skills/shared/bootstrap.md) | Both | Create/update project context docs in `.agent/` |
-| [`shared/refactor`](skills/shared/refactor.md) | Both | Convention-aligned refactoring without behavior changes |
-| [`shared/anti-invention`](skills/shared/anti-invention.md) | Both | Guardrails against AI hallucination and scope creep |
-| [`shared/pattern-analysis`](skills/shared/pattern-analysis.md) | Both | 3-example rule: study codebase before generating |
-| [`shared/gap-analysis`](skills/shared/gap-analysis.md) | Both | Detect missing requirement info before writing specs |
-| [`shared/spec-validation`](skills/shared/spec-validation.md) | Both | Validate spec completeness and consistency |
-| [`shared/dor`](skills/shared/dor.md) | Both | Definition of Ready — 15-item pre-implementation gate |
-| [`shared/dod`](skills/shared/dod.md) | Both | Definition of Done — 23-item completion checklist |
+| [`shared/api-design`](skills/shared/api-design/SKILL.md) | Both | REST conventions, pagination, RFC 7807 errors, OpenAPI |
+| [`shared/database`](skills/shared/database/SKILL.md) | Both | Flyway vs EF Migrations, N+1, projections, soft delete, indexing |
+| [`shared/security`](skills/shared/security/SKILL.md) | Both | Auth, CORS, input validation, secrets handling |
+| [`shared/observability`](skills/shared/observability/SKILL.md) | Both | Logging, tracing, metrics, health checks |
+| [`shared/error-handling`](skills/shared/error-handling/SKILL.md) | Both | Exception mapping, RFC 7807 problem details |
+| [`shared/bootstrap`](skills/shared/bootstrap/SKILL.md) | Both | Create/update project context docs in `.agent/` |
+| [`shared/refactor`](skills/shared/refactor/SKILL.md) | Both | Convention-aligned refactoring without behavior changes |
+| [`shared/anti-invention`](skills/shared/anti-invention/SKILL.md) | Both | Guardrails against AI hallucination and scope creep |
+| [`shared/pattern-analysis`](skills/shared/pattern-analysis/SKILL.md) | Both | 3-example rule: study codebase before generating |
+| [`shared/gap-analysis`](skills/shared/gap-analysis/SKILL.md) | Both | Detect missing requirement info before writing specs |
+| [`shared/spec-validation`](skills/shared/spec-validation/SKILL.md) | Both | Validate spec completeness and consistency |
+| [`shared/dor`](skills/shared/dor/SKILL.md) | Both | Definition of Ready — 15-item pre-implementation gate |
+| [`shared/dod`](skills/shared/dod/SKILL.md) | Both | Definition of Done — 23-item completion checklist |
 
 ---
 
@@ -388,14 +428,14 @@ You can also reference skills directly for targeted tasks:
 
 ```text
 Read .agent/SKILLS.md.
-Create endpoint POST /api/v1/orders following skills/shared/api-design.md,
+Create endpoint POST /api/v1/orders following skills/shared/api-design/SKILL.md,
 use validation and RFC 7807 errors.
 ```
 
 ```text
 Read .agent/SKILLS.md.
 Refactor Order module to respect skills/spring-boot/SKILL.md
-and skills/shared/database.md conventions.
+and skills/shared/database/SKILL.md conventions.
 ```
 
 ### 3) Keep project-specific rules in `.agent/SKILLS.md`
@@ -488,7 +528,7 @@ Write tests for the Order module following the testing skill.
 | Command | Agent / Skill | Purpose |
 |---------|---------------|----------|
 | `@review` | → **reviewer** agent | Structured code review with 🔴🟡🔵 severity classification |
-| `@refactor` | [refactor.md](skills/shared/refactor.md) | Restructure code to align with conventions without changing behavior |
+| `@refactor` | [refactor.md](skills/shared/refactor/SKILL.md) | Restructure code to align with conventions without changing behavior |
 
 ```text
 @review
