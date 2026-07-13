@@ -3,7 +3,6 @@
 # Usage:
 #   make help
 #   make validate
-#   make generate
 #   make install STACK=spring-boot TARGET=/path/to/your/project
 #   make install STACK=dotnet     TARGET=/path/to/your/project FORMAT=kiro
 
@@ -49,7 +48,6 @@ help: ## Show this help
 	@echo "    make install STACK=spring-boot TARGET=~/projects/my-api"
 	@echo "    make bootstrap STACK=spring-boot TARGET=~/projects/my-api"
 	@echo "    make install STACK=dotnet TARGET=~/projects/my-app FORMAT=kiro"
-	@echo "    make generate"
 	@echo "    make validate"
 	@echo ""
 
@@ -60,16 +58,16 @@ validate: ## Validate all skill files (frontmatter + required sections)
 	@bash $(SCRIPTS_DIR)/validate.sh $(SKILLS_DIR) $(TEMPLATES)
 	@echo "$(GREEN)✔ All skills valid$(RESET)"
 
-# ─── Generate ─────────────────────────────────────────────────────────────────
-.PHONY: generate
-generate: ## Generate .toml files from all .md skill files
-	@echo "$(CYAN)▶ Generating .toml files...$(RESET)"
-	@bash $(SCRIPTS_DIR)/generate.sh $(SKILLS_DIR) $(OUTPUTS)
-	@echo "$(GREEN)✔ Generation complete$(RESET)"
+# ─── Validate specs ───────────────────────────────────────────────────────────
+.PHONY: validate-specs
+validate-specs: ## Validate TOON spec files (SPECS=path, default: specs/examples)
+	@echo "$(CYAN)▶ Validating TOON specs...$(RESET)"
+	@bash $(SCRIPTS_DIR)/validate-spec.sh $(or $(SPECS),$(SPECS_DIR)/examples)
+	@echo "$(GREEN)✔ All specs valid$(RESET)"
 
 # ─── Install ──────────────────────────────────────────────────────────────────
 .PHONY: install
-install: validate generate ## Install skills into a project (.agent/ or .kiro/steering/)
+install: validate ## Install skills into a project (.agent/ or .kiro/steering/)
 	@echo "$(CYAN)▶ Installing SDD into: $(TARGET)$(RESET)"
 	@echo "  Stack  : $(YELLOW)$(STACK)$(RESET)"
 	@echo "  Format : $(YELLOW)$(FORMAT)$(RESET)"
@@ -90,28 +88,27 @@ install: validate generate ## Install skills into a project (.agent/ or .kiro/st
 
 # ─── Bootstrap ────────────────────────────────────────────────────────────────
 .PHONY: bootstrap
-bootstrap: check install ## Bootstrap workflow: validate, generate and install .agent context
+bootstrap: check install ## Bootstrap workflow: run all checks and install .agent context
 	@echo "$(GREEN)✔ Bootstrap completed (validation + install)$(RESET)"
 
 # ─── Update ───────────────────────────────────────────────────────────────────
 .PHONY: update
-update: ## Pull latest skills and regenerate (for projects that already have SDD installed)
+update: ## Pull the latest skills (for projects that already have SDD installed)
 	@echo "$(CYAN)▶ Updating SDD...$(RESET)"
 	@if [ ! -d "$(SDD_DIR).git" ]; then \
 		echo "$(RED)✘ Not a git repo. Run from the sdd/ directory.$(RESET)"; exit 1; \
 	fi
 	git -C $(SDD_DIR) pull --ff-only
-	@$(MAKE) generate
 	@echo "$(GREEN)✔ SDD updated$(RESET)"
 
 # ─── Upgrade ─────────────────────────────────────────────────────────────────
 .PHONY: upgrade
-upgrade: update install ## Pull latest skills, regenerate, and reinstall into TARGET project
+upgrade: update install ## Pull latest skills and reinstall into TARGET project
 	@echo "$(GREEN)✔ SDD upgraded in: $(TARGET)$(RESET)"
 
 # ─── Check (CI) ───────────────────────────────────────────────────────────────
 .PHONY: check
-check: validate generate validate-agents ## Run all checks (for CI)
+check: validate validate-specs validate-agents ## Run all checks (for CI)
 	@echo "$(GREEN)✔ All checks passed$(RESET)"
 
 # ─── Validate Agents ──────────────────────────────────────────────────────────

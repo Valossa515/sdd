@@ -84,7 +84,7 @@ Refactor the Order module to follow skills/spring-boot/SKILL.md layer separation
 
 ```text
 @refactor
-Align error handling in src/main/java/com/example/api/ with skills/shared/error-handling.md.
+Align error handling in src/main/java/com/example/api/ with skills/shared/error-handling/SKILL.md.
 ```
 
 ## Refactoring checklist

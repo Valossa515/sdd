@@ -74,10 +74,24 @@ When installed in a project:
     └── contracts/       ← architecture contracts (.contract.toon)
 ```
 
+## Validating Specs
+
+`scripts/validate-spec.sh` checks spec files against the schema rules — required blocks and fields, ID formats (`FT-NNN`, `BR-NNN`, `AC-NNN`), unique IDs, declared row counts (`[N]`), allowed enum values, and that `feature-ref` points to an existing feature spec:
+
+```bash
+# In the SDD repo (validates the examples):
+make validate-specs
+
+# In your project (the installer copies the validator to .agent/scripts/):
+bash .agent/scripts/validate-spec.sh .agent/specs
+```
+
+Reference examples live in [`specs/examples/`](examples/) and double as test fixtures for the validator in CI.
+
 ## Principles
 
 1. **Spec before code** — no code without a spec (or at minimum, a contract)
 2. **Traceable** — every spec has an `id` that downstream artifacts reference
 3. **Deterministic** — same spec → same code (agents must not add undocumented behavior)
-4. **Validated** — specs are checked against schemas before use (see `skills/shared/spec-validation.md`)
+4. **Validated** — specs are checked against schemas before use (see `skills/shared/spec-validation/SKILL.md`)
 5. **Token-efficient** — TOON format minimizes token usage for LLM agents

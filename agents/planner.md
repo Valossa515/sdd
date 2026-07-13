@@ -40,7 +40,7 @@ All three artifacts are generated together in one execution.
 ```
 1. READ the requirement carefully
 2. READ context — load .agent/SKILLS.md, context.md, architecture.md, conventions.md
-3. RUN gap analysis (see skills/shared/gap-analysis.md)
+3. RUN gap analysis (see skills/shared/gap-analysis/SKILL.md)
    → If blocking gaps exist → STOP and ask the user
 4. IDENTIFY scope — list which layers, modules, and files will be affected
 5. DESIGN the approach — describe the solution at the architectural level
@@ -61,7 +61,7 @@ Before writing anything, you MUST execute the gap analysis protocol:
 - Show the gap analysis results to the user
 - Only proceed when all blocking gaps are resolved
 
-Reference: `skills/shared/gap-analysis.md`
+Reference: `skills/shared/gap-analysis/SKILL.md`
 
 ## Plan Document Template
 

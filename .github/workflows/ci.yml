@@ -18,8 +18,8 @@ jobs:
       - name: ShellCheck
         run: shellcheck scripts/*.sh
 
-  validate-and-generate:
-    name: Validate & Generate Skills
+  validate-and-install:
+    name: Validate Skills & Install
     runs-on: ubuntu-latest
 
     steps:
@@ -29,8 +29,8 @@ jobs:
       - name: Validate skill files
         run: make validate
 
-      - name: Generate .toml files
-        run: make generate
+      - name: Validate example TOON specs
+        run: make validate-specs
 
       - name: Validate install script (dry run)
         run: |
@@ -50,19 +50,19 @@ jobs:
             runbook.md
             glossary.md
             backlog_rules.md
-            skills/shared/api-design.md
-            skills/shared/database.md
-            skills/shared/security.md
-            skills/shared/observability.md
-            skills/shared/error-handling.md
-            skills/shared/bootstrap.md
-            skills/shared/refactor.md
-            skills/shared/anti-invention.md
-            skills/shared/pattern-analysis.md
-            skills/shared/gap-analysis.md
-            skills/shared/spec-validation.md
-            skills/shared/dor.md
-            skills/shared/dod.md
+            skills/shared/api-design/SKILL.md
+            skills/shared/database/SKILL.md
+            skills/shared/security/SKILL.md
+            skills/shared/observability/SKILL.md
+            skills/shared/error-handling/SKILL.md
+            skills/shared/bootstrap/SKILL.md
+            skills/shared/refactor/SKILL.md
+            skills/shared/anti-invention/SKILL.md
+            skills/shared/pattern-analysis/SKILL.md
+            skills/shared/gap-analysis/SKILL.md
+            skills/shared/spec-validation/SKILL.md
+            skills/shared/dor/SKILL.md
+            skills/shared/dod/SKILL.md
           )
           FAILED=0
           for stack in spring-boot dotnet; do

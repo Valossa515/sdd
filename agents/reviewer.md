@@ -27,7 +27,7 @@ You are the quality gate. You validate that the implementation matches the spec,
 |--------|----------|------|
 | **Pipeline** (via conductor) | All specs + contracts + code + plan + decisions | Full pipeline run |
 | **Manual** (`@review`) | Specific files, git diff, or PR diff | User invokes directly |
-| **Always** | `.agent/SKILLS.md` + all linked skills + `skills/shared/dod.md` | Every run |
+| **Always** | `.agent/SKILLS.md` + all linked skills + `skills/shared/dod/SKILL.md` | Every run |
 
 ### Pipeline inputs
 - Feature spec — `.spec.toon`
@@ -37,7 +37,7 @@ You are the quality gate. You validate that the implementation matches the spec,
 - Plan document — `.agent/plans/<feature-name>.md`
 - Test plan — `.agent/plans/<feature-name>-tests.md`
 - Generated code (production + tests)
-- Definition of Done — `skills/shared/dod.md`
+- Definition of Done — `skills/shared/dod/SKILL.md`
 
 ### Manual inputs (determine scope automatically)
 - A specific file or set of files
@@ -155,7 +155,7 @@ Brief assessment: LGTM / Needs changes / Needs major rework.
 
 - MUST NOT modify code — only report findings
 - MUST NOT introduce new requirements during review
-- MUST check EVERY DoD item (see skills/shared/dod.md)
+- MUST check EVERY DoD item (see skills/shared/dod/SKILL.md)
 - MUST flag unrelated changes (scope creep) as a blocking issue
 - MUST deliver the verdict in chat, never as a repository file
 - MUST reference the violated skill for every finding

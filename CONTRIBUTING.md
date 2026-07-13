@@ -27,14 +27,13 @@ Every skill must have:
 - **Code examples** — prose is not enough
 - **`## What NOT to do`** — anti-patterns matter as much as patterns
 
-### 3. Validate and generate
+### 3. Validate
 
 ```bash
 make validate   # check frontmatter and structure
-make generate   # build .toml files
 ```
 
-Both must pass cleanly before you open a PR.
+It must pass cleanly before you open a PR.
 
 ### 4. Update the relevant SKILLS.md template
 
@@ -46,7 +45,7 @@ If your skill should be active by default for a stack, add it to `templates/<sta
 
 - Keep breaking changes minimal
 - If changing a major convention (e.g., switching from `@Value` to `@ConfigurationProperties`), briefly mention the old way so readers can migrate
-- Re-run `make validate && make generate` after every edit
+- Re-run `make validate` after every edit
 
 ---
 

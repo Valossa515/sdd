@@ -12,14 +12,20 @@ GREEN='\033[0;32m'
 CYAN='\033[0;36m'
 RESET='\033[0m'
 
-DEST="$SKILLS_DIR/$STACK/$NAME.md"
+# Shared skills live in one directory per skill (Claude Code plugin format);
+# stack skills are flat files inside the stack directory.
+if [ "$STACK" = "shared" ]; then
+  DEST="$SKILLS_DIR/$STACK/$NAME/SKILL.md"
+else
+  DEST="$SKILLS_DIR/$STACK/$NAME.md"
+fi
 
 if [ -f "$DEST" ]; then
   echo "File already exists: $DEST"
   exit 1
 fi
 
-mkdir -p "$SKILLS_DIR/$STACK"
+mkdir -p "$(dirname "$DEST")"
 
 cat > "$DEST" <<EOF
 ---
@@ -84,4 +90,4 @@ EOF
 echo -e "${GREEN}✔ Created: $DEST${RESET}"
 echo ""
 echo -e "${CYAN}Edit the file and fill in the [TODO] sections.${RESET}"
-echo -e "Then run ${CYAN}make validate && make generate${RESET} to check and compile it."
+echo -e "Then run ${CYAN}make validate${RESET} to check it."
