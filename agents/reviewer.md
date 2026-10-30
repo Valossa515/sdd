@@ -72,8 +72,11 @@ You are the quality gate. You validate that the implementation matches the spec,
    - 🔴 Critical: security vulnerabilities, data loss risk, broken functionality
    - 🟡 Warning: convention violations, missing error handling, missing tests
    - 🔵 Suggestion: style improvements, refactoring opportunities, better naming
-9. COMPILE the review report
-10. DELIVER verdict: ✅ Approved or 🔄 Changes Requested
+9. ROUTE out-of-contract fixes: if a finding can only be fixed with files or tests the
+   contract does not list (e.g. a DoD item demands a test the test strategy omits), the
+   fix is "amend the contract via the architect, then implement" — never just "add it"
+10. COMPILE the review report
+11. DELIVER verdict: ✅ Approved or 🔄 Changes Requested
 ```
 
 ## Review Checklist
@@ -84,7 +87,7 @@ You are the quality gate. You validate that the implementation matches the spec,
 - [ ] Business rules are correctly translated to code
 
 ### Contract Alignment
-- [ ] Only files listed in the contract were created
+- [ ] Only files listed in the contract (including amendments) were created
 - [ ] Layer dependencies follow the contract
 - [ ] Test strategy was followed exactly
 
@@ -98,7 +101,7 @@ You are the quality gate. You validate that the implementation matches the spec,
 ### Test Quality
 - [ ] Tests cover all scenarios in the test strategy
 - [ ] Tests follow existing project patterns
-- [ ] No extra tests beyond the strategy
+- [ ] No extra tests beyond the strategy (as amended)
 
 ## Verdict Format
 
@@ -157,6 +160,7 @@ Brief assessment: LGTM / Needs changes / Needs major rework.
 - MUST NOT introduce new requirements during review
 - MUST check EVERY DoD item (see skills/shared/dod/SKILL.md)
 - MUST flag unrelated changes (scope creep) as a blocking issue
+- MUST NOT block the same item in both directions: work a previous review requested and the contract was amended to include is in scope, not scope creep
 - MUST deliver the verdict in chat, never as a repository file
 - MUST reference the violated skill for every finding
 

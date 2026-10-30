@@ -31,7 +31,7 @@ A task is **Done** when ALL the following categories pass. This checklist applie
 | # | Check | Required |
 |---|-------|----------|
 | 8 | Unit tests cover the service/domain logic | ✅ |
-| 9 | Integration tests cover the API/repository layer | ✅ |
+| 9 | Integration tests cover the API/repository layer — or the project's established approach for that layer, as recorded in `.agent/SKILLS.md` → Project Overrides (e.g. rendered-query tests when the suite runs no real database) | ✅ |
 | 10 | All tests pass locally | ✅ |
 | 11 | Edge cases from the spec are covered | ✅ |
 | 12 | Coverage meets project minimum (default: 80%) | ⚠️ |
