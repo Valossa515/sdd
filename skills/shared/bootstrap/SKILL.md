@@ -156,6 +156,7 @@ Follow these steps **in order**. Each step MUST end with a **file being written 
 - Active skills list
 - Section **`## Project Overrides`** (keep this exact heading — installers, commands and docs refer to it)
 - Links to `project-reference.md`, `context.md`, `architecture.md`, and `runbook.md`
+- How the repository and API layers are tested (real database, in-memory, rendered queries, `WebApplicationFactory`/`MockMvc`, ...) — the DoD's integration-test item is checked against this, so record it whenever the project does not run real integration tests
 
 **Reconcile the Active Skills tables with the real stack.** The installed template ships generic
 `Scope` descriptions (e.g. Database → "Entities, DbContext"; Error handling → "Exception mapping,
