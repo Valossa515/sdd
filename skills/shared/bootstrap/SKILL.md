@@ -154,10 +154,17 @@ Follow these steps **in order**. Each step MUST end with a **file being written 
 
 **⚠️ ACTION REQUIRED:** Use your file-writing tool to **write the file** at `.agent/SKILLS.md` with:
 - Active skills list
-- Section **Overrides específicos do projeto**
+- Section **`## Project Overrides`** (keep this exact heading — installers, commands and docs refer to it)
 - Links to `project-reference.md`, `context.md`, `architecture.md`, and `runbook.md`
 
-**✅ Checkpoint:** The file `.agent/SKILLS.md` now exists on disk.
+**Reconcile the Active Skills tables with the real stack.** The installed template ships generic
+`Scope` descriptions (e.g. Database → "Entities, DbContext"; Error handling → "Exception mapping,
+RFC 7807"). For every row whose scope names a technology or format the scan did **not** find, rewrite
+the scope to what the project actually uses (e.g. "Entities, MongoDB repositories, indexes";
+"Exception mapping, `{ code, message, field }` — see Project Overrides"). Never leave a table row that
+contradicts `## Project Overrides` — agents read the tables first. Keep the skill links unchanged.
+
+**✅ Checkpoint:** The file `.agent/SKILLS.md` now exists on disk, and no Active Skills row names a technology or format that Project Overrides says the project does not use.
 
 ---
 
