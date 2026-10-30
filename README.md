@@ -168,11 +168,11 @@ their changelog; the installed `.agent/SKILLS.md` records which version it came 
 ### Option 2: install via `git clone` (recommended for teams)
 
 ```bash
-git clone https://github.com/valossa515/sdd.git /tmp/sdd && \
-  make -C /tmp/sdd install STACK=spring-boot TARGET=$(pwd)
+git clone https://github.com/valossa515/sdd.git /tmp/sdd
 
-# .NET
-make -C /tmp/sdd install STACK=dotnet TARGET=$(pwd)
+# then pick ONE stack:
+make -C /tmp/sdd install STACK=spring-boot TARGET=$(pwd)   # Spring Boot
+make -C /tmp/sdd install STACK=dotnet      TARGET=$(pwd)   # .NET
 ```
 
 ### Option 3: run from local clone
@@ -184,6 +184,20 @@ make bootstrap STACK=spring-boot TARGET=$(pwd)
 ```
 
 This creates a `.agent/` folder in your project with all relevant skills, ready to customize.
+
+### Windows (PowerShell)
+
+The installer is a bash script, and PowerShell has neither `make` nor `\` line
+continuations. Use the bash that ships with [Git for Windows](https://git-scm.com/download/win)
+(call it by full path — a bare `bash` may resolve to WSL instead). From your project folder:
+
+```powershell
+git clone https://github.com/valossa515/sdd.git $env:TEMP\sdd
+& "$env:ProgramFiles\Git\bin\bash.exe" "$env:TEMP/sdd/scripts/install.sh" dotnet .
+```
+
+Replace `dotnet` with `spring-boot` for a Spring Boot project. Inside a Git Bash
+terminal, Option 1 works as-is (Options 2 and 3 need `make`, which Git Bash does not include).
 
 ---
 

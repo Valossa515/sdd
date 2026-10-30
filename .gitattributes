@@ -1,0 +1,4 @@
+# Shell scripts and the Makefile must keep LF endings, even on Windows
+# checkouts (core.autocrlf=true), or bash fails with $'\r': command not found.
+*.sh     text eol=lf
+Makefile text eol=lf

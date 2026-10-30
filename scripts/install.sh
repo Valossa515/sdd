@@ -326,7 +326,7 @@ suggest_gitignore() {
 post_install_summary() {
   echo ""
   echo "  ┌─────────────────────────────────────────────────────────┐"
-  echo "  │  ${BOLD}What to do next${RESET}                                         │"
+  echo -e "  │  ${BOLD}What to do next${RESET}                                         │"
   echo "  │                                                         │"
   if [ "$FORMAT" = "kiro" ]; then
     echo "  │  1. Open .kiro/steering/ and review the skills          │"
