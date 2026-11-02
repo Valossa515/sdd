@@ -8,6 +8,9 @@
 #
 # Usage (from Makefile):
 #   make install STACK=spring-boot TARGET=/path/to/project FORMAT=agent
+#
+# Windows: scripts/install.ps1 is the native PowerShell port. CI diffs the output
+# of both installers, so any change here must be mirrored there.
 
 set -euo pipefail
 
@@ -39,6 +42,7 @@ RESET='\033[0m'
 
 SDD_REPO="https://github.com/valossa515/sdd.git"
 TMPDIR_SDD=""
+KEPT=()                # project-owned files left untouched on re-install
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
 banner() {
@@ -74,6 +78,16 @@ check_deps() {
   if [ "${#missing[@]}" -gt 0 ]; then
     echo -e "${RED}✘ Missing required tools: ${missing[*]}${RESET}"
     exit 1
+  fi
+}
+
+# Project-owned files (SKILLS.md overrides, bootstrap context docs) are only
+# created on first install; re-installs keep the project's version.
+copy_if_missing() {
+  if [ -e "$2" ]; then
+    KEPT+=("${2#"$TARGET"/}")
+  else
+    cp "$1" "$2"
   fi
 }
 
@@ -128,13 +142,9 @@ install_agent_format() {
   cp -r "$src/skills/shared/." "$dest/skills/shared/"
 
   echo -e "  ${CYAN}→${RESET} .agent/context docs"
-  cp "$src/templates/common/context.md" "$dest/context.md"
-  cp "$src/templates/common/architecture.md" "$dest/architecture.md"
-  cp "$src/templates/common/decisions.md" "$dest/decisions.md"
-  cp "$src/templates/common/conventions.md" "$dest/conventions.md"
-  cp "$src/templates/common/runbook.md" "$dest/runbook.md"
-  cp "$src/templates/common/glossary.md" "$dest/glossary.md"
-  cp "$src/templates/common/backlog_rules.md" "$dest/backlog_rules.md"
+  for doc in context architecture decisions conventions runbook glossary backlog_rules; do
+    copy_if_missing "$src/templates/common/$doc.md" "$dest/$doc.md"
+  done
 
   # Stacks are the directories under skills/ (except shared); each stack needs
   # a matching templates/<stack>/SKILLS.md entry point.
@@ -152,9 +162,10 @@ install_agent_format() {
   mkdir -p "$dest/skills/$STACK"
   echo -e "  ${CYAN}→${RESET} .agent/skills/$STACK/"
   cp -r "$src/skills/$STACK/." "$dest/skills/$STACK/"
-  cp "$src/templates/$STACK/SKILLS.md" "$dest/SKILLS.md"
+  copy_if_missing "$src/templates/$STACK/SKILLS.md" "$dest/SKILLS.md"
 
-  # Stamp the real SDD version so projects know what they installed
+  # Stamp the real SDD version so projects know what they installed (also on a
+  # kept SKILLS.md: only that line changes, the overrides stay)
   local version
   version=$(sdd_version "$src")
   if [ -n "$version" ]; then
@@ -245,6 +256,14 @@ install_agent_format() {
     mkdir -p "$dest/templates"
     cp "$src/templates/PULL_REQUEST_TEMPLATE.md" "$dest/templates/"
     echo -e "  ${CYAN}→${RESET} .agent/templates/PULL_REQUEST_TEMPLATE.md"
+  fi
+
+  if [ "${#KEPT[@]}" -gt 0 ]; then
+    echo ""
+    echo -e "  ${YELLOW}Kept your existing project files${RESET} (delete one to reset it to the template):"
+    for f in "${KEPT[@]}"; do
+      echo "     $f"
+    done
   fi
 
   echo ""

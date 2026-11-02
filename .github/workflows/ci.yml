@@ -91,6 +91,17 @@ jobs:
           [ "$FAILED" -eq 0 ] || exit 1
           echo "✔ All required files present after install"
 
+      - name: Re-install keeps project-owned files
+        run: |
+          echo "MY OVERRIDE" >> /tmp/test-dotnet/.agent/SKILLS.md
+          echo "MY CONTEXT"  >> /tmp/test-dotnet/.agent/context.md
+          echo "STALE"       >> /tmp/test-dotnet/.agent/skills/shared/dod/SKILL.md
+          bash scripts/install.sh dotnet /tmp/test-dotnet agent "$(pwd)"
+          grep -q "MY OVERRIDE" /tmp/test-dotnet/.agent/SKILLS.md || { echo "❌ SKILLS.md overrides lost"; exit 1; }
+          grep -q "MY CONTEXT"  /tmp/test-dotnet/.agent/context.md || { echo "❌ context.md lost"; exit 1; }
+          if grep -q "STALE" /tmp/test-dotnet/.agent/skills/shared/dod/SKILL.md; then echo "❌ skills not refreshed"; exit 1; fi
+          echo "✔ Re-install keeps SKILLS.md and context docs, refreshes skills"
+
       - name: Verify skill count
         run: |
           EXPECTED=17
@@ -98,3 +109,80 @@ jobs:
           echo "Skills found: $ACTUAL (expected: $EXPECTED)"
           [ "$ACTUAL" -ge "$EXPECTED" ] || { echo "❌ Expected at least $EXPECTED skill files"; exit 1; }
           echo "✔ Skill count OK"
+
+  install-powershell:
+    name: PowerShell installer (${{ matrix.os }}, ${{ matrix.shell }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: windows-latest, shell: powershell }   # Windows PowerShell 5.1
+          - { os: windows-latest, shell: pwsh }
+          - { os: ubuntu-latest,  shell: pwsh }
+    defaults:
+      run:
+        shell: ${{ matrix.shell }}
+
+    steps:
+      - name: Keep LF line endings (as the README's clone command does)
+        run: git config --global core.autocrlf false
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: install.ps1 is ASCII-only (Windows PowerShell 5.1 reads BOM-less scripts as ANSI)
+        run: |
+          if ([IO.File]::ReadAllBytes("$PWD/scripts/install.ps1") | Where-Object { $_ -gt 127 }) {
+            throw 'scripts/install.ps1 must contain only ASCII characters'
+          }
+
+      - name: install.ps1 output matches install.sh
+        run: |
+          $bash = if ($env:OS -eq 'Windows_NT') { "$env:ProgramFiles\Git\bin\bash.exe" } else { 'bash' }
+          function Get-Tree([string] $Dir) {
+            $root = (Resolve-Path $Dir).Path
+            Get-ChildItem $root -Recurse -File -Force | ForEach-Object {
+              '{0} {1}' -f $_.FullName.Substring($root.Length + 1).Replace('\', '/'), (Get-FileHash $_.FullName -Algorithm SHA256).Hash
+            } | Sort-Object
+          }
+          foreach ($stack in 'spring-boot', 'dotnet') {
+            foreach ($format in 'agent', 'kiro') {
+              $ps = "out/ps-$stack-$format"; $sh = "out/sh-$stack-$format"
+              New-Item -ItemType Directory -Force $ps, $sh | Out-Null
+              & ./scripts/install.ps1 -Stack $stack -Target $ps -Format $format
+              & $bash scripts/install.sh $stack $sh $format .
+              if ($LASTEXITCODE -ne 0) { throw "install.sh failed for $stack/$format" }
+              $diff = Compare-Object @(Get-Tree $sh) @(Get-Tree $ps)
+              if ($diff) {
+                $diff | Format-Table -AutoSize | Out-String -Width 300 | Write-Host
+                git --no-pager diff --no-index $sh $ps
+                throw "install.ps1 and install.sh differ for $stack/$format"
+              }
+              Write-Host "OK: $stack/$format identical"
+            }
+          }
+
+      - name: install.ps1 works as a one-line scriptblock (remote install form)
+        run: |
+          New-Item -ItemType Directory -Force out/scriptblock | Out-Null
+          & ([scriptblock]::Create((Get-Content -Raw scripts/install.ps1))) -Stack dotnet -Target out/scriptblock -Source .
+          if (-not (Test-Path out/scriptblock/.agent/SKILLS.md)) { throw 'scriptblock install produced no .agent/SKILLS.md' }
+
+      - name: install.ps1 re-install keeps project-owned files
+        run: |
+          $t = 'out/ps-dotnet-agent/.agent'
+          Add-Content "$t/SKILLS.md" 'MY OVERRIDE'
+          Add-Content "$t/context.md" 'MY CONTEXT'
+          Add-Content "$t/skills/shared/dod/SKILL.md" 'STALE'
+          & ./scripts/install.ps1 -Stack dotnet -Target out/ps-dotnet-agent
+          if (-not (Select-String "$t/SKILLS.md" -SimpleMatch 'MY OVERRIDE' -Quiet)) { throw 'SKILLS.md overrides lost' }
+          if (-not (Select-String "$t/context.md" -SimpleMatch 'MY CONTEXT' -Quiet)) { throw 'context.md lost' }
+          if (Select-String "$t/skills/shared/dod/SKILL.md" -SimpleMatch 'STALE' -Quiet) { throw 'skills not refreshed' }
+
+      - name: install.ps1 rejects an unknown stack
+        run: |
+          New-Item -ItemType Directory -Force out/bad | Out-Null
+          $failed = $false
+          try { & ./scripts/install.ps1 -Stack nope -Target out/bad } catch { $failed = $true; Write-Host "Rejected as expected: $_" }
+          if (-not $failed) { throw 'install.ps1 accepted an unknown stack' }
