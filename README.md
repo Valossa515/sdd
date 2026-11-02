@@ -96,6 +96,7 @@ examples/
 
 scripts/
 ├── install.sh
+├── install.ps1              # native Windows installer (same output as install.sh)
 ├── validate.sh
 ├── validate-spec.sh
 └── new-skill.sh
@@ -185,19 +186,38 @@ make bootstrap STACK=spring-boot TARGET=$(pwd)
 
 This creates a `.agent/` folder in your project with all relevant skills, ready to customize.
 
-### Windows (PowerShell)
+### Option 4: Windows (PowerShell)
 
-The installer is a bash script, and PowerShell has neither `make` nor `\` line
-continuations. Use the bash that ships with [Git for Windows](https://git-scm.com/download/win)
-(call it by full path — a bare `bash` may resolve to WSL instead). From your project folder:
+`scripts/install.ps1` is a native installer: no bash, `make` or Git Bash needed. It runs on
+Windows PowerShell 5.1 (built into Windows) and PowerShell 7+, needs only `git`, and produces
+exactly the same files as the bash installer. From your project folder:
+
+```powershell
+& ([scriptblock]::Create((irm https://raw.githubusercontent.com/valossa515/sdd/main/scripts/install.ps1))) -Stack dotnet
+```
+
+| Parameter | Values | Default |
+|-----------|--------|---------|
+| `-Stack` | `dotnet`, `spring-boot` | required |
+| `-Target` | path to your project | current folder |
+| `-Format` | `agent`, `kiro` | `agent` |
+| `-Ref` | tag or branch to install, e.g. `v1.0.0` (recommended for teams) | latest `main` |
+
+From a local clone (`-ExecutionPolicy Bypass` applies to this one run only — Windows PowerShell
+blocks local scripts by default):
 
 ```powershell
 git clone https://github.com/valossa515/sdd.git $env:TEMP\sdd
-& "$env:ProgramFiles\Git\bin\bash.exe" "$env:TEMP/sdd/scripts/install.sh" dotnet .
+powershell -ExecutionPolicy Bypass -File $env:TEMP\sdd\scripts\install.ps1 -Stack dotnet -Target .
 ```
 
-Replace `dotnet` with `spring-boot` for a Spring Boot project. Inside a Git Bash
-terminal, Option 1 works as-is (Options 2 and 3 need `make`, which Git Bash does not include).
+Prefer bash? Inside a Git Bash terminal, Option 1 works as-is (Options 2 and 3 need `make`,
+which Git Bash does not include).
+
+Re-running either installer upgrades SDD in place: skills, agents, prompts and schemas are
+refreshed, while your `.agent/SKILLS.md` (Project Overrides) and the context docs filled in by
+`@bootstrap` are kept — only their `sdd-version` line is updated. Delete a file to reset it to the
+template.
 
 ---
 
@@ -395,7 +415,7 @@ git pull                # fetch latest version
 make upgrade STACK=spring-boot TARGET=/path/to/your/project
 ```
 
-`make upgrade` runs `update` (git pull) then `install` — replacing all skill, agent, prompt, and spec files in your project's `.agent/` folder while preserving your `SKILLS.md` overrides.
+`make upgrade` runs `update` (git pull) then `install` — replacing all skill, agent, prompt, and spec files in your project's `.agent/` folder while preserving your `SKILLS.md` overrides and the context docs (`context.md`, `architecture.md`, ...).
 
 ### Option 2: one-line reinstall (curl)
 
