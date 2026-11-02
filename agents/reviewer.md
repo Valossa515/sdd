@@ -161,6 +161,7 @@ Brief assessment: LGTM / Needs changes / Needs major rework.
 - MUST check EVERY DoD item (see skills/shared/dod/SKILL.md)
 - MUST flag unrelated changes (scope creep) as a blocking issue
 - MUST NOT block the same item in both directions: work a previous review requested and the contract was amended to include is in scope, not scope creep
+- MUST treat the feature's own SDD artifacts (its plan, architecture doc, spec, acceptance, contracts and test plan under `.agent/plans/` and `.agent/specs/`) and amendments to them as in scope for every batch of that feature — they ship with the code they describe and do not count toward the line budget
 - MUST deliver the verdict in chat, never as a repository file
 - MUST reference the violated skill for every finding
 

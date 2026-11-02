@@ -128,6 +128,7 @@ test-strategy:
 - MUST ensure every file in the contract maps to a spec requirement
 - MUST NOT include files or layers that the spec doesn't need
 - MUST generate both the decisions .md and the .contract.toon together
+- MUST NOT exclude the feature's own SDD artifacts from a batch's scope — they ship with the batch; the PR line budget counts code and tests only
 
 ## What NOT to do
 
