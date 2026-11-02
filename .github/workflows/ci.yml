@@ -176,9 +176,9 @@ jobs:
           Add-Content "$t/context.md" 'MY CONTEXT'
           Add-Content "$t/skills/shared/dod/SKILL.md" 'STALE'
           & ./scripts/install.ps1 -Stack dotnet -Target out/ps-dotnet-agent
-          if (-not (Select-String "$t/SKILLS.md" -SimpleMatch 'MY OVERRIDE' -Quiet)) { throw 'SKILLS.md overrides lost' }
-          if (-not (Select-String "$t/context.md" -SimpleMatch 'MY CONTEXT' -Quiet)) { throw 'context.md lost' }
-          if (Select-String "$t/skills/shared/dod/SKILL.md" -SimpleMatch 'STALE' -Quiet) { throw 'skills not refreshed' }
+          if (-not (Select-String -LiteralPath "$t/SKILLS.md" -Pattern 'MY OVERRIDE' -SimpleMatch -Quiet)) { throw 'SKILLS.md overrides lost' }
+          if (-not (Select-String -LiteralPath "$t/context.md" -Pattern 'MY CONTEXT' -SimpleMatch -Quiet)) { throw 'context.md lost' }
+          if (Select-String -LiteralPath "$t/skills/shared/dod/SKILL.md" -Pattern 'STALE' -SimpleMatch -Quiet) { throw 'skills not refreshed' }
 
       - name: install.ps1 rejects an unknown stack
         run: |

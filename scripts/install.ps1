@@ -289,7 +289,7 @@ function Install-KiroFormat([string] $Src) {
 # --- .gitignore hint ----------------------------------------------------------
 function Show-GitignoreHint {
   $gitignore = Join-Child $Target '.gitignore'
-  if ((Test-Path -LiteralPath $gitignore) -and -not (Select-String -LiteralPath $gitignore -SimpleMatch '.agent/' -Quiet)) {
+  if ((Test-Path -LiteralPath $gitignore) -and -not (Select-String -LiteralPath $gitignore -Pattern '.agent/' -SimpleMatch -Quiet)) {
     Write-Host ''
     Write-Host 'Tip: ' -ForegroundColor Yellow -NoNewline
     Write-Host 'Commit the .agent/ folder so your team shares the same conventions.'
