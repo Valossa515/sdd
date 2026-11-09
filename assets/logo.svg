@@ -1,164 +1,153 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="356" height="124" viewBox="0 0 356 124" role="img" aria-labelledby="title">
-  <title id="title">SDD — Skill-Driven Development</title>
-  <style>
-    .block  { fill: #0969da; }
-    .shadow { fill: #b6cbe8; }
-    .tag    { fill: #57606a; font: 600 15px ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: 0.5px; }
-    @media (prefers-color-scheme: dark) {
-      .block  { fill: #58a6ff; }
-      .shadow { fill: #1c3a63; }
-      .tag    { fill: #9ba5b0; }
-    }
-  </style>
-  <g>
-    <rect class="shadow" x="12" y="12" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="26" y="12" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="40" y="12" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="54" y="12" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="68" y="12" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="82" y="12" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="96" y="12" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="124" y="12" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="138" y="12" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="152" y="12" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="166" y="12" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="180" y="12" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="194" y="12" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="236" y="12" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="250" y="12" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="264" y="12" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="278" y="12" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="292" y="12" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="306" y="12" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="12" y="26" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="26" y="26" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="124" y="26" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="138" y="26" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="194" y="26" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="208" y="26" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="236" y="26" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="250" y="26" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="306" y="26" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="320" y="26" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="12" y="40" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="26" y="40" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="40" y="40" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="54" y="40" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="68" y="40" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="82" y="40" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="96" y="40" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="124" y="40" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="138" y="40" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="194" y="40" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="208" y="40" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="236" y="40" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="250" y="40" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="306" y="40" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="320" y="40" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="82" y="54" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="96" y="54" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="124" y="54" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="138" y="54" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="194" y="54" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="208" y="54" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="236" y="54" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="250" y="54" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="306" y="54" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="320" y="54" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="12" y="68" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="26" y="68" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="40" y="68" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="54" y="68" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="68" y="68" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="82" y="68" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="96" y="68" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="124" y="68" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="138" y="68" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="152" y="68" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="166" y="68" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="180" y="68" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="194" y="68" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="236" y="68" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="250" y="68" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="264" y="68" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="278" y="68" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="292" y="68" width="13" height="13" rx="1.5"/>
-    <rect class="shadow" x="306" y="68" width="13" height="13" rx="1.5"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="356" height="124" viewBox="0 0 356 124" role="img" aria-label="SDD — Skill-Driven Development">
+  <g fill="#b6cbe8">
+    <rect x="12" y="12" width="13" height="13" rx="1.5"/>
+    <rect x="26" y="12" width="13" height="13" rx="1.5"/>
+    <rect x="40" y="12" width="13" height="13" rx="1.5"/>
+    <rect x="54" y="12" width="13" height="13" rx="1.5"/>
+    <rect x="68" y="12" width="13" height="13" rx="1.5"/>
+    <rect x="82" y="12" width="13" height="13" rx="1.5"/>
+    <rect x="96" y="12" width="13" height="13" rx="1.5"/>
+    <rect x="124" y="12" width="13" height="13" rx="1.5"/>
+    <rect x="138" y="12" width="13" height="13" rx="1.5"/>
+    <rect x="152" y="12" width="13" height="13" rx="1.5"/>
+    <rect x="166" y="12" width="13" height="13" rx="1.5"/>
+    <rect x="180" y="12" width="13" height="13" rx="1.5"/>
+    <rect x="194" y="12" width="13" height="13" rx="1.5"/>
+    <rect x="236" y="12" width="13" height="13" rx="1.5"/>
+    <rect x="250" y="12" width="13" height="13" rx="1.5"/>
+    <rect x="264" y="12" width="13" height="13" rx="1.5"/>
+    <rect x="278" y="12" width="13" height="13" rx="1.5"/>
+    <rect x="292" y="12" width="13" height="13" rx="1.5"/>
+    <rect x="306" y="12" width="13" height="13" rx="1.5"/>
+    <rect x="12" y="26" width="13" height="13" rx="1.5"/>
+    <rect x="26" y="26" width="13" height="13" rx="1.5"/>
+    <rect x="124" y="26" width="13" height="13" rx="1.5"/>
+    <rect x="138" y="26" width="13" height="13" rx="1.5"/>
+    <rect x="194" y="26" width="13" height="13" rx="1.5"/>
+    <rect x="208" y="26" width="13" height="13" rx="1.5"/>
+    <rect x="236" y="26" width="13" height="13" rx="1.5"/>
+    <rect x="250" y="26" width="13" height="13" rx="1.5"/>
+    <rect x="306" y="26" width="13" height="13" rx="1.5"/>
+    <rect x="320" y="26" width="13" height="13" rx="1.5"/>
+    <rect x="12" y="40" width="13" height="13" rx="1.5"/>
+    <rect x="26" y="40" width="13" height="13" rx="1.5"/>
+    <rect x="40" y="40" width="13" height="13" rx="1.5"/>
+    <rect x="54" y="40" width="13" height="13" rx="1.5"/>
+    <rect x="68" y="40" width="13" height="13" rx="1.5"/>
+    <rect x="82" y="40" width="13" height="13" rx="1.5"/>
+    <rect x="96" y="40" width="13" height="13" rx="1.5"/>
+    <rect x="124" y="40" width="13" height="13" rx="1.5"/>
+    <rect x="138" y="40" width="13" height="13" rx="1.5"/>
+    <rect x="194" y="40" width="13" height="13" rx="1.5"/>
+    <rect x="208" y="40" width="13" height="13" rx="1.5"/>
+    <rect x="236" y="40" width="13" height="13" rx="1.5"/>
+    <rect x="250" y="40" width="13" height="13" rx="1.5"/>
+    <rect x="306" y="40" width="13" height="13" rx="1.5"/>
+    <rect x="320" y="40" width="13" height="13" rx="1.5"/>
+    <rect x="82" y="54" width="13" height="13" rx="1.5"/>
+    <rect x="96" y="54" width="13" height="13" rx="1.5"/>
+    <rect x="124" y="54" width="13" height="13" rx="1.5"/>
+    <rect x="138" y="54" width="13" height="13" rx="1.5"/>
+    <rect x="194" y="54" width="13" height="13" rx="1.5"/>
+    <rect x="208" y="54" width="13" height="13" rx="1.5"/>
+    <rect x="236" y="54" width="13" height="13" rx="1.5"/>
+    <rect x="250" y="54" width="13" height="13" rx="1.5"/>
+    <rect x="306" y="54" width="13" height="13" rx="1.5"/>
+    <rect x="320" y="54" width="13" height="13" rx="1.5"/>
+    <rect x="12" y="68" width="13" height="13" rx="1.5"/>
+    <rect x="26" y="68" width="13" height="13" rx="1.5"/>
+    <rect x="40" y="68" width="13" height="13" rx="1.5"/>
+    <rect x="54" y="68" width="13" height="13" rx="1.5"/>
+    <rect x="68" y="68" width="13" height="13" rx="1.5"/>
+    <rect x="82" y="68" width="13" height="13" rx="1.5"/>
+    <rect x="96" y="68" width="13" height="13" rx="1.5"/>
+    <rect x="124" y="68" width="13" height="13" rx="1.5"/>
+    <rect x="138" y="68" width="13" height="13" rx="1.5"/>
+    <rect x="152" y="68" width="13" height="13" rx="1.5"/>
+    <rect x="166" y="68" width="13" height="13" rx="1.5"/>
+    <rect x="180" y="68" width="13" height="13" rx="1.5"/>
+    <rect x="194" y="68" width="13" height="13" rx="1.5"/>
+    <rect x="236" y="68" width="13" height="13" rx="1.5"/>
+    <rect x="250" y="68" width="13" height="13" rx="1.5"/>
+    <rect x="264" y="68" width="13" height="13" rx="1.5"/>
+    <rect x="278" y="68" width="13" height="13" rx="1.5"/>
+    <rect x="292" y="68" width="13" height="13" rx="1.5"/>
+    <rect x="306" y="68" width="13" height="13" rx="1.5"/>
   </g>
-  <g>
-    <rect class="block" x="8" y="8" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="22" y="8" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="36" y="8" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="50" y="8" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="64" y="8" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="78" y="8" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="92" y="8" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="120" y="8" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="134" y="8" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="148" y="8" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="162" y="8" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="176" y="8" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="190" y="8" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="232" y="8" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="246" y="8" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="260" y="8" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="274" y="8" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="288" y="8" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="302" y="8" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="8" y="22" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="22" y="22" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="120" y="22" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="134" y="22" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="190" y="22" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="204" y="22" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="232" y="22" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="246" y="22" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="302" y="22" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="316" y="22" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="8" y="36" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="22" y="36" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="36" y="36" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="50" y="36" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="64" y="36" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="78" y="36" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="92" y="36" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="120" y="36" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="134" y="36" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="190" y="36" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="204" y="36" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="232" y="36" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="246" y="36" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="302" y="36" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="316" y="36" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="78" y="50" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="92" y="50" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="120" y="50" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="134" y="50" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="190" y="50" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="204" y="50" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="232" y="50" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="246" y="50" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="302" y="50" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="316" y="50" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="8" y="64" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="22" y="64" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="36" y="64" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="50" y="64" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="64" y="64" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="78" y="64" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="92" y="64" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="120" y="64" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="134" y="64" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="148" y="64" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="162" y="64" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="176" y="64" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="190" y="64" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="232" y="64" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="246" y="64" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="260" y="64" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="274" y="64" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="288" y="64" width="13" height="13" rx="1.5"/>
-    <rect class="block" x="302" y="64" width="13" height="13" rx="1.5"/>
+  <g fill="#0969da">
+    <rect x="8" y="8" width="13" height="13" rx="1.5"/>
+    <rect x="22" y="8" width="13" height="13" rx="1.5"/>
+    <rect x="36" y="8" width="13" height="13" rx="1.5"/>
+    <rect x="50" y="8" width="13" height="13" rx="1.5"/>
+    <rect x="64" y="8" width="13" height="13" rx="1.5"/>
+    <rect x="78" y="8" width="13" height="13" rx="1.5"/>
+    <rect x="92" y="8" width="13" height="13" rx="1.5"/>
+    <rect x="120" y="8" width="13" height="13" rx="1.5"/>
+    <rect x="134" y="8" width="13" height="13" rx="1.5"/>
+    <rect x="148" y="8" width="13" height="13" rx="1.5"/>
+    <rect x="162" y="8" width="13" height="13" rx="1.5"/>
+    <rect x="176" y="8" width="13" height="13" rx="1.5"/>
+    <rect x="190" y="8" width="13" height="13" rx="1.5"/>
+    <rect x="232" y="8" width="13" height="13" rx="1.5"/>
+    <rect x="246" y="8" width="13" height="13" rx="1.5"/>
+    <rect x="260" y="8" width="13" height="13" rx="1.5"/>
+    <rect x="274" y="8" width="13" height="13" rx="1.5"/>
+    <rect x="288" y="8" width="13" height="13" rx="1.5"/>
+    <rect x="302" y="8" width="13" height="13" rx="1.5"/>
+    <rect x="8" y="22" width="13" height="13" rx="1.5"/>
+    <rect x="22" y="22" width="13" height="13" rx="1.5"/>
+    <rect x="120" y="22" width="13" height="13" rx="1.5"/>
+    <rect x="134" y="22" width="13" height="13" rx="1.5"/>
+    <rect x="190" y="22" width="13" height="13" rx="1.5"/>
+    <rect x="204" y="22" width="13" height="13" rx="1.5"/>
+    <rect x="232" y="22" width="13" height="13" rx="1.5"/>
+    <rect x="246" y="22" width="13" height="13" rx="1.5"/>
+    <rect x="302" y="22" width="13" height="13" rx="1.5"/>
+    <rect x="316" y="22" width="13" height="13" rx="1.5"/>
+    <rect x="8" y="36" width="13" height="13" rx="1.5"/>
+    <rect x="22" y="36" width="13" height="13" rx="1.5"/>
+    <rect x="36" y="36" width="13" height="13" rx="1.5"/>
+    <rect x="50" y="36" width="13" height="13" rx="1.5"/>
+    <rect x="64" y="36" width="13" height="13" rx="1.5"/>
+    <rect x="78" y="36" width="13" height="13" rx="1.5"/>
+    <rect x="92" y="36" width="13" height="13" rx="1.5"/>
+    <rect x="120" y="36" width="13" height="13" rx="1.5"/>
+    <rect x="134" y="36" width="13" height="13" rx="1.5"/>
+    <rect x="190" y="36" width="13" height="13" rx="1.5"/>
+    <rect x="204" y="36" width="13" height="13" rx="1.5"/>
+    <rect x="232" y="36" width="13" height="13" rx="1.5"/>
+    <rect x="246" y="36" width="13" height="13" rx="1.5"/>
+    <rect x="302" y="36" width="13" height="13" rx="1.5"/>
+    <rect x="316" y="36" width="13" height="13" rx="1.5"/>
+    <rect x="78" y="50" width="13" height="13" rx="1.5"/>
+    <rect x="92" y="50" width="13" height="13" rx="1.5"/>
+    <rect x="120" y="50" width="13" height="13" rx="1.5"/>
+    <rect x="134" y="50" width="13" height="13" rx="1.5"/>
+    <rect x="190" y="50" width="13" height="13" rx="1.5"/>
+    <rect x="204" y="50" width="13" height="13" rx="1.5"/>
+    <rect x="232" y="50" width="13" height="13" rx="1.5"/>
+    <rect x="246" y="50" width="13" height="13" rx="1.5"/>
+    <rect x="302" y="50" width="13" height="13" rx="1.5"/>
+    <rect x="316" y="50" width="13" height="13" rx="1.5"/>
+    <rect x="8" y="64" width="13" height="13" rx="1.5"/>
+    <rect x="22" y="64" width="13" height="13" rx="1.5"/>
+    <rect x="36" y="64" width="13" height="13" rx="1.5"/>
+    <rect x="50" y="64" width="13" height="13" rx="1.5"/>
+    <rect x="64" y="64" width="13" height="13" rx="1.5"/>
+    <rect x="78" y="64" width="13" height="13" rx="1.5"/>
+    <rect x="92" y="64" width="13" height="13" rx="1.5"/>
+    <rect x="120" y="64" width="13" height="13" rx="1.5"/>
+    <rect x="134" y="64" width="13" height="13" rx="1.5"/>
+    <rect x="148" y="64" width="13" height="13" rx="1.5"/>
+    <rect x="162" y="64" width="13" height="13" rx="1.5"/>
+    <rect x="176" y="64" width="13" height="13" rx="1.5"/>
+    <rect x="190" y="64" width="13" height="13" rx="1.5"/>
+    <rect x="232" y="64" width="13" height="13" rx="1.5"/>
+    <rect x="246" y="64" width="13" height="13" rx="1.5"/>
+    <rect x="260" y="64" width="13" height="13" rx="1.5"/>
+    <rect x="274" y="64" width="13" height="13" rx="1.5"/>
+    <rect x="288" y="64" width="13" height="13" rx="1.5"/>
+    <rect x="302" y="64" width="13" height="13" rx="1.5"/>
   </g>
-  <text class="tag" x="178.0" y="112" text-anchor="middle">Skill-Driven Development</text>
+  <text x="178.0" y="112" text-anchor="middle" fill="#57606a" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, monospace" font-size="15" font-weight="600" letter-spacing="0.5">Skill-Driven Development</text>
 </svg>

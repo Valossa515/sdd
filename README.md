@@ -1,6 +1,9 @@
 <div align="center">
 
-<img src="assets/logo.svg" alt="SDD — Skill-Driven Development" width="360">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="assets/logo-dark.svg">
+  <img src="assets/logo.svg" alt="SDD — Skill-Driven Development" width="360">
+</picture>
 
 **Structured skill files, agent roles, and specification schemas for AI coding agents**  
 *Spring Boot · .NET · REST APIs · Database · Testing · Bootstrap · Agent Pipeline · Specs*
@@ -68,6 +71,9 @@ agents/
 ├── tester.md                # contract + code → test-plan.md + tests (@test-plan + @test)
 ├── reviewer.md              # code review + DoD (@review)
 └── conductor.md             # pipeline orchestration
+
+docs/
+└── agents.md                # agent pipeline guide (installed as .agent/agents/README.md)
 
 prompts/
 ├── endpoint.md              # generate REST endpoint
@@ -233,6 +239,7 @@ your-project/
 │   │       ├── dor/SKILL.md             ← Definition of Ready gate
 │   │       └── dod/SKILL.md             ← Definition of Done gate
 │   ├── agents/                    ← agent role definitions
+│   │   ├── README.md              ← pipeline guide
 │   │   ├── planner.md             ← requirement → plan + specs
 │   │   ├── architect.md           ← spec → architecture decisions + contract
 │   │   ├── builder.md             ← contract/plan → production code
@@ -328,7 +335,7 @@ Use the full pipeline for new features, or shortcut for simpler tasks:
 | Simple bugfix | builder → tester → reviewer |
 | Refactor | builder → tester → reviewer |
 
-See [agents/README.md](agents/README.md) for full documentation.
+See [docs/agents.md](docs/agents.md) for full documentation.
 
 ### Using agents in GitHub Copilot (VS Code)
 

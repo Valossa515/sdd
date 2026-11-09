@@ -26,12 +26,12 @@ The **conductor** orchestrates this pipeline end-to-end, or you can invoke each 
 
 | Role | File | Input | Output |
 |------|------|-------|--------|
-| **planner** | [planner.md](planner.md) | Business requirement | Plan (.md) + feature spec + acceptance (.toon) |
-| **architect** | [architect.md](architect.md) | Feature spec + plan (.toon + .md) | Architecture decisions (.md) + contract (.toon) |
-| **builder** | [builder.md](builder.md) | Contract (.toon) or plan (.md) | Production code only |
-| **tester** | [tester.md](tester.md) | Contract (.toon) + code | Test plan (.md) + test code |
-| **reviewer** | [reviewer.md](reviewer.md) | Everything above | Review verdict (🔴🟡🔵) |
-| **conductor** | [conductor.md](conductor.md) | Business requirement | Full pipeline |
+| **planner** | [planner.md](../agents/planner.md) | Business requirement | Plan (.md) + feature spec + acceptance (.toon) |
+| **architect** | [architect.md](../agents/architect.md) | Feature spec + plan (.toon + .md) | Architecture decisions (.md) + contract (.toon) |
+| **builder** | [builder.md](../agents/builder.md) | Contract (.toon) or plan (.md) | Production code only |
+| **tester** | [tester.md](../agents/tester.md) | Contract (.toon) + code | Test plan (.md) + test code |
+| **reviewer** | [reviewer.md](../agents/reviewer.md) | Everything above | Review verdict (🔴🟡🔵) |
+| **conductor** | [conductor.md](../agents/conductor.md) | Business requirement | Full pipeline |
 
 ## Cross-Cutting Rules (All Roles)
 
