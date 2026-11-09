@@ -29,9 +29,29 @@ versions: "SDD 1.x"
 ## Trigger phrases
 
 - `@bootstrap`
+- `@bootstrap` followed by a description of what the project does
 - "bootstrap do projeto"
 - "initialize project context"
 - "prepare .agent docs"
+
+---
+
+## Two sources: the code and the project description
+
+Bootstrap writes the context docs from two sources, and either one can be missing:
+
+| Source | What it tells you | Where it goes |
+|--------|-------------------|---------------|
+| **The codebase** (Step 1 scan) | What the system does *today*: modules, endpoints, schema, conventions, build | All files |
+| **The project description** — anything the user writes with `@bootstrap`: purpose, problem, users, main flows, business rules, constraints, domain terms, decisions already made | *Why* the system exists and what it must do — things code rarely shows | `context.md` (Problem, Objectives, Personas, Main Flows, Constraints), `glossary.md` (business terms), `backlog_rules.md` (business rules), `decisions.md` (decisions the team already made) |
+
+Rules:
+
+- **The description is a primary source, not a guess.** Facts the user states are explicit requirements (see `anti-invention`): write them down as given. Do not embellish them or fill gaps around them.
+- **The code wins for what exists; the description wins for intent.** When they disagree (e.g. the description says "multi-tenant" but nothing in the code filters by tenant), write both and mark the line `⚠️ Divergence: description says X, code shows Y` in `context.md`. Never silently pick one.
+- **New project, little or no code:** write all 9 files from the description. Sections that only code can fill (class map, endpoints, schema, build commands) get `TODO: no code yet`. Anything the description plans but the code does not have yet is labelled **(planned)**, never presented as implemented.
+- **No description given:** business sections the code cannot reveal (Problem, Objectives, Personas, Constraints) get `TODO: describe in @bootstrap`. List them in the Step 10 report and suggest re-running `@bootstrap` with a description.
+- **Re-running with only a description** (to add or correct what the project does): update the business sections of the existing files and keep everything else as it is.
 
 ---
 
@@ -81,8 +101,8 @@ Follow these steps **in order**. Each step MUST end with a **file being written 
 
 **⚠️ ACTION REQUIRED:** Use your file-writing tool to **write the file** at `.agent/context.md` with:
 - Follow template from `templates/common/context.md`
-- Project overview, problem statement, objectives, main flows, endpoints, constraints, dependencies
-- Populate from the data already collected in Step 1
+- Project overview, problem statement, objectives, personas, main flows, endpoints, constraints, dependencies
+- Populate from the data already collected in Step 1 **and from the project description, if one was given** (see "Two sources" above): problem, objectives, personas and constraints come mostly from the description
 
 **✅ Checkpoint:** The file `.agent/context.md` now exists on disk.
 
@@ -125,7 +145,7 @@ Follow these steps **in order**. Each step MUST end with a **file being written 
 
 **⚠️ ACTION REQUIRED:** Use your file-writing tool to **write the file** at `.agent/glossary.md` with:
 - Follow template from `templates/common/glossary.md`
-- Domain terms, entity names, enum values, abbreviations from the codebase
+- Domain terms, entity names, enum values, abbreviations from the codebase, plus the business terms the project description defines
 
 **✅ Checkpoint:** The file `.agent/glossary.md` now exists on disk.
 
@@ -145,6 +165,7 @@ Follow these steps **in order**. Each step MUST end with a **file being written 
 
 **⚠️ ACTION REQUIRED:** Use your file-writing tool to **write the file** at `.agent/backlog_rules.md` with:
 - Follow template from `templates/common/backlog_rules.md`
+- Include the business rules stated in the project description
 
 **✅ Checkpoint:** The file `.agent/backlog_rules.md` now exists on disk.
 
@@ -200,11 +221,13 @@ contradicts `## Project Overrides` — agents read the tables first. Keep the sk
 - .agent/SKILLS.md
 ```
 
+Then list the sections left as `TODO: describe in @bootstrap` and any `⚠️ Divergence` lines, so the user knows what to describe or decide.
+
 ---
 
 ## Output quality rules
 
-- Every section must contain **real project data** — scan the codebase before writing.
+- Every section must contain **real project data** — from the codebase scan or the user's project description, never invented.
 - Class/module descriptions must be specific (e.g., "Handles order creation and stock validation") not generic (e.g., "Service layer").
 - Architecture docs must reflect the actual folder structure and class relationships.
 - Use `TODO: <reason>` instead of inventing facts — but only for genuinely unknowable info.
@@ -214,6 +237,11 @@ contradicts `## Project Overrides` — agents read the tables first. Keep the sk
 
 ```text
 @bootstrap
+```
+
+```text
+@bootstrap
+This project is <what it does, for whom, main flows, business rules, constraints>.
 ```
 
 ```bash
