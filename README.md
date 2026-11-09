@@ -148,7 +148,7 @@ This registers everything natively in Claude Code:
 | `/sdd:review` | reviewer | Structured review with 🔴🟡🔵 findings + DoD check |
 | `/sdd:refactor` | refactor skill | Convention-aligned refactoring, no behavior change |
 | `/sdd:pipeline` | conductor | Full pipeline with confirmation gates |
-| `/sdd:bootstrap` | bootstrap skill | Create/update the `.agent/` context docs |
+| `/sdd:bootstrap` | bootstrap skill | Create/update the `.agent/` context docs from your code and/or a description of the project |
 
 The plugin works standalone, or together with a `.agent/` folder installed by the options below (commands read `.agent/SKILLS.md` overrides when present).
 
@@ -298,7 +298,7 @@ your-project/
 | [`shared/security`](skills/shared/security/SKILL.md) | Both | Auth, CORS, input validation, secrets handling |
 | [`shared/observability`](skills/shared/observability/SKILL.md) | Both | Logging, tracing, metrics, health checks |
 | [`shared/error-handling`](skills/shared/error-handling/SKILL.md) | Both | Exception mapping, RFC 7807 problem details |
-| [`shared/bootstrap`](skills/shared/bootstrap/SKILL.md) | Both | Create/update project context docs in `.agent/` |
+| [`shared/bootstrap`](skills/shared/bootstrap/SKILL.md) | Both | Create/update project context docs in `.agent/` from the code and/or a description of what the project does |
 | [`shared/refactor`](skills/shared/refactor/SKILL.md) | Both | Convention-aligned refactoring without behavior changes |
 | [`shared/anti-invention`](skills/shared/anti-invention/SKILL.md) | Both | Guardrails against AI hallucination and scope creep |
 | [`shared/pattern-analysis`](skills/shared/pattern-analysis/SKILL.md) | Both | 3-example rule: study codebase before generating |
@@ -505,43 +505,76 @@ In **Project Overrides**, add concrete rules such as:
 
 ## How to use bootstrap (`@bootstrap`)
 
-The shared `bootstrap` skill helps create/update project context docs in `.agent/`:
+`@bootstrap` writes the project context that every agent reads before working — `context.md`,
+`architecture.md`, `conventions.md`, `decisions.md`, `runbook.md`, `glossary.md`,
+`backlog_rules.md`, `project-reference.md` and the Project Overrides in `SKILLS.md`.
 
-- `context.md`
-- `architecture.md`
-- `decisions.md` (or `adr/`)
-- `conventions.md`
-- `runbook.md`
-- `glossary.md`
-- `backlog_rules.md`
+It works from **two sources**, and you can give it either or both:
 
-### Prompt-driven bootstrap
+| Source | What it captures |
+|--------|------------------|
+| **Your code** — the agent scans the repository | What the system does *today*: modules, endpoints, database, conventions, build and test commands |
+| **Your description of the project** — what you write after `@bootstrap` | *What the project is for*: the problem it solves, who uses it, main flows, business rules, constraints, domain terms — things the code rarely shows |
 
-Use in prompt:
+What you describe is recorded as given (it is never "improved" or filled in). Where the
+description and the code disagree, bootstrap writes both down and flags the divergence instead
+of picking one. Business sections it could not fill are left as `TODO` and listed at the end, so
+you know what to describe.
+
+### Existing project: map the code and say what it is for (recommended)
 
 ```text
 @bootstrap
-Read .agent/SKILLS.md, map the repository context, and update all .agent context files.
-Do not invent facts: add TODOs for unknowns.
+This is the inventory API for small retailers. Each company manages its own products
+and stock movements; data must never leak between companies. Stock changes come from
+the REST API and from Kafka commands sent by the company's ERP. A product's SKU is
+unique per company. Out of scope: invoicing and the storefront.
 ```
 
-### CLI bootstrap (recommended)
+### Existing project: map the code only
 
-```bash
-make bootstrap STACK=spring-boot TARGET=$(pwd)
-# or
-make bootstrap STACK=dotnet TARGET=$(pwd)
+```text
+@bootstrap
 ```
 
-This guarantees validation and generation happen before installation.
+Problem, objectives, users and business constraints usually can't be read from code, so those
+sections come back as `TODO`. Run `@bootstrap` again later with a description to fill them in —
+only the business sections are updated, the rest is kept.
 
-### Suggested bootstrap routine per project
+### New project (no code yet): define what it will do
 
-1. Run `make bootstrap STACK=<stack> TARGET=$(pwd)`.
-2. Open `.agent/context.md` and fill domain/problem details.
-3. Register key architectural choices in `.agent/decisions.md` or `.agent/adr/`.
-4. Update `.agent/glossary.md` with domain terminology.
-5. Commit `.agent/` together with code changes.
+Use bootstrap to write down what the project is meant to do *before* the first line of code, so
+the planner starts from it:
+
+```text
+@bootstrap
+New project, no code yet. A .NET 10 API for booking meeting rooms: employees book rooms
+by time slot, admins manage rooms. A room can't be double-booked; bookings longer than
+4 hours need admin approval. PostgreSQL, JWT authentication.
+```
+
+Everything that depends on code (class map, endpoints, schema) is marked `TODO: no code yet`,
+and what the description plans is labelled **(planned)**, never presented as already built.
+
+Write the description in any language. Re-run `@bootstrap` whenever the project's purpose or
+rules change.
+
+### `make bootstrap` vs `@bootstrap`
+
+They are different steps:
+
+- `make bootstrap STACK=<stack> TARGET=$(pwd)` runs SDD's checks and **installs** the `.agent/`
+  folder with empty templates. It does not read your code or write any context.
+- `@bootstrap`, in your AI agent's chat, **fills** those templates from your code and your
+  description.
+
+### Suggested routine per project
+
+1. Install SDD (any option under [Install](#install)).
+2. Run `@bootstrap` with a description of what the project does.
+3. Review `.agent/SKILLS.md` → Project Overrides and `.agent/context.md`; fix anything the agent
+   got wrong and answer the remaining `TODO`s.
+4. Commit `.agent/` together with your code.
 
 ## Invocable commands
 
