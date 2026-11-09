@@ -1,14 +1,6 @@
 <div align="center">
 
-```
- ███████╗██████╗ ██████╗
- ██╔════╝██╔══██╗██╔══██╗
- ███████╗██║  ██║██║  ██║
- ╚════██║██║  ██║██║  ██║
- ███████║██████╔╝██████╔╝
- ╚══════╝╚═════╝ ╚═════╝
-  Skill-Driven Development
-```
+<img src="assets/logo.svg" alt="SDD — Skill-Driven Development" width="360">
 
 **Structured skill files, agent roles, and specification schemas for AI coding agents**  
 *Spring Boot · .NET · REST APIs · Database · Testing · Bootstrap · Agent Pipeline · Specs*
