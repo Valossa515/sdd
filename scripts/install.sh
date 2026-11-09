@@ -183,6 +183,11 @@ install_agent_format() {
       [ -f "$f" ] || continue
       cp "$f" "$dest/agents/"
     done
+    # The pipeline guide lives outside agents/ so the Claude Code plugin does
+    # not load it as an agent; projects keep it at .agent/agents/README.md
+    if [ -f "$src/docs/agents.md" ]; then
+      cp "$src/docs/agents.md" "$dest/agents/README.md"
+    fi
   fi
 
   # ── Copilot Custom Agents (.github/agents/*.agent.md) ──────────────────

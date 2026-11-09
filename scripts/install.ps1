@@ -188,6 +188,10 @@ function Install-AgentFormat([string] $Src) {
     New-Directory (Join-Child $dest 'agents')
     Write-Step '.agent/agents/'
     foreach ($f in $agents) { Copy-Item -LiteralPath $f.FullName -Destination (Join-Child $dest 'agents') -Force }
+    # The pipeline guide lives outside agents/ so the Claude Code plugin does
+    # not load it as an agent; projects keep it at .agent/agents/README.md
+    $guide = Join-Child $Src 'docs/agents.md'
+    if (Test-Path -LiteralPath $guide) { Copy-Item -LiteralPath $guide -Destination (Join-Child $dest 'agents/README.md') -Force }
 
     # -- Copilot Custom Agents (.github/agents/*.agent.md) ------------------
     $agentsDir = Join-Child $Target '.github/agents'
