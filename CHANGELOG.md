@@ -9,6 +9,16 @@ The `version` field in `.claude-plugin/plugin.json` must always match the
 latest release in this file (CI enforces it) — Claude Code plugin users only
 receive updates when that field is bumped.
 
+## [Unreleased]
+
+### Fixed
+
+- **Remote install with `install.sh`** (the `bash <(curl ...)` one-liner, with
+  or without `--ref`) failed with `cp: cannot stat .../skills/shared/.`: the
+  temporary clone was deleted before the install started, because its cleanup
+  trap was registered inside a `$(...)` subshell. CI now tests the clone path
+  of both installers
+
 ## [1.1.0] - 2026-11-14
 
 ### Added

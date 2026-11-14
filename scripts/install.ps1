@@ -23,7 +23,8 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$SddRepo  = 'https://github.com/valossa515/sdd.git'
+# SDD_REPO_URL overrides the source repository (CI points it at the local checkout)
+$SddRepo  = if ($env:SDD_REPO_URL) { $env:SDD_REPO_URL } else { 'https://github.com/valossa515/sdd.git' }
 $Utf8     = New-Object System.Text.UTF8Encoding($false)
 $CheckMk  = [char]0x2714
 $Arrow    = [char]0x2192

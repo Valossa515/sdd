@@ -40,8 +40,10 @@ RED='\033[0;31m'
 BOLD='\033[1m'
 RESET='\033[0m'
 
-SDD_REPO="https://github.com/valossa515/sdd.git"
+# SDD_REPO_URL overrides the source repository (CI points it at the local checkout)
+SDD_REPO="${SDD_REPO_URL:-https://github.com/valossa515/sdd.git}"
 TMPDIR_SDD=""
+SDD_SRC=""             # set by ensure_sdd_source
 KEPT=()                # project-owned files left untouched on re-install
 
 # ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -99,10 +101,12 @@ cleanup() {
 }
 
 # ─── Get SDD source ───────────────────────────────────────────────────────────
+# Sets SDD_SRC. Must run in the main shell, not in $(...): the EXIT trap that
+# removes the temporary clone would fire as soon as a subshell returned.
 ensure_sdd_source() {
   if [ -n "$SDD_SOURCE" ] && [ -d "$SDD_SOURCE/skills" ]; then
     [ -n "$REF" ] && echo -e "${YELLOW}⚠ --ref is ignored when installing from a local source${RESET}" >&2
-    echo "$SDD_SOURCE"
+    SDD_SRC="$SDD_SOURCE"
     return
   fi
 
@@ -113,7 +117,7 @@ ensure_sdd_source() {
   repo_root="$(cd "$script_dir/.." && pwd)"
   if [ -d "$repo_root/skills" ]; then
     [ -n "$REF" ] && echo -e "${YELLOW}⚠ --ref is ignored when installing from a local clone (use git checkout $REF)${RESET}" >&2
-    echo "$repo_root"
+    SDD_SRC="$repo_root"
     return
   fi
 
@@ -121,8 +125,9 @@ ensure_sdd_source() {
   echo -e "${CYAN}▶ Fetching SDD from GitHub${REF:+ (ref: $REF)}...${RESET}" >&2
   TMPDIR_SDD=$(mktemp -d)
   trap cleanup EXIT
-  git clone --depth=1 --quiet ${REF:+--branch "$REF"} "$SDD_REPO" "$TMPDIR_SDD"
-  echo "$TMPDIR_SDD"
+  git -c advice.detachedHead=false clone --depth=1 --quiet -c core.autocrlf=false \
+    ${REF:+--branch "$REF"} "$SDD_REPO" "$TMPDIR_SDD"
+  SDD_SRC="$TMPDIR_SDD"
 }
 
 # The SDD version being installed, read from the plugin manifest
@@ -389,8 +394,8 @@ main() {
   echo -e "  Format : ${YELLOW}${FORMAT}${RESET}"
   echo ""
 
-  local sdd_src
-  sdd_src=$(ensure_sdd_source)
+  ensure_sdd_source
+  local sdd_src="$SDD_SRC"
 
   echo -e "${CYAN}▶ Installing skills...${RESET}"
   echo ""
