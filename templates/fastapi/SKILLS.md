@@ -1,0 +1,121 @@
+---
+# .agent/SKILLS.md
+# ─────────────────────────────────────────────────────────
+# SDD — Skill-Driven Development entry point
+# This file is read by the AI agent BEFORE every task.
+# Commit this folder alongside your source code.
+# ─────────────────────────────────────────────────────────
+name: my-fastapi-project
+stack: fastapi
+sdd-version: "1.0"
+---
+
+# Project Agent Skills
+
+This is a **FastAPI / Python 3.12+** project (Pydantic v2, async SQLAlchemy 2.0, Alembic). Before writing any code,
+read and follow all the skills listed below.
+
+## Active Skills
+
+### Stack Skills
+
+| Skill | File | Scope |
+|-------|------|-------|
+| Architecture & patterns | [skills/fastapi/SKILL.md](skills/fastapi/SKILL.md) | All code |
+| Testing | [skills/fastapi/testing.md](skills/fastapi/testing.md) | Test files |
+| REST & API design | [skills/shared/api-design/SKILL.md](skills/shared/api-design/SKILL.md) | Routers, Pydantic schemas |
+| Database | [skills/shared/database/SKILL.md](skills/shared/database/SKILL.md) | ORM models, repositories, Alembic |
+| Security | [skills/shared/security/SKILL.md](skills/shared/security/SKILL.md) | Auth, CORS, input validation |
+| Observability | [skills/shared/observability/SKILL.md](skills/shared/observability/SKILL.md) | Logging, tracing, health checks |
+| Error handling | [skills/shared/error-handling/SKILL.md](skills/shared/error-handling/SKILL.md) | Exception mapping, RFC 7807 |
+| Bootstrap | [skills/shared/bootstrap/SKILL.md](skills/shared/bootstrap/SKILL.md) | Project context setup and maintenance |
+| Refactor | [skills/shared/refactor/SKILL.md](skills/shared/refactor/SKILL.md) | Convention-aligned refactoring |
+
+### Commands
+
+Workflow commands are handled directly by the agent roles:
+
+| Command | Agent | What it does |
+|---------|-------|--------------|
+| `@planning` | [agents/planner.md](agents/planner.md) | Plan a feature — produces plan.md + .spec.toon + .acceptance.toon |
+| `@implementation` | [agents/builder.md](agents/builder.md) | Execute a plan — implements tasks following conventions |
+| `@test-plan` | [agents/tester.md](agents/tester.md) | Design the testing strategy + test plan document |
+| `@test` | [agents/tester.md](agents/tester.md) | Implement the tests from the test plan |
+| `@review` | [agents/reviewer.md](agents/reviewer.md) | Structured code review with 🔴🟡🔵 severity classification |
+
+### Agent Guardrails
+
+| Skill | File | Scope |
+|-------|------|-------|
+| Anti-invention | [skills/shared/anti-invention/SKILL.md](skills/shared/anti-invention/SKILL.md) | All tasks — prevents hallucination |
+| Pattern analysis | [skills/shared/pattern-analysis/SKILL.md](skills/shared/pattern-analysis/SKILL.md) | All generation — 3-example rule |
+| Gap analysis | [skills/shared/gap-analysis/SKILL.md](skills/shared/gap-analysis/SKILL.md) | Planning — detects missing info |
+| Spec validation | [skills/shared/spec-validation/SKILL.md](skills/shared/spec-validation/SKILL.md) | Specs — validates structure |
+| Definition of Ready | [skills/shared/dor/SKILL.md](skills/shared/dor/SKILL.md) | Pre-implementation gate |
+| Definition of Done | [skills/shared/dod/SKILL.md](skills/shared/dod/SKILL.md) | Post-implementation gate |
+
+### Agent Roles
+
+For pipeline-driven development, see [agents/README.md](agents/README.md):
+
+| Role | File | When to use |
+|------|------|-------------|
+| Planner | [agents/planner.md](agents/planner.md) | Convert requirement → spec |
+| Architect | [agents/architect.md](agents/architect.md) | Convert spec → contract |
+| Builder | [agents/builder.md](agents/builder.md) | Generate production code |
+| Tester | [agents/tester.md](agents/tester.md) | Generate tests |
+| Reviewer | [agents/reviewer.md](agents/reviewer.md) | Validate + review |
+| Conductor | [agents/conductor.md](agents/conductor.md) | Run full pipeline |
+
+## Project Overrides
+
+> ✏️ **Edit this section** with your project's specific conventions.
+> Rules here take precedence over the base skills above.
+
+
+### Context documents
+- [context.md](context.md)
+- [architecture.md](architecture.md)
+- [runbook.md](runbook.md)
+- [glossary.md](glossary.md)
+
+### Package structure
+```
+app/
+├── main.py
+├── api/
+│   ├── deps.py
+│   └── v1/
+│       └── schemas/
+├── services/
+├── domain/
+├── repositories/
+├── db/
+│   └── models/
+└── core/
+alembic/
+tests/
+```
+
+### Database
+- **Engine**: PostgreSQL 16 via SQLAlchemy 2.0 async (`asyncpg`)
+- **Migrations**: Alembic (`alembic/versions/`)
+- **Session**: `async_sessionmaker(..., expire_on_commit=False)` in `app/db/session.py`
+
+### Authentication
+- JWT bearer tokens verified with PyJWT against the issuer's JWKS (`get_current_user` dependency)
+- Token header: `Authorization: Bearer <token>`
+
+### Custom rules
+<!-- Add your project-specific rules below. Examples:
+- All monetary values use Decimal, never float
+- Every list endpoint is paginated with limit/offset (max 100)
+- All external API calls go through httpx.AsyncClient with a 5s timeout
+-->
+
+## How to use
+
+Point your agent at this file before each task:
+> "Read `.agent/SKILLS.md` and follow all linked skills before writing any code."
+
+Or configure your IDE plugin to auto-load context from `.agent/`.

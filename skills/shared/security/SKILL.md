@@ -1,13 +1,13 @@
 ---
 name: security
-description: Security conventions for Spring Boot and .NET projects. Covers authentication (JWT, OAuth2), authorization, CORS, CSRF, input validation, secrets management, and OWASP Top 10 prevention.
+description: Security conventions for every SDD stack — authentication (JWT, OAuth2), authorization, CORS, CSRF, input validation, secrets management, and OWASP Top 10 prevention. Examples in Spring Boot and .NET.
 stack: shared
 versions: "Spring Security 6.x, ASP.NET Core Identity, OAuth2/OIDC"
 ---
 
 # Security — Shared Conventions
 
-Apply these conventions regardless of stack (Spring Boot or .NET).
+Apply these conventions regardless of stack. Code samples show Spring Boot and .NET; projects on the other stacks (`spring-boot-kotlin`, `ktor`, `fastapi`, `django`) follow the same rules, and their stack skill (`skills/<stack>/SKILL.md`) shows how to implement them.
 
 ## Authentication — JWT
 

@@ -2,7 +2,7 @@
 #
 # Usage (one line, from your project folder):
 #   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/valossa515/sdd/main/scripts/install.ps1))) -Stack dotnet
-#   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/valossa515/sdd/main/scripts/install.ps1))) -Stack spring-boot -Ref v1.0.0
+#   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/valossa515/sdd/main/scripts/install.ps1))) -Stack spring-boot -Ref v1.1.0
 #
 # Usage (from a local clone):
 #   powershell -ExecutionPolicy Bypass -File C:\tmp\sdd\scripts\install.ps1 -Stack dotnet -Target .
@@ -16,7 +16,7 @@ param(
   [Parameter(Position = 0)] [string] $Stack,
   [Parameter(Position = 1)] [string] $Target = (Get-Location).Path,
   [Parameter(Position = 2)] [ValidateSet('agent', 'kiro')] [string] $Format = 'agent',
-  [string] $Ref,     # tag or branch to clone, e.g. v1.0.0 (remote installs only)
+  [string] $Ref,     # tag or branch to clone, e.g. v1.1.0 (remote installs only)
   [string] $Source   # local SDD checkout; default: the repo this script is in, else a fresh clone
 )
 
@@ -329,7 +329,7 @@ Write-Host '  Specialized skill files for AI coding agents'
 Write-Host ''
 
 if (-not $Stack) {
-  throw 'Stack is required. Usage: install.ps1 -Stack <spring-boot|dotnet> [-Target <dir>] [-Format agent|kiro] [-Ref <tag>]'
+  throw 'Stack is required. Usage: install.ps1 -Stack <spring-boot|spring-boot-kotlin|ktor|dotnet|fastapi|django> [-Target <dir>] [-Format agent|kiro] [-Ref <tag>]'
 }
 if (-not (Test-Path -LiteralPath $Target -PathType Container)) {
   throw "Target directory does not exist: $Target"

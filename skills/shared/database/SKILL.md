@@ -1,11 +1,13 @@
 ---
 name: database
-description: Database conventions for Spring Boot (JPA/Hibernate) and .NET (EF Core) projects. Covers schema design, migrations, query patterns, and performance.
+description: Database conventions for every SDD stack — schema design, migrations, query patterns, transactions and performance. Examples in Spring Boot (JPA/Hibernate) and .NET (EF Core).
 stack: shared
 versions: "PostgreSQL 16+, Flyway or EF Migrations"
 ---
 
 # Database — Shared Conventions
+
+Apply these conventions regardless of stack. Code samples show Spring Boot and .NET; projects on the other stacks (`spring-boot-kotlin`, `ktor`, `fastapi`, `django`) follow the same rules, and their stack skill (`skills/<stack>/SKILL.md`) shows how to implement them.
 
 ## Schema Design
 

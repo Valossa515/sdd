@@ -20,7 +20,7 @@ REF=""                 # --ref <tag|branch>: version to clone (curl installs)
 POSITIONAL=()
 while [ "$#" -gt 0 ]; do
   case "$1" in
-    --ref)   REF="${2:?--ref requires a value (e.g. --ref v1.0.0)}"; shift 2 ;;
+    --ref)   REF="${2:?--ref requires a value (e.g. --ref v1.1.0)}"; shift 2 ;;
     --ref=*) REF="${1#--ref=}"; shift ;;
     *)       POSITIONAL+=("$1"); shift ;;
   esac
@@ -57,16 +57,17 @@ usage() {
   echo "  $0 <stack> [target_dir] [format] [--ref <tag>]"
   echo ""
   echo "Arguments:"
-  echo "  stack       spring-boot | dotnet | any directory under skills/ (except shared)"
+  echo "  stack       spring-boot | spring-boot-kotlin | ktor | dotnet | fastapi | django"
+  echo "              (any directory under skills/ except shared)"
   echo "  target_dir  Path to your project (default: current dir)"
   echo "  format      agent | kiro  (default: agent)"
-  echo "  --ref       Tag or branch to install (curl installs only, e.g. --ref v1.0.0)"
+  echo "  --ref       Tag or branch to install (curl installs only, e.g. --ref v1.1.0)"
   echo ""
   echo "Examples:"
   echo "  $0 spring-boot"
   echo "  $0 dotnet ~/projects/my-api"
   echo "  $0 spring-boot ~/projects/my-api kiro"
-  echo "  $0 spring-boot ~/projects/my-api agent --ref v1.0.0"
+  echo "  $0 spring-boot ~/projects/my-api agent --ref v1.1.0"
   exit 1
 }
 

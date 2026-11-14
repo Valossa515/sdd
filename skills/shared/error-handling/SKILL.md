@@ -1,13 +1,13 @@
 ---
 name: error-handling
-description: Error handling conventions for Spring Boot and .NET projects. Covers RFC 7807 Problem Details, exception hierarchy, error mapping, and client-friendly responses.
+description: Error handling conventions for every SDD stack — RFC 7807 Problem Details, exception hierarchy, error mapping, and client-friendly responses. Examples in Spring Boot and .NET.
 stack: shared
 versions: "RFC 7807, Spring Boot 3.x ProblemDetail, ASP.NET Core ProblemDetails"
 ---
 
 # Error Handling — Shared Conventions
 
-Apply these conventions regardless of stack (Spring Boot or .NET).
+Apply these conventions regardless of stack. Code samples show Spring Boot and .NET; projects on the other stacks (`spring-boot-kotlin`, `ktor`, `fastapi`, `django`) follow the same rules, and their stack skill (`skills/<stack>/SKILL.md`) shows how to implement them.
 
 ## Principles
 
