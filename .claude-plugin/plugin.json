@@ -1,7 +1,7 @@
 {
   "name": "sdd",
   "displayName": "SDD — Skill-Driven Development",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Skill files, agent roles (planner → architect → builder → tester → reviewer) and TOON spec schemas for structured, traceable AI-driven development on Spring Boot (Java and Kotlin), Ktor, .NET, FastAPI and Django.",
   "author": {
     "name": "Valossa515"

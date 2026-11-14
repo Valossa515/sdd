@@ -9,6 +9,59 @@ The `version` field in `.claude-plugin/plugin.json` must always match the
 latest release in this file (CI enforces it) — Claude Code plugin users only
 receive updates when that field is bumped.
 
+## [1.1.0] - 2026-11-14
+
+### Added
+
+- **Four new stacks** — `spring-boot-kotlin` (Spring Boot 3 in Kotlin),
+  `ktor` (Ktor 3 + Exposed + Koin), `fastapi` (FastAPI + Pydantic v2 + async
+  SQLAlchemy 2.0 + Alembic) and `django` (Django 5 + DRF), each with an
+  architecture skill, a testing skill and a `SKILLS.md` template. SDD now
+  ships 25 skill files across six stacks
+- **Native Windows installer** — `scripts/install.ps1` runs on Windows
+  PowerShell 5.1 and PowerShell 7+ with only `git` (no bash, `make` or Git
+  Bash), one line via `irm` or `-File` from a clone, and produces the same
+  files as `install.sh` (CI compares the two byte by byte for every stack)
+- **Bootstrap from a project description** — `@bootstrap` now takes a
+  description of what the project does (purpose, users, flows, business
+  rules, constraints) as a source alongside the code, records divergences
+  between the two, and can bootstrap a project that has no code yet
+- **Logo** — the README banner is an SVG logo with light and dark variants
+
+### Changed
+
+- **Re-installing keeps project-owned files** — both installers create
+  `.agent/SKILLS.md` and the bootstrap context docs only on first install;
+  re-running them refreshes skills, agents, prompts and schemas but keeps
+  your Project Overrides and bootstrap output (only the `sdd-version` line
+  is updated). Previously a re-install overwrote them
+- **Reviewer scope rules** — a finding that needs files or tests outside the
+  contract is fixed by amending the contract through the architect first;
+  a feature's own SDD artifacts (plan, specs, contracts, test plan) are
+  always in scope of its batches; the reviewer never blocks the same item in
+  both directions
+- **DoD item 9** accepts the project's established repository/API test
+  approach recorded in Project Overrides (e.g. rendered-query tests)
+- **Bootstrap** reconciles the Active Skills table with the real stack,
+  records how repositories and APIs are tested, uses the exact
+  `## Project Overrides` heading, and recognises `build.gradle.kts`,
+  `pyproject.toml` and `manage.py`
+- **Shared skills** state that their rules apply to every stack and point to
+  the stack skill for the implementation
+- **CI** installs and checks every stack under `skills/` instead of a fixed list
+
+### Fixed
+
+- `agents/README.md` was loaded as a seventh agent by the Claude Code plugin;
+  the pipeline guide moved to `docs/agents.md` and is still installed as
+  `.agent/agents/README.md`
+- ANSI colors printed as raw `\033[...` codes in `make` output and in the
+  install summary, whose right border was also misaligned
+- Shell scripts and the Makefile are forced to LF line endings, so Windows
+  checkouts with `core.autocrlf=true` no longer break them
+- README: Windows instructions, single-stack install examples, and
+  `make bootstrap` (installs templates) separated from `@bootstrap` (fills them)
+
 ## [1.0.0] - 2026-07-13
 
 First versioned release. Everything below describes the state of SDD at v1.0.0.
