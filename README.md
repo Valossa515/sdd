@@ -6,13 +6,15 @@
 </picture>
 
 **Structured skill files, agent roles, and specification schemas for AI coding agents**  
-*Spring Boot · .NET · REST APIs · Database · Testing · Bootstrap · Agent Pipeline · Specs*
+*Spring Boot (Java & Kotlin) · Ktor · .NET · FastAPI · Django · REST APIs · Database · Testing · Agent Pipeline · Specs*
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Skills](https://img.shields.io/badge/skills-17-blue)](#skills)
+[![Skills](https://img.shields.io/badge/skills-25-blue)](#skills)
 [![Agents](https://img.shields.io/badge/agents-6-orange)](#agent-pipeline)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?logo=springboot&logoColor=white)](#spring-boot)
-[![.NET](https://img.shields.io/badge/.NET-8%2F9-512BD4?logo=dotnet&logoColor=white)](#net)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?logo=springboot&logoColor=white)](#supported-stacks)
+[![Kotlin](https://img.shields.io/badge/Kotlin-2.x-7F52FF?logo=kotlin&logoColor=white)](#supported-stacks)
+[![.NET](https://img.shields.io/badge/.NET-8%2F9-512BD4?logo=dotnet&logoColor=white)](#supported-stacks)
+[![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)](#supported-stacks)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
 </div>
@@ -43,12 +45,12 @@ commands/                    # Claude Code slash commands (/sdd:plan, /sdd:pipel
 └── bootstrap.md
 
 skills/
-├── spring-boot/
-│   ├── SKILL.md
-│   └── testing.md
+├── spring-boot/             # each stack: SKILL.md (architecture, patterns) + testing.md
+├── spring-boot-kotlin/
+├── ktor/
 ├── dotnet/
-│   ├── SKILL.md
-│   └── testing.md
+├── fastapi/
+├── django/
 └── shared/                  # one directory per skill (Claude Code plugin format)
     ├── api-design/SKILL.md
     ├── database/SKILL.md
@@ -124,6 +126,21 @@ you what SDD actually produces.
 
 ## Install
 
+### Supported stacks
+
+Pass one of these as the stack to any install option (`STACK=`, `-Stack`, or the installer's first argument):
+
+| Stack | For | Built on |
+|-------|-----|----------|
+| `spring-boot` | ☕ Java | Spring Boot 3.x, Java 21+, JPA, Flyway |
+| `spring-boot-kotlin` | 🟣 Kotlin | Spring Boot 3.x, Kotlin 2.x, JPA, Flyway, MockK |
+| `ktor` | 🟣 Kotlin | Ktor 3.x, Exposed, Koin, kotlinx.serialization, Flyway |
+| `dotnet` | 🔷 C# | .NET 8/9, ASP.NET Core, EF Core, MediatR |
+| `fastapi` | 🐍 Python | FastAPI, Pydantic v2, async SQLAlchemy 2.0, Alembic |
+| `django` | 🐍 Python | Django 5.x, Django REST Framework, pytest-django |
+
+The shared skills (API design, database, security, errors, observability, quality gates) apply to every stack.
+
 ### Option 0: as a Claude Code plugin (recommended for Claude Code users)
 
 ```text
@@ -196,7 +213,7 @@ exactly the same files as the bash installer. From your project folder:
 
 | Parameter | Values | Default |
 |-----------|--------|---------|
-| `-Stack` | `dotnet`, `spring-boot` | required |
+| `-Stack` | any [supported stack](#supported-stacks), e.g. `dotnet`, `fastapi` | required |
 | `-Target` | path to your project | current folder |
 | `-Format` | `agent`, `kiro` | `agent` |
 | `-Ref` | tag or branch to install, e.g. `v1.0.0` (recommended for teams) | latest `main` |
@@ -292,19 +309,27 @@ your-project/
 | [`spring-boot/testing`](skills/spring-boot/testing.md) | ☕ Spring Boot 3.x | JUnit 5, Mockito, MockMvc, Testcontainers, @WebMvcTest |
 | [`dotnet/SKILL`](skills/dotnet/SKILL.md) | 🔷 .NET 8/9 | Clean Architecture, CQRS/MediatR, FluentValidation, EF Core |
 | [`dotnet/testing`](skills/dotnet/testing.md) | 🔷 .NET 8/9 | xUnit, NSubstitute, WebApplicationFactory, Testcontainers, Respawn |
-| [`shared/api-design`](skills/shared/api-design/SKILL.md) | Both | REST conventions, pagination, RFC 7807 errors, OpenAPI |
-| [`shared/database`](skills/shared/database/SKILL.md) | Both | Flyway vs EF Migrations, N+1, projections, soft delete, indexing |
-| [`shared/security`](skills/shared/security/SKILL.md) | Both | Auth, CORS, input validation, secrets handling |
-| [`shared/observability`](skills/shared/observability/SKILL.md) | Both | Logging, tracing, metrics, health checks |
-| [`shared/error-handling`](skills/shared/error-handling/SKILL.md) | Both | Exception mapping, RFC 7807 problem details |
-| [`shared/bootstrap`](skills/shared/bootstrap/SKILL.md) | Both | Create/update project context docs in `.agent/` from the code and/or a description of what the project does |
-| [`shared/refactor`](skills/shared/refactor/SKILL.md) | Both | Convention-aligned refactoring without behavior changes |
-| [`shared/anti-invention`](skills/shared/anti-invention/SKILL.md) | Both | Guardrails against AI hallucination and scope creep |
-| [`shared/pattern-analysis`](skills/shared/pattern-analysis/SKILL.md) | Both | 3-example rule: study codebase before generating |
-| [`shared/gap-analysis`](skills/shared/gap-analysis/SKILL.md) | Both | Detect missing requirement info before writing specs |
-| [`shared/spec-validation`](skills/shared/spec-validation/SKILL.md) | Both | Validate spec completeness and consistency |
-| [`shared/dor`](skills/shared/dor/SKILL.md) | Both | Definition of Ready — 15-item pre-implementation gate |
-| [`shared/dod`](skills/shared/dod/SKILL.md) | Both | Definition of Done — 23-item completion checklist |
+| [`spring-boot-kotlin/SKILL`](skills/spring-boot-kotlin/SKILL.md) | 🟣 Spring Boot + Kotlin | Kotlin idioms for Spring: null-safety, data-class DTOs, `@field:` validation, JPA entity rules |
+| [`spring-boot-kotlin/testing`](skills/spring-boot-kotlin/testing.md) | 🟣 Spring Boot + Kotlin | JUnit 5, MockK, springmockk, MockMvc Kotlin DSL, Testcontainers |
+| [`ktor/SKILL`](skills/ktor/SKILL.md) | 🟣 Ktor 3.x | Routes, plugins, Exposed + transactions, Koin, StatusPages RFC 7807, JWT |
+| [`ktor/testing`](skills/ktor/testing.md) | 🟣 Ktor 3.x | MockK + runTest, testApplication, Testcontainers + Flyway |
+| [`fastapi/SKILL`](skills/fastapi/SKILL.md) | 🐍 FastAPI | Routers, Depends, Pydantic v2, async SQLAlchemy 2.0, Alembic, RFC 7807 handlers |
+| [`fastapi/testing`](skills/fastapi/testing.md) | 🐍 FastAPI | pytest-asyncio, httpx + dependency overrides, Testcontainers + Alembic |
+| [`django/SKILL`](skills/django/SKILL.md) | 🐍 Django 5.x | Apps, services/selectors, DRF views and serializers, migrations, RFC 7807 handler |
+| [`django/testing`](skills/django/testing.md) | 🐍 Django 5.x | pytest-django, factory_boy, APIClient, query-count assertions |
+| [`shared/api-design`](skills/shared/api-design/SKILL.md) | All | REST conventions, pagination, RFC 7807 errors, OpenAPI |
+| [`shared/database`](skills/shared/database/SKILL.md) | All | Flyway vs EF Migrations, N+1, projections, soft delete, indexing |
+| [`shared/security`](skills/shared/security/SKILL.md) | All | Auth, CORS, input validation, secrets handling |
+| [`shared/observability`](skills/shared/observability/SKILL.md) | All | Logging, tracing, metrics, health checks |
+| [`shared/error-handling`](skills/shared/error-handling/SKILL.md) | All | Exception mapping, RFC 7807 problem details |
+| [`shared/bootstrap`](skills/shared/bootstrap/SKILL.md) | All | Create/update project context docs in `.agent/` from the code and/or a description of what the project does |
+| [`shared/refactor`](skills/shared/refactor/SKILL.md) | All | Convention-aligned refactoring without behavior changes |
+| [`shared/anti-invention`](skills/shared/anti-invention/SKILL.md) | All | Guardrails against AI hallucination and scope creep |
+| [`shared/pattern-analysis`](skills/shared/pattern-analysis/SKILL.md) | All | 3-example rule: study codebase before generating |
+| [`shared/gap-analysis`](skills/shared/gap-analysis/SKILL.md) | All | Detect missing requirement info before writing specs |
+| [`shared/spec-validation`](skills/shared/spec-validation/SKILL.md) | All | Validate spec completeness and consistency |
+| [`shared/dor`](skills/shared/dor/SKILL.md) | All | Definition of Ready — 15-item pre-implementation gate |
+| [`shared/dod`](skills/shared/dod/SKILL.md) | All | Definition of Done — 23-item completion checklist |
 
 ---
 

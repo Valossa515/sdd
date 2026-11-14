@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-STACK="${1:?Stack required (spring-boot | dotnet | shared)}"
+STACK="${1:?Stack required (a directory under skills/, e.g. spring-boot | fastapi | shared)}"
 NAME="${2:?Skill name required}"
 SKILLS_DIR="${3:?Skills directory required}"
 

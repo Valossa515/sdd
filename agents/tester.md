@@ -45,7 +45,7 @@ You design the testing strategy and write all tests in a single pass. You create
 ```
 Phase 1 — PLAN
 1. READ the test strategy from the architecture contract (or analyze the production code)
-2. READ the stack-specific testing skill (spring-boot/testing.md or dotnet/testing.md)
+2. READ the stack-specific testing skill (`skills/<stack>/testing.md` — the stack is in `.agent/SKILLS.md`)
 3. IDENTIFY test categories:
    - Unit tests: domain logic, services, validators, mappers
    - Integration tests: API endpoints, database queries, external services
@@ -116,6 +116,8 @@ Brief description of what is being tested.
 ```
 
 ## Test Structure Reference
+
+Shapes for the two original stacks; the other stacks' `testing.md` has the equivalent for Kotlin (MockK, backtick names) and Python (pytest).
 
 ### Spring Boot
 

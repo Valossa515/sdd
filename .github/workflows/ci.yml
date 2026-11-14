@@ -48,9 +48,11 @@ jobs:
 
       - name: Validate install script (dry run)
         run: |
-          mkdir -p /tmp/test-spring /tmp/test-dotnet
-          bash scripts/install.sh spring-boot /tmp/test-spring agent "$(pwd)"
-          bash scripts/install.sh dotnet      /tmp/test-dotnet agent "$(pwd)"
+          # every directory under skills/ except shared is an installable stack
+          for stack in $(find skills -mindepth 1 -maxdepth 1 -type d ! -name shared -exec basename {} \; | sort); do
+            mkdir -p "/tmp/test-$stack"
+            bash scripts/install.sh "$stack" "/tmp/test-$stack" agent "$(pwd)"
+          done
           echo "✔ Install scripts work correctly"
 
       - name: Check required files in install output
@@ -80,11 +82,9 @@ jobs:
             agents/README.md
           )
           FAILED=0
-          for stack in spring-boot dotnet; do
-            case "$stack" in
-              spring-boot) target=/tmp/test-spring ;;
-              dotnet)      target=/tmp/test-dotnet ;;
-            esac
+          for stack in $(find skills -mindepth 1 -maxdepth 1 -type d ! -name shared -exec basename {} \; | sort); do
+            target="/tmp/test-$stack"
+            [ -f "templates/$stack/SKILLS.md" ] || { echo "❌ Stack $stack has no templates/$stack/SKILLS.md"; FAILED=1; }
             for f in "${COMMON_REQUIRED[@]}" "skills/$stack/SKILL.md" "skills/$stack/testing.md"; do
               [ -f "$target/.agent/$f" ] || { echo "❌ Missing ($stack): $f"; FAILED=1; }
             done
@@ -147,7 +147,8 @@ jobs:
               '{0} {1}' -f $_.FullName.Substring($root.Length + 1).Replace('\', '/'), (Get-FileHash $_.FullName -Algorithm SHA256).Hash
             } | Sort-Object
           }
-          foreach ($stack in 'spring-boot', 'dotnet') {
+          $stacks = Get-ChildItem skills -Directory | Where-Object Name -ne 'shared' | ForEach-Object Name | Sort-Object
+          foreach ($stack in $stacks) {
             foreach ($format in 'agent', 'kiro') {
               $ps = "out/ps-$stack-$format"; $sh = "out/sh-$stack-$format"
               New-Item -ItemType Directory -Force $ps, $sh | Out-Null

@@ -1,13 +1,13 @@
 ---
 name: api-design
-description: REST API conventions applicable to both Spring Boot and .NET projects. Covers URL structure, HTTP verbs, status codes, pagination, versioning, and OpenAPI.
+description: REST API conventions for every SDD stack — URL structure, HTTP verbs, status codes, pagination, versioning, and OpenAPI.
 stack: shared
 versions: "REST/OpenAPI 3.x"
 ---
 
 # API Design — Shared Conventions
 
-Apply these conventions regardless of stack (Spring Boot or .NET).
+Apply these conventions regardless of stack. Code samples show Spring Boot and .NET; projects on the other stacks (`spring-boot-kotlin`, `ktor`, `fastapi`, `django`) follow the same rules, and their stack skill (`skills/<stack>/SKILL.md`) shows how to implement them.
 
 ## URL Structure
 

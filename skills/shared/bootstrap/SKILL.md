@@ -76,7 +76,7 @@ Follow these steps **in order**. Each step MUST end with a **file being written 
 
 ### Step 1 — Scan & write `.agent/project-reference.md`
 
-**Scan:** Read `README`, build file (`pom.xml`, `build.gradle`, `*.csproj`, `package.json`), CI config, and the full source tree. Map every package/namespace, class, controller, service, repository, entity, and config. Identify architecture style, conventions, integrations, and domain vocabulary.
+**Scan:** Read `README`, build file (`pom.xml`, `build.gradle`, `build.gradle.kts`, `*.csproj`, `pyproject.toml`, `requirements*.txt`, `package.json`), CI config, and the full source tree. Map every package/namespace, class, controller, service, repository, entity, and config. Identify architecture style, conventions, integrations, and domain vocabulary.
 
 **⚠️ ACTION REQUIRED:** Use your file-writing tool to **write the file** at `.agent/project-reference.md` with:
 - Follow template structure from `templates/common/project-reference.md`
@@ -87,7 +87,7 @@ Follow these steps **in order**. Each step MUST end with a **file being written 
 - Database schema (from entities/migrations)
 - Conventions summary (naming, structure, technical choices)
 - Domain glossary (entities, enums, business terms)
-- Dependencies table (from build file)
+- Dependencies table (from build file — for Python, `pyproject.toml` and lock files; `manage.py` marks a Django project)
 - How to build, run, and test
 
 > This is the PRIMARY deliverable. It must be comprehensive and populated with real data.

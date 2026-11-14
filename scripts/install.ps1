@@ -329,7 +329,7 @@ Write-Host '  Specialized skill files for AI coding agents'
 Write-Host ''
 
 if (-not $Stack) {
-  throw 'Stack is required. Usage: install.ps1 -Stack <spring-boot|dotnet> [-Target <dir>] [-Format agent|kiro] [-Ref <tag>]'
+  throw 'Stack is required. Usage: install.ps1 -Stack <spring-boot|spring-boot-kotlin|ktor|dotnet|fastapi|django> [-Target <dir>] [-Format agent|kiro] [-Ref <tag>]'
 }
 if (-not (Test-Path -LiteralPath $Target -PathType Container)) {
   throw "Target directory does not exist: $Target"

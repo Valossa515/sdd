@@ -1,13 +1,13 @@
 ---
 name: observability
-description: Observability conventions for Spring Boot and .NET projects. Covers structured logging, distributed tracing, health checks, metrics, and alerting patterns.
+description: Observability conventions for every SDD stack — structured logging, distributed tracing, health checks, metrics, and alerting patterns. Examples in Spring Boot and .NET.
 stack: shared
 versions: "Micrometer/Prometheus, OpenTelemetry, Serilog/SLF4J"
 ---
 
 # Observability — Shared Conventions
 
-Apply these conventions regardless of stack (Spring Boot or .NET).
+Apply these conventions regardless of stack. Code samples show Spring Boot and .NET; projects on the other stacks (`spring-boot-kotlin`, `ktor`, `fastapi`, `django`) follow the same rules, and their stack skill (`skills/<stack>/SKILL.md`) shows how to implement them.
 
 ## Structured Logging
 
