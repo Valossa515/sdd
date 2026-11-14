@@ -103,6 +103,20 @@ jobs:
           if grep -q "STALE" /tmp/test-dotnet/.agent/skills/shared/dod/SKILL.md; then echo "❌ skills not refreshed"; exit 1; fi
           echo "✔ Re-install keeps SKILLS.md and context docs, refreshes skills"
 
+      - name: Remote install (clone path) works
+        run: |
+          # A copy outside the repo can't find skills/ next to it, so it clones
+          # SDD_REPO_URL (here the local checkout) like the curl one-liner does
+          git tag ci-remote-test
+          mkdir -p /tmp/remote/bin /tmp/remote/latest /tmp/remote/pinned /tmp/remote/local
+          cp scripts/install.sh /tmp/remote/bin/
+          SDD_REPO_URL="file://$PWD" bash /tmp/remote/bin/install.sh dotnet /tmp/remote/latest agent
+          SDD_REPO_URL="file://$PWD" bash /tmp/remote/bin/install.sh dotnet /tmp/remote/pinned agent --ref ci-remote-test
+          bash scripts/install.sh dotnet /tmp/remote/local agent "$(pwd)"
+          diff -r /tmp/remote/local /tmp/remote/latest
+          diff -r /tmp/remote/local /tmp/remote/pinned
+          echo "✔ Remote install matches local install"
+
       - name: Verify skill count
         run: |
           EXPECTED=17
@@ -181,6 +195,29 @@ jobs:
           if (-not (Select-String -LiteralPath "$t/SKILLS.md" -Pattern 'MY OVERRIDE' -SimpleMatch -Quiet)) { throw 'SKILLS.md overrides lost' }
           if (-not (Select-String -LiteralPath "$t/context.md" -Pattern 'MY CONTEXT' -SimpleMatch -Quiet)) { throw 'context.md lost' }
           if (Select-String -LiteralPath "$t/skills/shared/dod/SKILL.md" -Pattern 'STALE' -SimpleMatch -Quiet) { throw 'skills not refreshed' }
+
+      - name: install.ps1 remote install (clone path) works
+        run: |
+          # A copy outside the repo can't find skills/ next to it, so it clones SDD_REPO_URL
+          git tag ci-remote-test-ps
+          $repo = (Get-Location).Path -replace '\\', '/'
+          if (-not $repo.StartsWith('/')) { $repo = "/$repo" }
+          $env:SDD_REPO_URL = "file://$repo"
+          New-Item -ItemType Directory -Force out/remote-bin, out/remote-latest, out/remote-pinned, out/remote-local | Out-Null
+          Copy-Item scripts/install.ps1 out/remote-bin/
+          & ./out/remote-bin/install.ps1 -Stack dotnet -Target out/remote-latest
+          & ./out/remote-bin/install.ps1 -Stack dotnet -Target out/remote-pinned -Ref ci-remote-test-ps
+          & ./scripts/install.ps1 -Stack dotnet -Target out/remote-local
+          function Get-Tree([string] $Dir) {
+            $root = (Resolve-Path $Dir).Path
+            Get-ChildItem $root -Recurse -File -Force | ForEach-Object {
+              '{0} {1}' -f $_.FullName.Substring($root.Length + 1).Replace('\', '/'), (Get-FileHash $_.FullName -Algorithm SHA256).Hash
+            } | Sort-Object
+          }
+          foreach ($remote in 'out/remote-latest', 'out/remote-pinned') {
+            if (Compare-Object @(Get-Tree out/remote-local) @(Get-Tree $remote)) { throw "$remote differs from the local install" }
+          }
+          Write-Host 'Remote install matches local install'
 
       - name: install.ps1 rejects an unknown stack
         run: |
