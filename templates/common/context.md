@@ -37,5 +37,5 @@
 <!-- Auto-populated from build file (pom.xml, build.gradle, *.csproj, package.json) -->
 | Dependency | Purpose |
 |------------|---------|
-| spring-boot-starter-web | REST API framework |
+| spring-boot-starter-webmvc | REST API framework |
 | ... | ... |

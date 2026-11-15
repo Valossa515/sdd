@@ -2,7 +2,7 @@
 name: security
 description: Security conventions for every SDD stack — authentication (JWT, OAuth2), authorization, CORS, CSRF, input validation, secrets management, and OWASP Top 10 prevention. Examples in Spring Boot and .NET.
 stack: shared
-versions: "Spring Security 6.x, ASP.NET Core Identity, OAuth2/OIDC"
+versions: "Spring Security 7.x, ASP.NET Core 10 Identity, OAuth2/OIDC"
 ---
 
 # Security — Shared Conventions
@@ -35,7 +35,7 @@ Use stateless JWT-based authentication for APIs.
 
 ---
 
-### Spring Boot — Spring Security 6
+### Spring Boot — Spring Security 7
 
 ```java
 @Configuration

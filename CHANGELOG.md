@@ -11,6 +11,22 @@ receive updates when that field is bumped.
 
 ## [Unreleased]
 
+### Changed
+
+- **Spring Boot 4** — `spring-boot` and `spring-boot-kotlin` target Spring
+  Boot 4.x (Spring Framework 7, Jakarta EE 11, Hibernate 7, Spring Security 7,
+  Jackson 3; Kotlin 2.2+). The skills cover the modular starters
+  (`spring-boot-starter-webmvc`, `spring-boot-starter-flyway`, per-technology
+  test starters), JSpecify null safety, and the test changes: `@MockitoBean`
+  replaces the removed `@MockBean`, `RestTestClient` with
+  `@AutoConfigureRestTestClient`, Testcontainers 2 artifacts and packages,
+  springmockk 5. `spring-boot/testing.md` has a Boot 3 → 4 test migration table
+- **.NET 10** — `dotnet` targets .NET 10 (LTS), C# 14, ASP.NET Core 10 and
+  EF Core 10: built-in OpenAPI 3.1, Minimal API validation, EF Core named
+  query filters, xUnit v3. A licensing table flags MediatR 13+, AutoMapper
+  15+ and FluentAssertions 8+ as commercial; the testing skill pins
+  FluentAssertions to 7.x
+
 ### Fixed
 
 - **Remote install with `install.sh`** (the `bash <(curl ...)` one-liner, with

@@ -1,8 +1,8 @@
 ---
 name: spring-boot-kotlin
-description: Use this skill for any Spring Boot task written in Kotlin — APIs, services, repositories, config, tests, or refactoring. Targets Spring Boot 3.x with Kotlin 2.x on JVM 21.
+description: Use this skill for any Spring Boot task written in Kotlin — APIs, services, repositories, config, tests, or refactoring. Targets Spring Boot 4.x with Kotlin 2.2+ on JVM 21.
 stack: spring-boot-kotlin
-versions: "Kotlin 2.x, JVM 21, Spring Boot 3.x, Gradle Kotlin DSL"
+versions: "Kotlin 2.2+, JVM 21, Spring Boot 4.x, Gradle Kotlin DSL"
 ---
 
 # Spring Boot + Kotlin Agent Skill
@@ -11,21 +11,21 @@ You are an expert Spring Boot engineer writing idiomatic Kotlin. Follow these gu
 
 ## Stack Versions (always target these unless told otherwise)
 
-- **Kotlin**: 2.x, JVM target 21
-- **Spring Boot**: 3.x (Jakarta EE namespace, not `javax`)
+- **Kotlin**: 2.2+ (the Spring Boot 4 baseline), JVM target 21
+- **Spring Boot**: 4.x — Spring Framework 7, Jakarta EE 11 (`jakarta.*`, never `javax.*`)
 - **Build tool**: Gradle with Kotlin DSL (`build.gradle.kts`)
-- **Database**: PostgreSQL via Spring Data JPA + Hibernate 6, migrations with Flyway
-- **JSON**: Jackson with `jackson-module-kotlin`
+- **Database**: PostgreSQL via Spring Data JPA + Hibernate 7, migrations with Flyway (`spring-boot-starter-flyway`)
+- **JSON**: Jackson 3 with `tools.jackson.module:jackson-module-kotlin`
 
 ### Required Gradle plugins
 
 ```kotlin
 // build.gradle.kts
 plugins {
-    kotlin("jvm") version "2.x.x"
-    kotlin("plugin.spring") version "2.x.x"   // opens @Component/@Service/@Transactional classes for proxies
-    kotlin("plugin.jpa") version "2.x.x"      // generates the no-arg constructors JPA needs
-    id("org.springframework.boot") version "3.x.x"
+    kotlin("jvm") version "2.2.x"
+    kotlin("plugin.spring") version "2.2.x"   // opens @Component/@Service/@Transactional classes for proxies
+    kotlin("plugin.jpa") version "2.2.x"      // generates the no-arg constructors JPA needs
+    id("org.springframework.boot") version "4.x.x"
     id("io.spring.dependency-management") version "1.x.x"
 }
 
@@ -36,14 +36,17 @@ allOpen {
     annotation("jakarta.persistence.Embeddable")
 }
 
-kotlin {
-    compilerOptions {
-        freeCompilerArgs.addAll("-Xjsr305=strict")   // Spring's nullability annotations become Kotlin types
-    }
+dependencies {
+    implementation("org.springframework.boot:spring-boot-starter-webmvc")     // was spring-boot-starter-web
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springframework.boot:spring-boot-starter-flyway")     // flyway-core alone no longer auto-configures
+    implementation("tools.jackson.module:jackson-module-kotlin")              // Jackson 3
 }
 ```
 
 Without `plugin.spring` and the `allOpen` block, Spring proxies and Hibernate lazy loading silently stop working, because Kotlin classes are `final` by default.
+
+Spring Framework 7 annotates its APIs with **JSpecify**, which Kotlin 2.x reads as nullable/non-null types out of the box — the old `-Xjsr305=strict` flag is no longer needed for Spring. Expect some Spring calls to change nullability when upgrading from Boot 3, and fix the call sites rather than adding `!!`.
 
 ---
 
@@ -316,7 +319,7 @@ Model domain errors as a small hierarchy (`sealed class DomainException`) so the
 
 ## Configuration
 
-Use typed `@ConfigurationProperties` data classes — never `@Value` for groups of related properties. Constructor binding is the default in Spring Boot 3.
+Use typed `@ConfigurationProperties` data classes — never `@Value` for groups of related properties. Constructor binding is the default.
 
 ```kotlin
 @ConfigurationProperties(prefix = "app.payment")
@@ -353,7 +356,7 @@ Use SLF4J through a per-class logger (`private val log = LoggerFactory.getLogger
 See `testing.md` for full testing guide. Quick rules:
 
 - Unit tests: JUnit 5 + **MockK** (not Mockito — it can't mock final Kotlin classes without extra setup), no Spring context
-- Controller tests: `@WebMvcTest` + MockMvc Kotlin DSL + `@MockkBean` (springmockk)
+- Controller tests: `@WebMvcTest` + MockMvc Kotlin DSL + `@MockkBean` (springmockk 5.x, the line for Spring Boot 4)
 - Integration tests: `@SpringBootTest` + Testcontainers for DB
 - **Minimum coverage**: 80% on `application/` and `domain/`
 
@@ -369,6 +372,7 @@ See `testing.md` for full testing guide. Quick rules:
 - ❌ Business logic in controllers
 - ❌ `@Transactional` on the whole class
 - ❌ `String` as primary key — use `UUID`
-- ❌ `javax.*` imports — use `jakarta.*` (Spring Boot 3+)
+- ❌ `javax.*` imports — use `jakarta.*`
+- ❌ `spring-boot-starter-web` or Jackson 2 (`com.fasterxml.jackson.databind`) — use `spring-boot-starter-webmvc` and Jackson 3 (`tools.jackson`)
 - ❌ Returning entities from controllers — always use DTOs
 - ❌ Blocking calls (JPA, `RestTemplate`) inside coroutines without `Dispatchers.IO`

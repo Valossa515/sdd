@@ -12,7 +12,7 @@ sdd-version: "1.0"
 
 # Project Agent Skills
 
-This is a **Spring Boot 3.x / Java 21** project. Before writing any code,
+This is a **Spring Boot 4.x / Java 21+** project. Before writing any code,
 read and follow all the skills listed below.
 
 ## Active Skills
@@ -101,7 +101,7 @@ com.YOURCOMPANY.YOURAPP
 - **Migration path**: `src/main/resources/db/migration`
 
 ### Authentication
-- Spring Security 6 + JWT
+- Spring Security 7 + JWT
 - Token header: `Authorization: Bearer <token>`
 
 ### Custom rules

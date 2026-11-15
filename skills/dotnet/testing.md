@@ -2,7 +2,7 @@
 name: dotnet-testing
 description: Testing guide for .NET projects. Unit tests with xUnit + NSubstitute, integration tests with WebApplicationFactory and Testcontainers.
 stack: dotnet
-versions: ".NET 8/9, xUnit, NSubstitute, Testcontainers"
+versions: ".NET 10, xUnit v3, NSubstitute, Testcontainers"
 ---
 
 # .NET Testing
@@ -11,17 +11,21 @@ versions: ".NET 8/9, xUnit, NSubstitute, Testcontainers"
 
 ```xml
 <!-- Unit test project -->
-<PackageReference Include="xunit" Version="2.*" />
-<PackageReference Include="xunit.runner.visualstudio" Version="2.*" />
+<PackageReference Include="xunit.v3" Version="3.*" />
+<PackageReference Include="xunit.runner.visualstudio" Version="3.*" />
 <PackageReference Include="NSubstitute" Version="5.*" />
-<PackageReference Include="FluentAssertions" Version="6.*" />
-<PackageReference Include="AutoFixture.Xunit2" Version="4.*" />
+<!-- 7.x is the last Apache-licensed FluentAssertions; 8+ needs a commercial license.
+     AwesomeAssertions (a fork of 7.x) or Shouldly are free alternatives. -->
+<PackageReference Include="FluentAssertions" Version="[7.0.0,8.0.0)" />
 
 <!-- Integration test project -->
-<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="8.*" />
-<PackageReference Include="Testcontainers.PostgreSql" Version="3.*" />
+<PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.*" />
+<PackageReference Include="Testcontainers.PostgreSql" Version="4.*" />
 <PackageReference Include="Respawn" Version="6.*" />
 ```
+
+- **xUnit v3** test projects are executables (`<OutputType>Exe</OutputType>`); test code is the same as v2 except that `IAsyncLifetime` methods return `ValueTask`
+- With the .NET 10 SDK, tests can run on **Microsoft.Testing.Platform**: add `"test": { "runner": "Microsoft.Testing.Platform" }` to `global.json` (check that every test project's packages support it first)
 
 ---
 
@@ -137,7 +141,7 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
         });
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await _postgres.StartAsync();
 
@@ -152,7 +156,11 @@ public class ApiFactory : WebApplicationFactory<Program>, IAsyncLifetime
 
     public async Task ResetDatabaseAsync() => await _respawner.ResetAsync(_postgres.GetConnectionString());
 
-    async Task IAsyncLifetime.DisposeAsync() => await _postgres.StopAsync();
+    public override async ValueTask DisposeAsync()
+    {
+        await _postgres.StopAsync();
+        await base.DisposeAsync();
+    }
 }
 ```
 

@@ -66,7 +66,7 @@ Before opening a PR, verify:
 - [ ] Frontmatter is complete (`name`, `description`, `stack`, `versions`)
 - [ ] At least one code example per major concept
 - [ ] `## What NOT to do` section present
-- [ ] Version-specific (e.g., "Spring Boot 3.x" not just "Spring Boot")
+- [ ] Version-specific (e.g., "Spring Boot 4.x" not just "Spring Boot")
 - [ ] `make check` passes
 
 ---
@@ -82,7 +82,7 @@ description: >
   One or two lines. Start with "Use this skill when..."
   Be specific about what triggers it.
 stack: spring-boot                 # a directory under skills/: spring-boot | spring-boot-kotlin | ktor | dotnet | fastapi | django | shared
-versions: "Java 21+, Spring Boot 3.x"
+versions: "Java 21+, Spring Boot 4.x"
 ---
 ```
 

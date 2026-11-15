@@ -13,7 +13,7 @@
 | **Type** | [API / Web App / CLI / Library / Microservice] |
 | **Stack** | [language + framework + major libs] |
 | **Build tool** | [Maven / Gradle / dotnet / npm / etc.] |
-| **Runtime version** | [Java 21 / .NET 8 / Node 20 / etc.] |
+| **Runtime version** | [Java 21 / .NET 10 / Python 3.12 / etc.] |
 | **Source root** | [src/main/java/... or src/ or lib/] |
 | **Test root** | [src/test/java/... or tests/ or test/] |
 
@@ -207,8 +207,8 @@ src/
 
 | Dependency | Version | Purpose |
 |------------|---------|---------|
-| spring-boot-starter-web | 3.x | REST API framework |
-| spring-boot-starter-data-jpa | 3.x | ORM / data access |
+| spring-boot-starter-webmvc | 4.x | REST API framework |
+| spring-boot-starter-data-jpa | 4.x | ORM / data access |
 | flyway-core | 10.x | Database migrations |
 | ... | ... | ... |
 
