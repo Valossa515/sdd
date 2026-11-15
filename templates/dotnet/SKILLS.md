@@ -12,7 +12,7 @@ sdd-version: "1.0"
 
 # Project Agent Skills
 
-This is a **.NET 8 / ASP.NET Core / C# 12** project using Clean Architecture.
+This is a **.NET 10 / ASP.NET Core 10 / C# 14** project using Clean Architecture.
 Before writing any code, read and follow all the skills listed below.
 
 ## Active Skills
@@ -90,7 +90,7 @@ tests/
 ```
 
 ### Database
-- **Engine**: PostgreSQL 16 via EF Core 8 + Npgsql
+- **Engine**: PostgreSQL 16 via EF Core 10 + Npgsql
 - **Migrations**: EF Core code-first
 - **DbContext**: `AppDbContext` in `Infrastructure/Persistence/`
 

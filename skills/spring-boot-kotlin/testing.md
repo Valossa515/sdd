@@ -2,7 +2,7 @@
 name: spring-boot-kotlin-testing
 description: Testing guide for Spring Boot projects in Kotlin. Unit tests with MockK, controller slice tests with the MockMvc Kotlin DSL, and Testcontainers integration tests.
 stack: spring-boot-kotlin
-versions: "Kotlin 2.x, Spring Boot 3.x, JUnit 5, MockK, springmockk, Testcontainers"
+versions: "Kotlin 2.2+, Spring Boot 4.x, JUnit Jupiter, MockK, springmockk 5, Testcontainers 2"
 ---
 
 # Spring Boot + Kotlin Testing
@@ -11,14 +11,15 @@ versions: "Kotlin 2.x, Spring Boot 3.x, JUnit 5, MockK, springmockk, Testcontain
 
 ```kotlin
 dependencies {
-    testImplementation("org.springframework.boot:spring-boot-starter-test") {
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test") {
         exclude(module = "mockito-core")          // MockK replaces Mockito
     }
+    testImplementation("org.springframework.boot:spring-boot-resttestclient")   // RestTestClient auto-configuration
     testImplementation("io.mockk:mockk:1.x.x")
-    testImplementation("com.ninja-squad:springmockk:4.x.x")   // @MockkBean / @SpykBean
+    testImplementation("com.ninja-squad:springmockk:5.x.x")   // @MockkBean / @MockkSpyBean — 5.x is the Spring Boot 4 line
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
-    testImplementation("org.testcontainers:junit-jupiter")
-    testImplementation("org.testcontainers:postgresql")
+    testImplementation("org.testcontainers:testcontainers-junit-jupiter")    // Testcontainers 2 artifact names
+    testImplementation("org.testcontainers:testcontainers-postgresql")
 }
 
 tasks.withType<Test> { useJUnitPlatform() }
@@ -128,14 +129,15 @@ class OrderControllerTest(
 
 ## Integration Tests — Testcontainers
 
-Full Spring context with a real database. In Kotlin the container lives in a `companion object` with `@JvmStatic`, so JUnit sees it as static.
+Full Spring context with a real database, called over HTTP with `RestTestClient`. In Kotlin the container lives in a `companion object` with `@JvmStatic`, so JUnit sees it as static.
 
 ```kotlin
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureRestTestClient
 @Testcontainers
 @ActiveProfiles("test")
 class OrderIntegrationTest(
-    @Autowired private val restTemplate: TestRestTemplate,
+    @Autowired private val client: RestTestClient,
     @Autowired private val jpaOrderRepository: JpaOrderRepository,
 ) {
 
@@ -143,7 +145,7 @@ class OrderIntegrationTest(
         @Container
         @ServiceConnection
         @JvmStatic
-        val postgres = PostgreSQLContainer<Nothing>("postgres:16-alpine")
+        val postgres = PostgreSQLContainer("postgres:16-alpine")   // org.testcontainers.postgresql, no type argument in 2.x
     }
 
     @BeforeEach
@@ -153,16 +155,21 @@ class OrderIntegrationTest(
     fun `POST order persists it and returns 201`() {
         val request = aCreateOrderRequest()
 
-        val response = restTemplate.postForEntity<OrderResponse>("/api/v1/orders", request)
+        val body = client.post().uri("/api/v1/orders")
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(request)
+            .exchange()
+            .expectStatus().isCreated()
+            .expectBody(OrderResponse::class.java)
+            .returnResult()
+            .responseBody
 
-        assertThat(response.statusCode).isEqualTo(HttpStatus.CREATED)
-        val body = requireNotNull(response.body)
-        assertThat(jpaOrderRepository.findByIdOrNull(body.id)).isNotNull()
+        assertThat(jpaOrderRepository.findByIdOrNull(requireNotNull(body).id)).isNotNull()
     }
 }
 ```
 
-`@ServiceConnection` (Spring Boot 3.1+) configures the datasource from the container — no manual property override needed. `postForEntity<T>` is the reified Kotlin extension from `spring-boot-test`.
+`@ServiceConnection` configures the datasource from the container — no manual property override needed. Boot 4 no longer gives `@SpringBootTest` an HTTP client or `MockMvc` by itself: add `@AutoConfigureRestTestClient` or `@AutoConfigureMockMvc`.
 
 ---
 
@@ -225,7 +232,7 @@ logging:
 
 ## What NOT to do
 
-- ❌ Mockito / `@MockBean` — use MockK and `@MockkBean`
+- ❌ Mockito / `@MockBean` (removed in Spring Boot 4) — use MockK and `@MockkBean`; `@SpykBean` is now `@MockkSpyBean`
 - ❌ `@SpringBootTest` for logic a plain unit test can cover
 - ❌ H2 instead of PostgreSQL in integration tests — use Testcontainers
 - ❌ Building entities through reflection — use the domain factory methods

@@ -1,8 +1,8 @@
 ---
 name: spring-boot
-description: Use this skill for any Spring Boot task — APIs, services, repositories, config, tests, or refactoring. Targets Spring Boot 3.x with Java 21+.
+description: Use this skill for any Spring Boot task — APIs, services, repositories, config, tests, or refactoring. Targets Spring Boot 4.x with Java 21+.
 stack: spring-boot
-versions: "Java 21+, Spring Boot 3.x, Maven or Gradle"
+versions: "Java 21+ (25 LTS recommended), Spring Boot 4.x, Maven or Gradle"
 ---
 
 # Spring Boot Agent Skill
@@ -11,11 +11,25 @@ You are an expert Spring Boot engineer. Follow these guidelines for every task i
 
 ## Stack Versions (always target these unless told otherwise)
 
-- **Java**: 21+ (use records, sealed classes, pattern matching where appropriate)
-- **Spring Boot**: 3.x (Jakarta EE namespace, not `javax`)
-- **Spring Security**: 6.x
+- **Java**: 21+, 25 LTS recommended (use records, sealed classes, pattern matching where appropriate)
+- **Spring Boot**: 4.x — Spring Framework 7, Jakarta EE 11 (`jakarta.*`, never `javax.*`)
+- **Spring Security**: 7.x
 - **Build tool**: Maven (preferred) or Gradle
-- **Database**: PostgreSQL via Spring Data JPA + Hibernate 6
+- **Database**: PostgreSQL via Spring Data JPA + Hibernate 7, migrations with Flyway
+- **JSON**: Jackson 3
+
+---
+
+## Spring Boot 4 Essentials
+
+- **Modular starters** — Boot 4 splits auto-configuration per technology, so pick the starter for what you use:
+  - `spring-boot-starter-webmvc` (replaces the deprecated `spring-boot-starter-web`)
+  - `spring-boot-starter-flyway` — a bare `flyway-core` dependency no longer triggers auto-configuration
+  - one test starter per technology, e.g. `spring-boot-starter-webmvc-test`, which brings `spring-boot-starter-test` with it
+- **Jackson 3** — group and packages moved from `com.fasterxml.jackson` to `tools.jackson` (annotations such as `@JsonProperty` keep `com.fasterxml.jackson.annotation`). Boot's customizer is now `JsonMapperBuilderCustomizer`, `@JsonComponent` is `@JacksonComponent`. Jackson 2 only through the deprecated `spring-boot-jackson2` module
+- **Null safety** — Spring's APIs are annotated with JSpecify; use `org.jspecify.annotations.Nullable` in your code, not `org.springframework.lang.Nullable`
+- **Retries** — Spring Retry is no longer managed by Boot; use Spring Framework 7's built-in `@Retryable` (enable with `@EnableResilientMethods`)
+- **Removed** — Undertow, `@MockBean`/`@SpyBean` (see `testing.md`), the embedded launch scripts
 
 ---
 
@@ -280,8 +294,8 @@ app:
 See `testing.md` for full testing guide. Quick rules:
 
 - Unit tests: JUnit 5 + Mockito, no Spring context
-- Integration tests: `@SpringBootTest` + Testcontainers for DB
-- Controller tests: `@WebMvcTest` + MockMvc
+- Integration tests: `@SpringBootTest` + `RestTestClient` + Testcontainers for DB
+- Controller tests: `@WebMvcTest` + MockMvc, dependencies mocked with `@MockitoBean`
 - **Minimum coverage**: 80% on `application/` and `domain/`
 
 ---
@@ -293,5 +307,7 @@ See `testing.md` for full testing guide. Quick rules:
 - ❌ Business logic in controllers
 - ❌ `@Transactional` on the whole class
 - ❌ `String` as primary key — use `UUID`
-- ❌ `javax.*` imports — use `jakarta.*` (Spring Boot 3+)
+- ❌ `javax.*` imports — use `jakarta.*`
+- ❌ `spring-boot-starter-web`, or `com.fasterxml.jackson.databind` imports — use `spring-boot-starter-webmvc` and Jackson 3 (`tools.jackson`)
+- ❌ `@MockBean` / `@SpyBean` — removed in Spring Boot 4; use `@MockitoBean` / `@MockitoSpyBean`
 - ❌ Returning raw entities from controllers — always use DTOs

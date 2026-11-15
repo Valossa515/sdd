@@ -2,7 +2,7 @@
 name: error-handling
 description: Error handling conventions for every SDD stack — RFC 7807 Problem Details, exception hierarchy, error mapping, and client-friendly responses. Examples in Spring Boot and .NET.
 stack: shared
-versions: "RFC 7807, Spring Boot 3.x ProblemDetail, ASP.NET Core ProblemDetails"
+versions: "RFC 7807, Spring Boot 4.x ProblemDetail, ASP.NET Core 10 ProblemDetails"
 ---
 
 # Error Handling — Shared Conventions

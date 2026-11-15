@@ -12,7 +12,7 @@ sdd-version: "1.0"
 
 # Project Agent Skills
 
-This is a **Spring Boot 3.x / Kotlin 2.x** project (JVM 21, Gradle Kotlin DSL). Before writing any code,
+This is a **Spring Boot 4.x / Kotlin 2.2+** project (JVM 21, Gradle Kotlin DSL). Before writing any code,
 read and follow all the skills listed below.
 
 ## Active Skills
@@ -96,12 +96,12 @@ src/main/kotlin/com/YOURCOMPANY/YOURAPP
 ```
 
 ### Database
-- **Engine**: PostgreSQL 16 via Spring Data JPA + Hibernate 6
+- **Engine**: PostgreSQL 16 via Spring Data JPA + Hibernate 7
 - **Migrations**: Flyway
 - **Migration path**: `src/main/resources/db/migration`
 
 ### Authentication
-- Spring Security 6 + JWT (OAuth2 resource server)
+- Spring Security 7 + JWT (OAuth2 resource server)
 - Token header: `Authorization: Bearer <token>`
 
 ### Custom rules

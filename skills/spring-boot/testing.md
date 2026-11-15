@@ -2,7 +2,7 @@
 name: spring-boot-testing
 description: Testing guide for Spring Boot projects. Unit tests, integration tests, controller slice tests, and Testcontainers setup.
 stack: spring-boot
-versions: "Java 21+, Spring Boot 3.x, JUnit 5, Testcontainers"
+versions: "Java 21+, Spring Boot 4.x, JUnit Jupiter, Testcontainers 2"
 ---
 
 # Spring Boot Testing
@@ -10,19 +10,32 @@ versions: "Java 21+, Spring Boot 3.x, JUnit 5, Testcontainers"
 ## Dependencies (add to pom.xml)
 
 ```xml
+<!-- MockMvc, @WebMvcTest; brings spring-boot-starter-test (JUnit, AssertJ, Mockito) -->
 <dependency>
     <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-test</artifactId>
+    <artifactId>spring-boot-starter-webmvc-test</artifactId>
+    <scope>test</scope>
+</dependency>
+<!-- RestTestClient / TestRestTemplate auto-configuration -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-resttestclient</artifactId>
+    <scope>test</scope>
+</dependency>
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-testcontainers</artifactId>
+    <scope>test</scope>
+</dependency>
+<!-- Testcontainers 2: every module artifact is prefixed with testcontainers- -->
+<dependency>
+    <groupId>org.testcontainers</groupId>
+    <artifactId>testcontainers-junit-jupiter</artifactId>
     <scope>test</scope>
 </dependency>
 <dependency>
     <groupId>org.testcontainers</groupId>
-    <artifactId>junit-jupiter</artifactId>
-    <scope>test</scope>
-</dependency>
-<dependency>
-    <groupId>org.testcontainers</groupId>
-    <artifactId>postgresql</artifactId>
+    <artifactId>testcontainers-postgresql</artifactId>
     <scope>test</scope>
 </dependency>
 ```
@@ -74,7 +87,7 @@ class OrderServiceTest {
 
 ## Controller Tests — @WebMvcTest
 
-Loads only the web layer. Mock the service.
+Loads only the web layer. Mock the service with `@MockitoBean` (Spring Framework's bean override — Boot's `@MockBean` was removed in Spring Boot 4).
 
 ```java
 @WebMvcTest(OrderController.class)
@@ -86,7 +99,7 @@ class OrderControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private OrderService orderService;
 
     @Test
@@ -118,20 +131,21 @@ class OrderControllerTest {
 
 ## Integration Tests — Testcontainers
 
-Full Spring context with real database.
+Full Spring context with real database, called over HTTP with `RestTestClient` (Spring Framework 7). Boot 4 no longer auto-configures a client for `@SpringBootTest` — `@AutoConfigureRestTestClient` adds it.
 
 ```java
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureRestTestClient
 @Testcontainers
 @ActiveProfiles("test")
 class OrderIntegrationTest {
 
     @Container
     @ServiceConnection
-    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16-alpine");
+    static PostgreSQLContainer postgres = new PostgreSQLContainer("postgres:16-alpine");   // org.testcontainers.postgresql
 
     @Autowired
-    private TestRestTemplate restTemplate;
+    private RestTestClient client;
 
     @Autowired
     private OrderRepository orderRepository;
@@ -148,17 +162,37 @@ class OrderIntegrationTest {
             List.of(new OrderItemRequest("product-1", 2))
         );
 
-        ResponseEntity<OrderResponse> response = restTemplate.postForEntity(
-            "/api/v1/orders", request, OrderResponse.class);
+        OrderResponse body = client.post().uri("/api/v1/orders")
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(request)
+            .exchange()
+            .expectStatus().isCreated()
+            .expectBody(OrderResponse.class)
+            .returnResult()
+            .getResponseBody();
 
-        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertThat(response.getBody()).isNotNull();
-        assertThat(orderRepository.findById(response.getBody().id())).isPresent();
+        assertThat(body).isNotNull();
+        assertThat(orderRepository.findById(body.id())).isPresent();
     }
 }
 ```
 
-Note: `@ServiceConnection` (Spring Boot 3.1+) auto-configures the datasource from the container — no manual property override needed.
+Notes:
+- `@ServiceConnection` configures the datasource from the container — no manual property override needed
+- Testcontainers 2 moved `PostgreSQLContainer` to `org.testcontainers.postgresql` and dropped its generic type parameter
+- A `@SpringBootTest` that injects `MockMvc` needs `@AutoConfigureMockMvc` — Boot 4 no longer adds it
+
+---
+
+## Migrating tests from Spring Boot 3
+
+| Spring Boot 3 | Spring Boot 4 |
+|---------------|---------------|
+| `@MockBean` / `@SpyBean` | `@MockitoBean` / `@MockitoSpyBean` (test-class fields only, not `@Configuration` classes) |
+| `TestRestTemplate` injected by `@SpringBootTest` | `RestTestClient` + `@AutoConfigureRestTestClient` (or `@AutoConfigureTestRestTemplate` to keep `TestRestTemplate`) |
+| `MockMvc` injected by `@SpringBootTest` | add `@AutoConfigureMockMvc` |
+| `spring-boot-starter-test` | the technology's test starter, e.g. `spring-boot-starter-webmvc-test` |
+| `org.testcontainers:postgresql`, `PostgreSQLContainer<?>` | `org.testcontainers:testcontainers-postgresql`, `org.testcontainers.postgresql.PostgreSQLContainer` |
 
 ---
 

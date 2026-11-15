@@ -11,9 +11,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Skills](https://img.shields.io/badge/skills-25-blue)](#skills)
 [![Agents](https://img.shields.io/badge/agents-6-orange)](#agent-pipeline)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?logo=springboot&logoColor=white)](#supported-stacks)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.x-6DB33F?logo=springboot&logoColor=white)](#supported-stacks)
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.x-7F52FF?logo=kotlin&logoColor=white)](#supported-stacks)
-[![.NET](https://img.shields.io/badge/.NET-8%2F9-512BD4?logo=dotnet&logoColor=white)](#supported-stacks)
+[![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)](#supported-stacks)
 [![Python](https://img.shields.io/badge/Python-3.12%2B-3776AB?logo=python&logoColor=white)](#supported-stacks)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 
@@ -132,10 +132,10 @@ Pass one of these as the stack to any install option (`STACK=`, `-Stack`, or the
 
 | Stack | For | Built on |
 |-------|-----|----------|
-| `spring-boot` | ☕ Java | Spring Boot 3.x, Java 21+, JPA, Flyway |
-| `spring-boot-kotlin` | 🟣 Kotlin | Spring Boot 3.x, Kotlin 2.x, JPA, Flyway, MockK |
+| `spring-boot` | ☕ Java | Spring Boot 4.x, Java 21+, JPA (Hibernate 7), Flyway, Jackson 3 |
+| `spring-boot-kotlin` | 🟣 Kotlin | Spring Boot 4.x, Kotlin 2.2+, JPA, Flyway, MockK |
 | `ktor` | 🟣 Kotlin | Ktor 3.x, Exposed, Koin, kotlinx.serialization, Flyway |
-| `dotnet` | 🔷 C# | .NET 8/9, ASP.NET Core, EF Core, MediatR |
+| `dotnet` | 🔷 C# | .NET 10 (LTS), C# 14, ASP.NET Core 10, EF Core 10, MediatR |
 | `fastapi` | 🐍 Python | FastAPI, Pydantic v2, async SQLAlchemy 2.0, Alembic |
 | `django` | 🐍 Python | Django 5.x, Django REST Framework, pytest-django |
 
@@ -305,10 +305,10 @@ your-project/
 
 | Skill | Stack | Description |
 |-------|-------|-------------|
-| [`spring-boot/SKILL`](skills/spring-boot/SKILL.md) | ☕ Spring Boot 3.x | Architecture, controllers, services, entities, DI, exception handling |
-| [`spring-boot/testing`](skills/spring-boot/testing.md) | ☕ Spring Boot 3.x | JUnit 5, Mockito, MockMvc, Testcontainers, @WebMvcTest |
-| [`dotnet/SKILL`](skills/dotnet/SKILL.md) | 🔷 .NET 8/9 | Clean Architecture, CQRS/MediatR, FluentValidation, EF Core |
-| [`dotnet/testing`](skills/dotnet/testing.md) | 🔷 .NET 8/9 | xUnit, NSubstitute, WebApplicationFactory, Testcontainers, Respawn |
+| [`spring-boot/SKILL`](skills/spring-boot/SKILL.md) | ☕ Spring Boot 4.x | Architecture, controllers, services, entities, DI, exception handling |
+| [`spring-boot/testing`](skills/spring-boot/testing.md) | ☕ Spring Boot 4.x | JUnit, Mockito + `@MockitoBean`, MockMvc, RestTestClient, Testcontainers 2 |
+| [`dotnet/SKILL`](skills/dotnet/SKILL.md) | 🔷 .NET 10 | Clean Architecture, CQRS/MediatR, FluentValidation, EF Core 10, built-in OpenAPI, library licensing |
+| [`dotnet/testing`](skills/dotnet/testing.md) | 🔷 .NET 10 | xUnit v3, NSubstitute, WebApplicationFactory, Testcontainers, Respawn |
 | [`spring-boot-kotlin/SKILL`](skills/spring-boot-kotlin/SKILL.md) | 🟣 Spring Boot + Kotlin | Kotlin idioms for Spring: null-safety, data-class DTOs, `@field:` validation, JPA entity rules |
 | [`spring-boot-kotlin/testing`](skills/spring-boot-kotlin/testing.md) | 🟣 Spring Boot + Kotlin | JUnit 5, MockK, springmockk, MockMvc Kotlin DSL, Testcontainers |
 | [`ktor/SKILL`](skills/ktor/SKILL.md) | 🟣 Ktor 3.x | Routes, plugins, Exposed + transactions, Koin, StatusPages RFC 7807, JWT |

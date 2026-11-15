@@ -1,8 +1,8 @@
 ---
 name: dotnet
-description: Use this skill for any .NET task — APIs, services, repositories, config, tests, or refactoring. Targets .NET 8/9 with C# 12+, ASP.NET Core, and EF Core.
+description: Use this skill for any .NET task — APIs, services, repositories, config, tests, or refactoring. Targets .NET 10 (LTS) with C# 14, ASP.NET Core 10 and EF Core 10.
 stack: dotnet
-versions: ".NET 8/9, ASP.NET Core, C# 12+, EF Core 8, MediatR"
+versions: ".NET 10 (LTS), ASP.NET Core 10, C# 14, EF Core 10, MediatR"
 ---
 
 # .NET Agent Skill
@@ -11,12 +11,46 @@ You are an expert .NET engineer. Follow these guidelines for every task in this 
 
 ## Stack Versions (always target these unless told otherwise)
 
-- **.NET**: 8 or 9 (use primary constructors, collection expressions, latest C# features)
-- **ASP.NET Core**: 8+
-- **EF Core**: 8+
-- **MediatR**: 12+ (CQRS pattern)
+- **.NET**: 10 (LTS, supported until November 2028), `<TargetFramework>net10.0</TargetFramework>` — .NET 8 and 9 reached end of support in November 2026
+- **C#**: 14 (primary constructors, collection expressions, the `field` keyword, extension members)
+- **ASP.NET Core**: 10
+- **EF Core**: 10 (Npgsql provider for PostgreSQL)
+- **MediatR**: 12.5 — the last Apache-licensed release (see licensing below)
 - **FluentValidation**: 11+
-- **xUnit**: latest
+- **xUnit**: v3
+
+---
+
+## .NET 10 Essentials
+
+- **OpenAPI is built in**: `builder.Services.AddOpenApi()` + `app.MapOpenApi()` (`Microsoft.AspNetCore.OpenApi`) generates OpenAPI **3.1** by default. Swashbuckle is no longer in the templates — add a UI (Scalar or Swagger UI) only if the project wants one.
+- **Minimal API validation**: `builder.Services.AddValidation()` validates DataAnnotations on Minimal API parameters (query, header and body). Controllers keep validating through `[ApiController]`; commands keep the FluentValidation pipeline below.
+- **EF Core 10 named query filters**: several filters per entity, each switchable on its own:
+
+  ```csharp
+  modelBuilder.Entity<Order>()
+      .HasQueryFilter("SoftDelete", o => !o.IsDeleted)
+      .HasQueryFilter("Tenant", o => o.TenantId == _tenant.Id);
+
+  // turn off only the soft-delete filter, keep tenant isolation
+  var withDeleted = await db.Orders.IgnoreQueryFilters(["SoftDelete"]).ToListAsync(ct);
+  ```
+
+- **EF Core 10 LINQ**: `LeftJoin` / `RightJoin` operators replace the `GroupJoin` + `DefaultIfEmpty` pattern
+- **C# 14 `field` keyword**: validate in a property setter without declaring a backing field —
+  `public string Sku { get; set => field = value?.Trim() ?? throw new ArgumentNullException(nameof(value)); }`
+
+### Library licensing
+
+Several popular libraries moved to commercial licenses. Don't upgrade past the last free version without checking the license, and record the project's choice in Project Overrides:
+
+| Library | Last free (Apache/MIT) | Newer versions |
+|---------|------------------------|----------------|
+| MediatR | 12.5.0 | 13+: RPL-1.5 or commercial license |
+| AutoMapper | 14.x and earlier | 15+: commercial license |
+| FluentAssertions | 7.x | 8+: commercial license (free for non-commercial use) |
+
+Alternatives when a license doesn't fit: a small in-house `ISender`/handler dispatcher instead of MediatR, explicit mapping methods instead of AutoMapper, AwesomeAssertions (community fork of FluentAssertions 7) or Shouldly for test assertions.
 
 ---
 
@@ -360,7 +394,7 @@ public static class ApplicationServiceExtensions
 
 See `testing.md` for full guide. Quick rules:
 
-- Unit tests: xUnit + NSubstitute (no integration, no EF)
+- Unit tests: xUnit v3 + NSubstitute (no integration, no EF)
 - Integration tests: `WebApplicationFactory` + Testcontainers
 - **Minimum coverage**: 80% on Application and Domain layers
 
@@ -376,3 +410,5 @@ See `testing.md` for full guide. Quick rules:
 - ❌ Catching `Exception` silently — log and rethrow or convert to domain exception
 - ❌ Public setters on domain entities
 - ❌ `IEnumerable<T>` in domain — use `IReadOnlyList<T>` to signal immutability
+- ❌ Adding Swashbuckle to a new project — use the built-in OpenAPI support
+- ❌ Upgrading MediatR, AutoMapper or FluentAssertions past their last free version without checking the license
