@@ -206,6 +206,12 @@ own marketplace (`.claude-plugin/marketplace.json`). Keep in mind:
 
 The `Release` workflow verifies tag ↔ `plugin.json` ↔ CHANGELOG consistency
 and publishes a GitHub Release with that version's CHANGELOG section as notes.
+
+Creating the release from the GitHub web UI ("Draft a new release" with a new
+tag) works the same way — but only **after** steps 1–2 are merged. A tag on a
+commit whose `plugin.json` still has the previous version makes the workflow
+fail: the release keeps GitHub's auto-generated notes, and plugin users don't
+receive the update because the version didn't change.
 Users can pin installs to any release with `install.sh <stack> ... --ref vx.y.z`.
 
 ---
