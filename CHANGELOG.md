@@ -9,7 +9,7 @@ The `version` field in `.claude-plugin/plugin.json` must always match the
 latest release in this file (CI enforces it) — Claude Code plugin users only
 receive updates when that field is bumped.
 
-## [Unreleased]
+## [1.3.0] - 2026-11-16
 
 ### Added
 
