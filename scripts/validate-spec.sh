@@ -6,6 +6,11 @@
 # ID formats (FT-NNN, BR-NNN, AC-NNN), unique IDs, declared row counts,
 # allowed enum values, and cross-file feature references.
 #
+# A feature spec may declare `feature.interface` (http, command, ui, library or
+# background; default http). It decides how the `status` column of
+# outputs.errors is checked: a 3-digit HTTP status, an integer exit code, or an
+# outcome identifier (a result type or UI state).
+#
 # Usage:
 #   bash validate-spec.sh <file-or-directory> [...]
 #
@@ -156,6 +161,18 @@ validate_feature() {
     done
   fi
 
+  # feature.interface is optional and defaults to http
+  local iface check_status=1
+  iface=$(grep -m1 -E '^[ ]+interface:' "$file" | sed 's/.*interface:[ ]*//' | tr -d ' ' || true)
+  [ -n "$iface" ] || iface="http"
+  case "$iface" in
+    http|command|ui|library|background) ;;
+    *)
+      fail "$rel" "invalid 'feature.interface' '$iface' (expected: http, command, ui, library or background)"
+      check_status=0
+      ;;
+  esac
+
   # errors rows must have code, status and when (3 non-empty columns)
   local row
   while IFS= read -r row; do
@@ -167,8 +184,21 @@ validate_feature() {
     if [ -z "$code" ] || [ -z "$status" ] || [ -z "$when" ]; then
       fail "$rel" "errors: row '$row' must have code, status and when"
     fi
-    echo "$status" | grep -qE '^[0-9]{3}$' || \
-      fail "$rel" "errors: '$code' has invalid HTTP status '$status'"
+    [ "$check_status" -eq 1 ] || continue
+    case "$iface" in
+      http)
+        echo "$status" | grep -qE '^[0-9]{3}$' || \
+          fail "$rel" "errors: '$code' has invalid HTTP status '$status'"
+        ;;
+      command)
+        echo "$status" | grep -qE '^[0-9]+$' || \
+          fail "$rel" "errors: '$code' has invalid exit code '$status' (interface: command expects an integer)"
+        ;;
+      *)
+        echo "$status" | grep -qE '^[A-Za-z][A-Za-z0-9_.-]*$' || \
+          fail "$rel" "errors: '$code' has invalid outcome '$status' (interface: $iface expects an identifier such as a result type or UI state)"
+        ;;
+    esac
   done < <(table_rows "$file" "errors")
 
   check_ids "$file" "$rel" "business-rules" 1 '^BR-[0-9]+$' "business rule"

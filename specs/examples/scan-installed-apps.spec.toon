@@ -1,0 +1,36 @@
+# TOON v3.0 – Feature Specification
+# Example of a feature that is not an HTTP endpoint (interface: ui).
+# status holds the UI state the user sees, not an HTTP status.
+
+feature:
+  id: FT-002
+  name: Scan Installed Apps
+  version: 1.0
+  status: draft
+  interface: ui
+
+requirement:
+  summary: Let the user check in one tap whether any installed app has a scam profile, so they know if the device needs attention.
+  actor: App user
+  trigger: User taps "Scan now" on the home screen
+
+inputs[1]{name,type,required,constraints}:
+  trigger,ScanTrigger,true,MANUAL when started by the user
+
+outputs:
+  success:
+    description: The device risk level and the list of risky apps are shown
+    status: Content
+    body[2]{name,type,value}:
+      level,RiskLevel,
+      riskyApps,list,
+  errors[2]{code,status,when}:
+    NO_SCAN_YET,Empty,no scan has ever completed
+    SCAN_FAILED,Error,the app inventory cannot be read
+
+business-rules[2]{id,rule}:
+  BR-001,Risk is never shown by color alone - always color plus icon plus text
+  BR-002,Apps the user marked as trusted are never listed as risky
+
+assumptions[1]:
+  The scan itself is specified by another feature - this one covers only the screen

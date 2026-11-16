@@ -31,6 +31,17 @@ assert_contains() {
   fi
 }
 
+assert_absent() {
+  local label="$1" haystack="$2" needle="$3"
+  CHECKS=$((CHECKS + 1))
+  if echo "$haystack" | grep -qF "$needle"; then
+    echo -e "  ${RED}✘${RESET} $label — output must not contain: $needle"
+    FAILURES=$((FAILURES + 1))
+  else
+    echo -e "  ${GREEN}✔${RESET} $label"
+  fi
+}
+
 echo ""
 echo "1) Valid reference specs must pass"
 echo "───────────────────────────────────────"
@@ -64,6 +75,16 @@ assert_contains "feature: missing summary rejected"     "$OUTPUT" "missing 'requ
 assert_contains "feature: row-count mismatch rejected"  "$OUTPUT" "inputs declares [3] but has 2 row(s)"
 assert_contains "feature: bad HTTP status rejected"     "$OUTPUT" "invalid HTTP status 'quatro'"
 assert_contains "feature: duplicate BR id rejected"     "$OUTPUT" "duplicate business rule id 'BR-001'"
+
+# feature.interface (non-HTTP features)
+assert_contains "interface: unknown value rejected"     "$OUTPUT" "invalid 'feature.interface' 'grpc'"
+assert_contains "interface: command needs exit code"    "$OUTPUT" "invalid exit code 'falha'"
+assert_contains "interface: ui needs an identifier"     "$OUTPUT" "invalid outcome 'error state'"
+# a rejected file is reported as "<file> — <reason>"; the valid ones must not be
+assert_contains "interface: command spec checked"       "$OUTPUT" "good-command.spec.toon"
+assert_absent   "interface: command spec accepted"      "$OUTPUT" "good-command.spec.toon —"
+assert_contains "interface: ui spec checked"            "$OUTPUT" "good-ui.spec.toon"
+assert_absent   "interface: ui spec accepted"           "$OUTPUT" "good-ui.spec.toon —"
 
 # acceptance defects
 assert_contains "acceptance: dangling feature-ref"      "$OUTPUT" "feature-ref 'FT-999' does not match"

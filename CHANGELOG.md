@@ -9,6 +9,32 @@ The `version` field in `.claude-plugin/plugin.json` must always match the
 latest release in this file (CI enforces it) — Claude Code plugin users only
 receive updates when that field is bumped.
 
+## [1.4.0] - 2026-11-16
+
+### Added
+
+- **Feature specs for non-HTTP features** — `.spec.toon` files accept an
+  optional `feature.interface` (`http`, `command`, `ui`, `library` or
+  `background`; default `http`). It decides what `status` means in
+  `outputs.errors`: a 3-digit HTTP status, an integer exit code, or an outcome
+  identifier such as a result type or UI state. Existing specs are unchanged.
+  The validator checks the value and the matching `status` format, the schema
+  documents it with an example, and `specs/examples` gains a `ui` spec
+
+### Changed
+
+- **Android skill targets AGP 9** — built-in Kotlin (no `kotlin-android`
+  plugin, no kapt), KSP 2.3.6+ and Hilt 2.59.2+, one JDK for toolchain, Gradle
+  daemon and CI, and a rule to stop instead of working around a build plugin
+  that does not support the project's versions. A new section explains how to
+  write specs for screens, use cases, workers and build tasks
+
+### Fixed
+
+- **`validate-spec.sh` rejected every non-HTTP spec** with "invalid HTTP
+  status", because `status` had to be three digits. Found while using the
+  `android` stack on a real project
+
 ## [1.3.0] - 2026-11-16
 
 ### Added

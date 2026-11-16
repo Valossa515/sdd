@@ -47,6 +47,8 @@ All three artifacts are generated together in one execution.
 6. DECOMPOSE into atomic deliverables if scope is large
 7. WRITE the plan document → .agent/plans/<feature-name>.md
 8. WRITE the feature spec following specs/feature.schema.md → .spec.toon
+   → If the feature is not an HTTP endpoint (a screen, a use case, a job, a build or CLI command),
+     set feature.interface and fill status as that interface defines. Never invent HTTP statuses.
 9. WRITE acceptance criteria following specs/acceptance.schema.md → .acceptance.toon
 10. VALIDATE all artifacts against their schemas
 11. PRESENT a summary to the user for confirmation

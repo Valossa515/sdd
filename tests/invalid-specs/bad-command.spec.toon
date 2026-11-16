@@ -1,0 +1,24 @@
+# Intentionally invalid — interface: command with a non-integer exit code
+
+feature:
+  id: FT-005
+  name: Bad Exit Code
+  interface: command
+
+requirement:
+  summary: Fixture with a status that is not an exit code.
+
+inputs[1]{name,type,required}:
+  a,string,true
+
+outputs:
+  success:
+    status: 0
+  errors[1]{code,status,when}:
+    BUILD_FAILED,falha,the build fails
+
+business-rules[1]{id,rule}:
+  BR-001,rule one
+
+assumptions[1]:
+  None
