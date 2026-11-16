@@ -39,7 +39,7 @@ help: ## Show this help
 	@echo "  Specialized skill files for AI coding agents"
 	@echo ""
 	@echo "  $(CYAN)Usage:$(RESET)"
-	@echo "    make <target> [STACK=spring-boot|spring-boot-kotlin|ktor|dotnet|fastapi|django] [TARGET=path] [FORMAT=agent|kiro]"
+	@echo "    make <target> [STACK=spring-boot|spring-boot-kotlin|ktor|android|dotnet|fastapi|django] [TARGET=path] [FORMAT=agent|kiro]"
 	@echo ""
 	@echo "  $(CYAN)Targets:$(RESET)"
 	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*?##/ { printf "    $(GREEN)%-18s$(RESET) %s\n", $$1, $$2 }' $(MAKEFILE_LIST)
