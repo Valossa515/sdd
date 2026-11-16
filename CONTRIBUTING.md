@@ -81,7 +81,7 @@ name: spring-boot-messaging        # kebab-case, must be unique
 description: >
   One or two lines. Start with "Use this skill when..."
   Be specific about what triggers it.
-stack: spring-boot                 # a directory under skills/: spring-boot | spring-boot-kotlin | ktor | dotnet | fastapi | django | shared
+stack: spring-boot                 # a directory under skills/: spring-boot | spring-boot-kotlin | ktor | android | dotnet | fastapi | django | shared
 versions: "Java 21+, Spring Boot 4.x"
 ---
 ```

@@ -59,7 +59,7 @@ usage() {
   echo "  $0 <stack> [target_dir] [format] [--ref <tag>]"
   echo ""
   echo "Arguments:"
-  echo "  stack       spring-boot | spring-boot-kotlin | ktor | dotnet | fastapi | django"
+  echo "  stack       spring-boot | spring-boot-kotlin | ktor | android | dotnet | fastapi | django"
   echo "              (any directory under skills/ except shared)"
   echo "  target_dir  Path to your project (default: current dir)"
   echo "  format      agent | kiro  (default: agent)"

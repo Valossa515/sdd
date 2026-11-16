@@ -1,0 +1,513 @@
+---
+name: android
+description: Use this skill for any Android app task — Gradle modules, Compose screens, ViewModels, Room, DataStore, WorkManager, permissions, tests, or refactoring. Targets Kotlin 2.x with Jetpack Compose, Hilt, Room and a multi-module Gradle build.
+stack: android
+versions: "Kotlin 2.x, AGP 8.x, Jetpack Compose (BOM), Material 3, Hilt, Room, DataStore, WorkManager, Gradle Kotlin DSL"
+---
+
+# Android Agent Skill
+
+You are an expert Android engineer building apps in Kotlin with Jetpack Compose. Follow these guidelines for every task in this project. Android leaves structure, DI and state handling open: this skill makes those choices explicit, so every feature is built the same way.
+
+## Stack Versions (always target these unless told otherwise)
+
+- **Kotlin**: 2.x, coroutines and Flow throughout
+- **Android Gradle Plugin**: 8.x, Gradle with Kotlin DSL (`build.gradle.kts`) and a version catalog (`gradle/libs.versions.toml`)
+- **SDK levels**: `minSdk`, `targetSdk` and `compileSdk` come from the project's convention (see `.agent/SKILLS.md` → Project Overrides); never raise or lower them inside a feature task
+- **UI**: Jetpack Compose via the Compose BOM, Material 3, Navigation Compose with type-safe routes
+- **DI**: Hilt (KSP)
+- **Persistence**: Room (KSP) for relational data, DataStore (Preferences) for settings
+- **Background work**: WorkManager
+- **Serialization**: kotlinx.serialization
+
+---
+
+## Architecture
+
+A multi-module Gradle build. Logic that does not need Android lives in pure Kotlin modules, so it runs in plain JVM tests and can be reused.
+
+```
+settings.gradle.kts
+gradle/libs.versions.toml       ← every version and dependency alias
+app/                            ← Application class, navigation graph, screens, workers, DI wiring
+├── src/main/kotlin/com/example/app/
+│   ├── ExampleApplication.kt
+│   ├── MainActivity.kt
+│   ├── navigation/             ← routes + NavHost
+│   ├── ui/
+│   │   ├── theme/
+│   │   ├── components/         ← reusable composables with no ViewModel
+│   │   └── <feature>/          ← <Feature>Screen.kt, <Feature>ViewModel.kt, <Feature>UiState.kt
+│   ├── work/                   ← WorkManager workers and schedulers
+│   └── di/                     ← Hilt modules that bind app-level types
+core-domain/                    ← pure Kotlin: models, use case and port interfaces, business rules
+core-data/                      ← Android library: Room, DataStore, repository implementations
+core-<capability>/              ← Android library: one platform capability behind domain ports
+```
+
+**Dependency direction:** `app` → `core-data` / `core-<capability>` → `core-domain`. Nothing points back.
+
+**Rules:**
+- `core-domain` applies only the `kotlin("jvm")` plugin: **zero** `android.*` or `androidx.*` imports
+- Business rules (scoring, validation, comparison, parsing) live in `core-domain` as pure functions or plain classes
+- Platform APIs (`PackageManager`, `NfcAdapter`, sensors, `ContentResolver`) are called only from adapter classes in `core-<capability>` or `core-data` that implement a `core-domain` interface
+- Composables render state and emit events. They never call a repository, a DAO or a platform API
+- One ViewModel per screen. It exposes a single `StateFlow<UiState>` and takes use cases or repositories in the constructor
+- A library module never depends on `app`
+
+---
+
+## Naming Conventions
+
+| Artifact | Convention | Example |
+|----------|-----------|---------|
+| Gradle module | kebab-case, `core-` prefix for libraries | `core-domain`, `core-data` |
+| Screen composable | `{Feature}Screen` (stateful) / `{Feature}Content` (stateless) | `ScanResultScreen`, `ScanResultContent` |
+| ViewModel | `{Feature}ViewModel` | `ScanResultViewModel` |
+| UI state | `{Feature}UiState` | `ScanResultUiState` |
+| Route | `@Serializable` object or data class named `{Feature}Route` | `AppDetailRoute(packageName)` |
+| Use case | verb phrase, `operator fun invoke` | `ScanDevice`, `MarkAppTrusted` |
+| Port (domain interface) | noun, no `I` prefix | `AppInventory`, `ScanRepository` |
+| Adapter | technology + port | `PackageManagerAppInventory`, `RoomScanRepository` |
+| Room entity / DAO | `{Thing}Entity` / `{Thing}Dao` | `ScanRunEntity`, `ScanRunDao` |
+| Worker | `{Purpose}Worker` | `PeriodicScanWorker` |
+| Hilt module | `{Scope}Module` | `DataModule`, `DetectionModule` |
+| String resource | `snake_case`, prefixed by screen | `scan_result_title` |
+
+---
+
+## Gradle
+
+Versions live only in the catalog. Module build files reference aliases.
+
+```toml
+# gradle/libs.versions.toml
+[versions]
+kotlin = "2.x.x"
+agp = "8.x.x"
+ksp = "2.x.x-x.x.x"
+composeBom = "20xx.xx.xx"
+hilt = "2.x"
+room = "2.x.x"
+
+[libraries]
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hilt" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+```
+
+```kotlin
+// core-domain/build.gradle.kts — pure Kotlin, no Android plugin
+plugins {
+    alias(libs.plugins.kotlin.jvm)
+}
+
+kotlin { jvmToolchain(17) }
+
+dependencies {
+    implementation(libs.kotlinx.coroutines.core)
+    testImplementation(libs.junit.jupiter)
+}
+
+tasks.withType<Test> { useJUnitPlatform() }
+```
+
+```kotlin
+// core-data/build.gradle.kts — Android library
+plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
+}
+
+android {
+    namespace = "com.example.app.core.data"
+    compileSdk = libs.versions.compileSdk.get().toInt()
+    defaultConfig { minSdk = libs.versions.minSdk.get().toInt() }
+}
+
+dependencies {
+    implementation(project(":core-domain"))
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+}
+```
+
+Use the real version numbers already in the project's catalog. When a library is missing, add it to the catalog first, then reference the alias.
+
+---
+
+## Domain Layer
+
+Models are immutable. Ports are interfaces. Rules are pure and take every input as a parameter, including the clock.
+
+```kotlin
+// core-domain
+data class InstalledApp(
+    val packageName: String,
+    val label: String,
+    val installerPackage: String?,
+    val firstInstallTime: Instant,
+    val requestedPermissions: Set<String>,
+)
+
+enum class RiskLevel { GREEN, YELLOW, RED }
+
+data class RiskResult(val score: Int, val level: RiskLevel, val signals: Set<Signal>)
+
+interface AppInventory {
+    suspend fun installedApps(): List<InstalledApp>
+}
+
+class RiskScorer(private val weights: ScoreWeights) {
+    fun score(app: InstalledApp, signals: Set<Signal>, context: ScoringContext): RiskResult {
+        val raw = signals.sumOf(weights::of).coerceAtMost(100)
+        val adjusted = context.rules.fold(raw) { acc, rule -> rule.adjust(acc, app, signals) }
+        return RiskResult(adjusted, RiskLevel.fromScore(adjusted), signals)
+    }
+}
+```
+
+Expected failures are values, not exceptions:
+
+```kotlin
+sealed interface CardReadResult {
+    data class Success(val applicationLabel: String, val lastFourDigits: String, val expiry: YearMonth) : CardReadResult
+    data object UnsupportedCard : CardReadResult
+    data object ConnectionLost : CardReadResult
+}
+```
+
+---
+
+## UI — Compose
+
+Each screen has a stateful entry point that owns the ViewModel and a stateless content composable that is easy to preview and test.
+
+```kotlin
+sealed interface ScanResultUiState {
+    data object Loading : ScanResultUiState
+    data object Empty : ScanResultUiState
+    data class Content(val risky: List<AppRiskItem>, val safeCount: Int) : ScanResultUiState
+    data class Error(@StringRes val message: Int) : ScanResultUiState
+}
+
+@HiltViewModel
+class ScanResultViewModel @Inject constructor(
+    private val scanRepository: ScanRepository,
+    private val scanDevice: ScanDevice,
+) : ViewModel() {
+
+    val uiState: StateFlow<ScanResultUiState> = scanRepository.latestReport()
+        .map { report -> report?.toUiState() ?: ScanResultUiState.Empty }
+        .catch { emit(ScanResultUiState.Error(R.string.scan_result_error)) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), ScanResultUiState.Loading)
+
+    fun onScanRequested() {
+        viewModelScope.launch { scanDevice(ScanTrigger.MANUAL) }
+    }
+}
+
+@Composable
+fun ScanResultScreen(
+    onAppClick: (String) -> Unit,
+    viewModel: ScanResultViewModel = hiltViewModel(),
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    ScanResultContent(uiState = uiState, onAppClick = onAppClick, onScanClick = viewModel::onScanRequested)
+}
+
+@Composable
+fun ScanResultContent(
+    uiState: ScanResultUiState,
+    onAppClick: (String) -> Unit,
+    onScanClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    when (uiState) {
+        ScanResultUiState.Loading -> LoadingIndicator(modifier)
+        ScanResultUiState.Empty -> EmptyState(onScanClick = onScanClick, modifier = modifier)
+        is ScanResultUiState.Content -> RiskList(uiState.risky, onAppClick, modifier)
+        is ScanResultUiState.Error -> ErrorState(message = stringResource(uiState.message), modifier = modifier)
+    }
+}
+```
+
+**Rules:**
+- Every screen with data handles **loading, empty, content and error**
+- Collect flows with `collectAsStateWithLifecycle()`, never `collectAsState()`
+- All user-visible text comes from `strings.xml` through `stringResource`
+- Meaning is never carried by color alone: pair color with an icon and text, and give icons a `contentDescription`
+- The stateless `*Content` composable takes `modifier: Modifier = Modifier` as its last optional parameter
+- One-off events (navigation, snackbars) are modelled as state that the UI consumes and acknowledges, not as a `SharedFlow` the UI might miss
+
+---
+
+## Navigation
+
+Type-safe routes with kotlinx.serialization. The `NavHost` is the only place that knows about `NavController`; screens receive lambdas.
+
+```kotlin
+@Serializable data object HomeRoute
+@Serializable data class AppDetailRoute(val packageName: String)
+
+@Composable
+fun AppNavHost(navController: NavHostController = rememberNavController()) {
+    NavHost(navController = navController, startDestination = HomeRoute) {
+        composable<HomeRoute> {
+            HomeScreen(onAppClick = { navController.navigate(AppDetailRoute(it)) })
+        }
+        composable<AppDetailRoute> {
+            AppDetailScreen(onBack = navController::popBackStack)
+        }
+    }
+}
+```
+
+The ViewModel reads route arguments with `savedStateHandle.toRoute<AppDetailRoute>()`.
+
+---
+
+## Dependency Injection — Hilt
+
+Constructor injection everywhere. Modules only bind interfaces to implementations and provide types the project does not own.
+
+```kotlin
+@HiltAndroidApp
+class ExampleApplication : Application(), Configuration.Provider {
+    @Inject lateinit var workerFactory: HiltWorkerFactory
+
+    override val workManagerConfiguration: Configuration
+        get() = Configuration.Builder().setWorkerFactory(workerFactory).build()
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+abstract class DetectionModule {
+    @Binds
+    abstract fun bindAppInventory(impl: PackageManagerAppInventory): AppInventory
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+object DataModule {
+    @Provides
+    @Singleton
+    fun provideDatabase(@ApplicationContext context: Context): AppDatabase =
+        Room.databaseBuilder(context, AppDatabase::class.java, "app.db").build()
+
+    @Provides
+    fun provideScanRunDao(database: AppDatabase): ScanRunDao = database.scanRunDao()
+
+    @Provides
+    fun provideClock(): Clock = Clock.systemUTC()
+}
+```
+
+Pure domain classes (`RiskScorer`) have no Hilt annotations: provide them from a module in the Android module that uses them.
+
+---
+
+## Persistence — Room
+
+Entities are persistence shapes, separate from domain models. DAOs return `Flow` for reads the UI observes and are `suspend` for writes.
+
+```kotlin
+@Entity(tableName = "scan_run")
+data class ScanRunEntity(
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    val startedAt: Long,
+    val finishedAt: Long,
+    val trigger: String,
+    val totalApps: Int,
+)
+
+@Dao
+interface ScanRunDao {
+    @Query("SELECT * FROM scan_run ORDER BY startedAt DESC LIMIT 1")
+    fun observeLatest(): Flow<ScanRunEntity?>
+
+    @Insert
+    suspend fun insert(run: ScanRunEntity): Long
+
+    @Query("DELETE FROM scan_run WHERE id NOT IN (SELECT id FROM scan_run ORDER BY startedAt DESC LIMIT :keep)")
+    suspend fun deleteOlderThanLatest(keep: Int)
+}
+
+@Database(entities = [ScanRunEntity::class, AppSnapshotEntity::class], version = 1, exportSchema = true)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun scanRunDao(): ScanRunDao
+}
+
+class RoomScanRepository @Inject constructor(
+    private val database: AppDatabase,
+    private val scanRunDao: ScanRunDao,
+    private val snapshotDao: AppSnapshotDao,
+) : ScanRepository {
+    override suspend fun save(report: ScanReport) = database.withTransaction {
+        val scanId = scanRunDao.insert(report.toEntity())
+        snapshotDao.insertAll(report.apps.map { it.toEntity(scanId) })
+    }
+}
+```
+
+**Rules:**
+- `exportSchema = true` and the schema JSON files are committed
+- Every version bump ships a `Migration` and a migration test
+- Multi-table writes run inside `withTransaction`
+- Repositories map entities to domain models; entities never reach a ViewModel
+
+### DataStore
+
+Settings and flags go in Preferences DataStore behind a repository interface defined in `core-domain`.
+
+```kotlin
+class DataStoreSettingsRepository @Inject constructor(
+    private val dataStore: DataStore<Preferences>,
+) : SettingsRepository {
+    override val monitoringEnabled: Flow<Boolean> =
+        dataStore.data.map { it[MONITORING_ENABLED] ?: true }
+
+    override suspend fun setMonitoringEnabled(enabled: Boolean) {
+        dataStore.edit { it[MONITORING_ENABLED] = enabled }
+    }
+
+    private companion object {
+        val MONITORING_ENABLED = booleanPreferencesKey("monitoring_enabled")
+    }
+}
+```
+
+---
+
+## Background Work — WorkManager
+
+Deferrable and periodic work uses WorkManager. A worker is a thin shell that calls a use case.
+
+```kotlin
+@HiltWorker
+class PeriodicScanWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val scanDevice: ScanDevice,
+    private val notifier: RiskNotifier,
+) : CoroutineWorker(context, params) {
+
+    override suspend fun doWork(): Result = try {
+        val report = scanDevice(ScanTrigger.PERIODIC)
+        notifier.notifyNewRisks(report)
+        Result.success()
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Exception) {
+        if (runAttemptCount < MAX_ATTEMPTS) Result.retry() else Result.failure()
+    }
+
+    companion object {
+        const val UNIQUE_NAME = "periodic-scan"
+        private const val MAX_ATTEMPTS = 3
+    }
+}
+
+class ScanScheduler @Inject constructor(private val workManager: WorkManager) {
+    fun schedule(intervalHours: Long) {
+        val request = PeriodicWorkRequestBuilder<PeriodicScanWorker>(intervalHours, TimeUnit.HOURS).build()
+        workManager.enqueueUniquePeriodicWork(
+            PeriodicScanWorker.UNIQUE_NAME,
+            ExistingPeriodicWorkPolicy.UPDATE,
+            request,
+        )
+    }
+
+    fun cancel() = workManager.cancelUniqueWork(PeriodicScanWorker.UNIQUE_NAME)
+}
+```
+
+Periodic work has a 15-minute minimum interval and the system may delay it. Anything the user must see promptly is also computed when the app opens.
+
+---
+
+## Permissions and Manifest
+
+- Declare only the permissions the feature needs. Each new `<uses-permission>` is named in the spec and in the PR description
+- Hardware the app can work without is declared `android:required="false"`, and the code checks for it at runtime
+- Runtime permissions are requested in context, right before the feature that needs them, with `rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission())`. A denial never blocks the rest of the app
+- Components are `android:exported="false"` unless another app must start them
+
+```xml
+<uses-permission android:name="android.permission.NFC" />
+<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+<uses-feature android:name="android.hardware.nfc" android:required="false" />
+```
+
+---
+
+## Error Handling
+
+- Expected outcomes (no hardware, unsupported input, empty result) are modelled as sealed results in `core-domain` and mapped to a `UiState`
+- Adapters catch the platform exceptions they know (`IOException`, `SecurityException`, `TagLostException`) and return a domain result. They never swallow `CancellationException`
+- ViewModels turn unexpected failures into `UiState.Error` with a string resource. Raw exception messages are never shown to the user
+- No `try/catch` in composables
+
+---
+
+## Configuration
+
+- Build-time constants go in `buildConfigField` or resources, per build type or flavor. No secrets in the repository
+- Tunable business values (weights, thresholds, intervals, allow-lists) live in one file in `core-domain` or in a bundled resource, not scattered as literals
+- `release` builds enable R8 (`isMinifyEnabled = true`) and keep rules live in each module's `consumer-rules.pro`
+
+---
+
+## Security and Privacy
+
+- Never log personal or sensitive data (card numbers, tokens, message contents, full package lists). Sensitive values are masked in the adapter that reads them and never leave it in full
+- Sensitive values are not written to Room, DataStore, `SavedStateHandle`, crash reports or analytics
+- Screens that show sensitive data set `WindowManager.LayoutParams.FLAG_SECURE`
+- If the product promises offline or local-only behaviour, the manifest must not declare `android.permission.INTERNET`, and a test enforces it
+
+---
+
+## Testing
+
+See `testing.md` for the full testing guide. Quick rules:
+
+- `core-domain`: JUnit 5 on the JVM, no Robolectric, no mocks of domain types
+- ViewModels: JUnit + MockK + Turbine + `kotlinx-coroutines-test`, with a main-dispatcher rule
+- Adapters and Room: Robolectric or instrumented tests with JUnit 4
+- Screens: Compose UI tests against the stateless `*Content` composable, one test per `UiState`
+- **Minimum coverage**: 80% on `core-domain`
+
+---
+
+## What NOT to do
+
+- ❌ `android.*` or `androidx.*` imports in `core-domain`
+- ❌ Business rules in composables, ViewModels, workers or DAOs
+- ❌ Calling repositories, DAOs or platform APIs from a composable
+- ❌ `GlobalScope`, `runBlocking` in production code, or a `CoroutineScope` created by hand inside a ViewModel
+- ❌ `collectAsState()` for flows that outlive the screen — use `collectAsStateWithLifecycle()`
+- ❌ Hard-coded user-visible strings, or version numbers outside `libs.versions.toml`
+- ❌ `!!` — use `?:` with a domain result or `requireNotNull` with a message
+- ❌ Passing `Context`, `NavController` or a ViewModel down the composable tree
+- ❌ `fallbackToDestructiveMigration()` in a release build
+- ❌ Foreground services or exact alarms for work that WorkManager can defer
+- ❌ Catching `Exception` without rethrowing `CancellationException`
+- ❌ Adding a permission, a dependency or an exported component that the spec does not name

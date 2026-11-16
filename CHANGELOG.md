@@ -9,6 +9,18 @@ The `version` field in `.claude-plugin/plugin.json` must always match the
 latest release in this file (CI enforces it) — Claude Code plugin users only
 receive updates when that field is bumped.
 
+## [Unreleased]
+
+### Added
+
+- **Android stack** — `android` (Kotlin 2.x, Jetpack Compose, Material 3, Hilt,
+  Room, DataStore, WorkManager, multi-module Gradle) with an architecture
+  skill, a testing skill and a `SKILLS.md` template. The architecture skill
+  keeps business rules in a pure Kotlin `core-domain` module and platform APIs
+  behind adapters; the testing skill separates JUnit 5 (JVM modules) from
+  JUnit 4 (Robolectric and instrumented tests). The shared `api-design` and
+  `error-handling` skills still describe HTTP services only
+
 ## [1.2.0] - 2026-11-15
 
 ### Changed

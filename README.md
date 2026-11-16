@@ -48,6 +48,7 @@ skills/
 ├── spring-boot/             # each stack: SKILL.md (architecture, patterns) + testing.md
 ├── spring-boot-kotlin/
 ├── ktor/
+├── android/
 ├── dotnet/
 ├── fastapi/
 ├── django/
@@ -135,6 +136,7 @@ Pass one of these as the stack to any install option (`STACK=`, `-Stack`, or the
 | `spring-boot` | ☕ Java | Spring Boot 4.x, Java 21+, JPA (Hibernate 7), Flyway, Jackson 3 |
 | `spring-boot-kotlin` | 🟣 Kotlin | Spring Boot 4.x, Kotlin 2.2+, JPA, Flyway, MockK |
 | `ktor` | 🟣 Kotlin | Ktor 3.x, Exposed, Koin, kotlinx.serialization, Flyway |
+| `android` | 🤖 Kotlin | Jetpack Compose, Material 3, Hilt, Room, DataStore, WorkManager, multi-module Gradle |
 | `dotnet` | 🔷 C# | .NET 10 (LTS), C# 14, ASP.NET Core 10, EF Core 10, MediatR |
 | `fastapi` | 🐍 Python | FastAPI, Pydantic v2, async SQLAlchemy 2.0, Alembic |
 | `django` | 🐍 Python | Django 5.x, Django REST Framework, pytest-django |
@@ -313,6 +315,8 @@ your-project/
 | [`spring-boot-kotlin/testing`](skills/spring-boot-kotlin/testing.md) | 🟣 Spring Boot + Kotlin | JUnit 5, MockK, springmockk, MockMvc Kotlin DSL, Testcontainers |
 | [`ktor/SKILL`](skills/ktor/SKILL.md) | 🟣 Ktor 3.x | Routes, plugins, Exposed + transactions, Koin, StatusPages RFC 7807, JWT |
 | [`ktor/testing`](skills/ktor/testing.md) | 🟣 Ktor 3.x | MockK + runTest, testApplication, Testcontainers + Flyway |
+| [`android/SKILL`](skills/android/SKILL.md) | 🤖 Android | Multi-module Gradle, pure Kotlin domain, Compose + ViewModel + UiState, Hilt, Room, DataStore, WorkManager, permissions |
+| [`android/testing`](skills/android/testing.md) | 🤖 Android | JUnit 5 domain tests, MockK + Turbine ViewModel tests, Robolectric, Room, Compose UI and WorkManager tests |
 | [`fastapi/SKILL`](skills/fastapi/SKILL.md) | 🐍 FastAPI | Routers, Depends, Pydantic v2, async SQLAlchemy 2.0, Alembic, RFC 7807 handlers |
 | [`fastapi/testing`](skills/fastapi/testing.md) | 🐍 FastAPI | pytest-asyncio, httpx + dependency overrides, Testcontainers + Alembic |
 | [`django/SKILL`](skills/django/SKILL.md) | 🐍 Django 5.x | Apps, services/selectors, DRF views and serializers, migrations, RFC 7807 handler |
