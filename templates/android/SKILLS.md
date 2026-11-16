@@ -12,7 +12,7 @@ sdd-version: "1.0"
 
 # Project Agent Skills
 
-This is an **Android / Kotlin 2.x** app (Jetpack Compose, Material 3, Hilt, Room, DataStore, WorkManager, multi-module Gradle). Before writing any code,
+This is an **Android / Kotlin 2.x** app (AGP 9 with built-in Kotlin, Jetpack Compose, Material 3, Hilt, Room, DataStore, WorkManager, multi-module Gradle). Before writing any code,
 read and follow all the skills listed below.
 
 ## Active Skills
@@ -93,6 +93,13 @@ core-YOURCAPABILITY/ ← platform adapters behind domain ports
 - **minSdk**: 26
 - **targetSdk / compileSdk**: the level Google Play currently requires
 - **Application id**: `com.YOURCOMPANY.YOURAPP`
+
+### Build
+- **AGP**: 9.x with built-in Kotlin (no `kotlin-android` plugin)
+- **JDK**: one version for toolchain, Gradle daemon and CI
+
+### Spec format
+- Feature specs set `feature.interface` (`ui`, `library`, `background` or `command`); `status` is a UI state, a result type or an exit code, never an HTTP status
 
 ### Persistence
 - **Database**: Room, schemas exported to `core-data/schemas`

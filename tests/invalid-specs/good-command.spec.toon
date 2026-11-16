@@ -1,0 +1,29 @@
+# Valid non-HTTP feature spec (interface: command) — status holds an exit code
+
+feature:
+  id: FT-002
+  name: Build The Project
+  version: 1.0
+  status: draft
+  interface: command
+
+requirement:
+  summary: The build compiles every module and runs the checks.
+  actor: Contributor
+  trigger: ./gradlew build
+
+inputs[1]{name,type,required,constraints}:
+  task,string,true,Gradle task name
+
+outputs:
+  success:
+    description: Build succeeds
+    status: 0
+  errors[1]{code,status,when}:
+    COMPILATION_FAILED,1,a module does not compile
+
+business-rules[1]{id,rule}:
+  BR-001,Versions live only in the version catalog
+
+assumptions[1]:
+  The toolchain JDK is installed

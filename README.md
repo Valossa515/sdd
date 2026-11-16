@@ -136,7 +136,7 @@ Pass one of these as the stack to any install option (`STACK=`, `-Stack`, or the
 | `spring-boot` | ☕ Java | Spring Boot 4.x, Java 21+, JPA (Hibernate 7), Flyway, Jackson 3 |
 | `spring-boot-kotlin` | 🟣 Kotlin | Spring Boot 4.x, Kotlin 2.2+, JPA, Flyway, MockK |
 | `ktor` | 🟣 Kotlin | Ktor 3.x, Exposed, Koin, kotlinx.serialization, Flyway |
-| `android` | 🤖 Kotlin | Jetpack Compose, Material 3, Hilt, Room, DataStore, WorkManager, multi-module Gradle |
+| `android` | 🤖 Kotlin | AGP 9 (built-in Kotlin), Jetpack Compose, Material 3, Hilt, Room, DataStore, WorkManager, multi-module Gradle |
 | `dotnet` | 🔷 C# | .NET 10 (LTS), C# 14, ASP.NET Core 10, EF Core 10, MediatR |
 | `fastapi` | 🐍 Python | FastAPI, Pydantic v2, async SQLAlchemy 2.0, Alembic |
 | `django` | 🐍 Python | Django 5.x, Django REST Framework, pytest-django |
@@ -176,7 +176,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/valossa515/sdd/main/scripts/
 bash <(curl -fsSL https://raw.githubusercontent.com/valossa515/sdd/main/scripts/install.sh) dotnet
 
 # pin a released version (recommended for teams):
-bash <(curl -fsSL https://raw.githubusercontent.com/valossa515/sdd/main/scripts/install.sh) spring-boot . agent --ref v1.3.0
+bash <(curl -fsSL https://raw.githubusercontent.com/valossa515/sdd/main/scripts/install.sh) spring-boot . agent --ref v1.4.0
 ```
 
 Releases are listed on the [releases page](https://github.com/valossa515/sdd/releases) with
@@ -218,7 +218,7 @@ exactly the same files as the bash installer. From your project folder:
 | `-Stack` | any [supported stack](#supported-stacks), e.g. `dotnet`, `fastapi` | required |
 | `-Target` | path to your project | current folder |
 | `-Format` | `agent`, `kiro` | `agent` |
-| `-Ref` | tag or branch to install, e.g. `v1.3.0` (recommended for teams) | latest `main` |
+| `-Ref` | tag or branch to install, e.g. `v1.4.0` (recommended for teams) | latest `main` |
 
 From a local clone (`-ExecutionPolicy Bypass` applies to this one run only — Windows PowerShell
 blocks local scripts by default):
@@ -393,7 +393,7 @@ requirement → feature.spec.toon → acceptance.toon → contract.toon → code
 
 | Schema | Purpose | Created by |
 |--------|---------|------------|
-| [feature.schema.md](specs/feature.schema.md) | Business behavior (inputs, outputs, business rules) | planner |
+| [feature.schema.md](specs/feature.schema.md) | Business behavior (inputs, outputs, business rules) for HTTP and non-HTTP features | planner |
 | [acceptance.schema.md](specs/acceptance.schema.md) | Given/When/Then testable criteria | planner |
 | [contract.schema.md](specs/contract.schema.md) | Files, layers, dependencies, test strategy | architect |
 

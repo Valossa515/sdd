@@ -1,0 +1,30 @@
+# Valid non-HTTP feature spec (interface: ui) — status holds the UI state
+
+feature:
+  id: FT-003
+  name: Show Scan Result
+  version: 1.0
+  status: draft
+  interface: ui
+
+requirement:
+  summary: The user sees whether any installed app has a scam profile.
+  actor: App user
+  trigger: User taps Scan now
+
+inputs[1]{name,type,required,constraints}:
+  trigger,ScanTrigger,true,MANUAL when started by the user
+
+outputs:
+  success:
+    description: Risk level and risky apps are shown
+    status: Content
+  errors[2]{code,status,when}:
+    NO_SCAN_YET,Empty,no scan has completed
+    SCAN_FAILED,ScanResultUiState.Error,the inventory cannot be read
+
+business-rules[1]{id,rule}:
+  BR-001,Risk is never shown by color alone
+
+assumptions[1]:
+  The device has at least one user app

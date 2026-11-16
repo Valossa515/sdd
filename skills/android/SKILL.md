@@ -2,7 +2,7 @@
 name: android
 description: Use this skill for any Android app task — Gradle modules, Compose screens, ViewModels, Room, DataStore, WorkManager, permissions, tests, or refactoring. Targets Kotlin 2.x with Jetpack Compose, Hilt, Room and a multi-module Gradle build.
 stack: android
-versions: "Kotlin 2.x, AGP 8.x, Jetpack Compose (BOM), Material 3, Hilt, Room, DataStore, WorkManager, Gradle Kotlin DSL"
+versions: "Kotlin 2.x, AGP 9.x (built-in Kotlin), Jetpack Compose (BOM), Material 3, Hilt, Room, DataStore, WorkManager, Gradle Kotlin DSL"
 ---
 
 # Android Agent Skill
@@ -12,10 +12,11 @@ You are an expert Android engineer building apps in Kotlin with Jetpack Compose.
 ## Stack Versions (always target these unless told otherwise)
 
 - **Kotlin**: 2.x, coroutines and Flow throughout
-- **Android Gradle Plugin**: 8.x, Gradle with Kotlin DSL (`build.gradle.kts`) and a version catalog (`gradle/libs.versions.toml`)
+- **Android Gradle Plugin**: 9.x with **built-in Kotlin**, Gradle with Kotlin DSL (`build.gradle.kts`) and a version catalog (`gradle/libs.versions.toml`)
+- **JDK**: one version for the toolchain, the Gradle daemon and CI (see Gradle → JDK)
 - **SDK levels**: `minSdk`, `targetSdk` and `compileSdk` come from the project's convention (see `.agent/SKILLS.md` → Project Overrides); never raise or lower them inside a feature task
 - **UI**: Jetpack Compose via the Compose BOM, Material 3, Navigation Compose with type-safe routes
-- **DI**: Hilt (KSP)
+- **DI**: Hilt 2.59.2+ (KSP 2.3.6+, the minimums for AGP 9)
 - **Persistence**: Room (KSP) for relational data, DataStore (Preferences) for settings
 - **Background work**: WorkManager
 - **Serialization**: kotlinx.serialization
@@ -84,7 +85,7 @@ Versions live only in the catalog. Module build files reference aliases.
 # gradle/libs.versions.toml
 [versions]
 kotlin = "2.x.x"
-agp = "8.x.x"
+agp = "9.x.x"
 ksp = "2.x.x-x.x.x"
 composeBom = "20xx.xx.xx"
 hilt = "2.x"
@@ -102,7 +103,6 @@ room-compiler = { group = "androidx.room", name = "room-compiler", version.ref =
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
@@ -115,7 +115,7 @@ plugins {
     alias(libs.plugins.kotlin.jvm)
 }
 
-kotlin { jvmToolchain(17) }
+kotlin { jvmToolchain(libs.versions.jdk.get().toInt()) }
 
 dependencies {
     implementation(libs.kotlinx.coroutines.core)
@@ -126,10 +126,9 @@ tasks.withType<Test> { useJUnitPlatform() }
 ```
 
 ```kotlin
-// core-data/build.gradle.kts — Android library
+// core-data/build.gradle.kts — Android library (AGP 9: no kotlin-android plugin)
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 }
@@ -139,6 +138,8 @@ android {
     compileSdk = libs.versions.compileSdk.get().toInt()
     defaultConfig { minSdk = libs.versions.minSdk.get().toInt() }
 }
+
+kotlin { jvmToolchain(libs.versions.jdk.get().toInt()) }
 
 dependencies {
     implementation(project(":core-domain"))
@@ -151,6 +152,32 @@ dependencies {
 ```
 
 Use the real version numbers already in the project's catalog. When a library is missing, add it to the catalog first, then reference the alias.
+
+### Built-in Kotlin (AGP 9)
+
+AGP 9 compiles Kotlin itself and enables this by default:
+
+- Android modules apply only `com.android.application` or `com.android.library`. **Do not apply `org.jetbrains.kotlin.android`**
+- `org.jetbrains.kotlin.kapt` is incompatible with built-in Kotlin. Use KSP for Room and Hilt
+- The Kotlin version comes from the Kotlin Gradle plugin on the build classpath. Declaring `kotlin-jvm` with `apply false` in the root build file, as the pure Kotlin module needs anyway, sets it for every module
+- Modules that use Compose still apply the Compose compiler plugin (`org.jetbrains.kotlin.plugin.compose`)
+- Pure Kotlin modules are unchanged: they apply `kotlin-jvm`
+
+A project still on AGP 8 keeps the `kotlin-android` plugin. Record which one applies in `.agent/SKILLS.md` → Project Overrides and do not mix the two.
+
+### JDK
+
+Pick one JDK version and use it in three places, all reading the same catalog entry:
+
+- the Kotlin toolchain of every module (`jvmToolchain`)
+- the Gradle daemon, pinned in `gradle/gradle-daemon-jvm.properties` (`toolchainVersion=<n>`)
+- CI (`actions/setup-java`)
+
+Static analysis plugins such as detekt run inside the Gradle daemon, so compiling with the right toolchain is not enough: a daemon on a newer JDK than the plugin supports fails with an error that does not name the cause. Prefer the JDK bundled with the current Android Studio over the newest release.
+
+### Before adding or upgrading a build plugin
+
+Check that the plugin supports the project's AGP, Kotlin, Gradle and JDK versions. If it does not run with them, stop and report it. Do not change another version, disable a check or add a workaround to make it pass.
 
 ---
 
@@ -485,6 +512,21 @@ Periodic work has a 15-minute minimum interval and the system may delay it. Anyt
 
 ---
 
+## Specs for Android features
+
+Android features are not HTTP endpoints. In the feature spec (`.spec.toon`), set `feature.interface` and fill `status` as `specs/feature.schema.md` defines:
+
+| The feature is | `interface` | `status` holds |
+|----------------|-------------|----------------|
+| A screen or user interaction | `ui` | the `UiState` case shown (`Content`, `Empty`, `Error`) |
+| A use case, collector, parser or repository | `library` | the result type returned (`Success`, `UnsupportedCard`) |
+| A worker or scheduled job | `background` | the worker outcome (`Success`, `Retry`, `Failure`) |
+| The build, a Gradle task or CI | `command` | the exit code (`0`, `1`) |
+
+Use the names the code uses, so a spec error maps to one sealed result subtype or one `UiState` case. The architecture contract lists Gradle modules and files, not endpoints.
+
+---
+
 ## Testing
 
 See `testing.md` for the full testing guide. Quick rules:
@@ -511,3 +553,6 @@ See `testing.md` for the full testing guide. Quick rules:
 - ❌ Foreground services or exact alarms for work that WorkManager can defer
 - ❌ Catching `Exception` without rethrowing `CancellationException`
 - ❌ Adding a permission, a dependency or an exported component that the spec does not name
+- ❌ Applying `org.jetbrains.kotlin.android` or `kapt` on AGP 9
+- ❌ HTTP statuses in the spec of a screen, use case or worker — set `feature.interface`
+- ❌ Changing a version or disabling a check to make an incompatible plugin run

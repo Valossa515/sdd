@@ -1,0 +1,24 @@
+# Intentionally invalid — unknown feature.interface value
+
+feature:
+  id: FT-004
+  name: Unknown Interface
+  interface: grpc
+
+requirement:
+  summary: Fixture with an interface the schema does not define.
+
+inputs[1]{name,type,required}:
+  a,string,true
+
+outputs:
+  success:
+    status: OK
+  errors[1]{code,status,when}:
+    FAILED,UNAVAILABLE,service is down
+
+business-rules[1]{id,rule}:
+  BR-001,rule one
+
+assumptions[1]:
+  None

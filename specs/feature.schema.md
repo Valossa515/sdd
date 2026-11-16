@@ -56,12 +56,53 @@ batches[2]{id,scope,estimate}:
   BATCH-02,Error handling and edge cases,1 day
 ```
 
+## Interface (features that are not HTTP endpoints)
+
+`feature.interface` says how the feature is reached. It is optional and defaults to `http`, so existing specs stay valid. It decides what `status` means in `outputs.success` and `outputs.errors`:
+
+| `interface` | The feature is | `trigger` example | `status` holds | Example |
+|-------------|----------------|-------------------|----------------|---------|
+| `http` (default) | An HTTP endpoint | `POST /api/v1/orders` | HTTP status, 3 digits | `201`, `404` |
+| `command` | A CLI command, build or script | `./gradlew build` | Exit code, an integer | `0`, `1` |
+| `ui` | A screen or user interaction | `User taps "Scan now"` | The UI state shown | `Content`, `Error`, `Empty` |
+| `library` | A function or use case called by other code | `ScanDevice(trigger)` | The result type returned | `Success`, `UnsupportedCard` |
+| `background` | A scheduled job, worker or event handler | `Periodic work every 6 hours` | The outcome reported | `Success`, `Retry`, `Failure` |
+
+For `ui`, `library` and `background`, `status` is an identifier: letters, digits, `_`, `.` and `-`, starting with a letter. Use the name the code will use (a sealed result subtype, a `UiState` case, a worker result), so the spec and the code share one vocabulary.
+
+```toon
+feature:
+  id: FT-002
+  name: Scan Installed Apps
+  interface: ui
+
+requirement:
+  summary: Show the user whether any installed app has a scam profile.
+  actor: App user
+  trigger: User taps "Scan now" on the home screen
+
+inputs[1]{name,type,required,constraints}:
+  trigger,ScanTrigger,true,MANUAL when started by the user
+
+outputs:
+  success:
+    description: The device risk level and the list of risky apps are shown
+    status: Content
+  errors[2]{code,status,when}:
+    NO_SCAN_YET,Empty,no scan has ever completed
+    SCAN_FAILED,Error,the app inventory cannot be read
+
+business-rules[1]{id,rule}:
+  BR-001,Risk is never shown by color alone
+```
+
 ## Required Fields
 
 | Field | Description | Required |
 |-------|-------------|----------|
 | `feature.id` | Unique identifier (FT-NNN) | ✅ |
 | `feature.name` | Human-readable name | ✅ |
+| `feature.interface` | `http` (default), `command`, `ui`, `library` or `background` | ⚠️ when not HTTP |
 | `requirement.summary` | What the feature does | ✅ |
 | `inputs` | Input parameters with types and constraints | ✅ |
 | `outputs.success` | Expected success response | ✅ |
@@ -73,7 +114,8 @@ batches[2]{id,scope,estimate}:
 ## Validation Rules
 
 1. Every input must have `name`, `type`, and `required`
-2. Every error must have `code`, `status`, and `when`
+2. Every error must have `code`, `status`, and `when`. `status` follows `feature.interface`: 3 digits for `http`, an integer for `command`, an identifier for `ui`, `library` and `background`
 3. Business rules must have unique IDs (BR-NNN)
 4. If the feature estimate > 2 days, `batches` is required
 5. Assumptions must always be flagged explicitly
+6. `feature.interface`, when present, must be one of the five values above

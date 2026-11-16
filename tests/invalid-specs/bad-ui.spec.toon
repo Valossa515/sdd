@@ -1,0 +1,24 @@
+# Intentionally invalid — interface: ui with a status that is not an identifier
+
+feature:
+  id: FT-006
+  name: Bad Outcome
+  interface: ui
+
+requirement:
+  summary: Fixture with a status that is not an identifier.
+
+inputs[1]{name,type,required}:
+  a,string,true
+
+outputs:
+  success:
+    status: Content
+  errors[1]{code,status,when}:
+    SCAN_FAILED,error state,the scan fails
+
+business-rules[1]{id,rule}:
+  BR-001,rule one
+
+assumptions[1]:
+  None

@@ -25,10 +25,12 @@ Check that required fields are present:
 Feature spec (.spec.toon):
   ✓ feature.id exists and matches pattern FT-NNN
   ✓ feature.name is not empty
+  ✓ feature.interface, when present, is http, command, ui, library or background
   ✓ requirement.summary is not empty
   ✓ inputs[] has at least 1 entry
   ✓ outputs.success is defined
   ✓ outputs.errors has at least 1 entry
+  ✓ each error status fits the interface (HTTP status, exit code or outcome identifier)
   ✓ business-rules has at least 1 entry
   ✓ Tabular array counts match declared [N]
 
