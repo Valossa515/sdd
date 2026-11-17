@@ -372,6 +372,8 @@ object DataModule {
 
 Pure domain classes (`RiskScorer`) have no Hilt annotations: provide them from a module in the Android module that uses them.
 
+Keep Room and DataStore as `implementation` dependencies of the data module. Hilt still assembles the whole graph in `app`, but the `app` module cannot see those types, so the test that injects the database, the DAOs and the `DataStore` lives in the data module (see `testing.md` → Hilt graph). Do not turn them into `api` just to test from `app`.
+
 ---
 
 ## Persistence — Room
@@ -422,17 +424,52 @@ class RoomScanRepository @Inject constructor(
 - Every version bump ships a `Migration` and a migration test
 - Multi-table writes run inside `withTransaction`
 - Repositories map entities to domain models; entities never reach a ViewModel
+- Room and Hilt use KSP only; `kapt` does not work with AGP 9's built-in Kotlin
+
+### Schema files
+
+Apply the Room Gradle plugin so the schema is exported to a fixed folder, and commit what it generates:
+
+```kotlin
+// core-data/build.gradle.kts
+plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
+}
+
+room { schemaDirectory("$projectDir/schemas") }
+```
+
+The build **rewrites** the JSON of the current version every time. A migration test therefore compares the code with itself and cannot catch an entity that changed without a version bump. What catches it is a CI step after the build that fails when the build changed the schema folder. Use `git status`, not `git diff`, so a new `N.json` that was never committed is caught too:
+
+```yaml
+- name: Room schema committed
+  run: |
+    CHANGED=$(git status --porcelain -- core-data/schemas)
+    if [ -n "$CHANGED" ]; then
+      echo "$CHANGED"
+      echo "The build regenerated the Room schema. Commit it together with the entity change."
+      exit 1
+    fi
+```
+
+Decide when a schema version is frozen and record it in the project's decisions. Before the first public release no device has the database, so version 1 may still change with its JSON committed and no migration. From the first release on, a published `N.json` never changes: any change is a new version with a `Migration` and a test, and CI should reject edits to a published `N.json`.
 
 ### DataStore
 
-Settings and flags go in Preferences DataStore behind a repository interface defined in `core-domain`.
+Settings and flags go in Preferences DataStore behind a repository interface defined in `core-domain`. Exactly one `DataStore` instance per file: provide it as a `@Singleton`; two instances on the same file corrupt each other and throw.
+
+Reads catch `IOException` and emit empty preferences, so the defaults apply when the file cannot be read. Rethrow anything else.
 
 ```kotlin
 class DataStoreSettingsRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>,
 ) : SettingsRepository {
     override val monitoringEnabled: Flow<Boolean> =
-        dataStore.data.map { it[MONITORING_ENABLED] ?: true }
+        dataStore.data
+            .catch { if (it is IOException) emit(emptyPreferences()) else throw it }
+            .map { it[MONITORING_ENABLED] ?: true }
 
     override suspend fun setMonitoringEnabled(enabled: Boolean) {
         dataStore.edit { it[MONITORING_ENABLED] = enabled }
@@ -532,6 +569,34 @@ Periodic work has a 15-minute minimum interval and the system may delay it. Anyt
 - Sensitive values are not written to Room, DataStore, `SavedStateHandle`, crash reports or analytics
 - Screens that show sensitive data set `WindowManager.LayoutParams.FLAG_SECURE`
 - If the product promises offline or local-only behaviour, the manifest must not declare `android.permission.INTERNET`, and a test enforces it
+- An app that keeps sensitive data on the device turns backup off. `android:allowBackup="false"` alone is not enough: from `targetSdk` 31, some devices still run device-to-device transfer. Add `android:dataExtractionRules` excluding every domain in `<cloud-backup>` and `<device-transfer>`, and `android:fullBackupContent` excluding them for Android 11 and lower. A test reads both XML files, and a CI step checks that the three attributes are in the manifest, because the rule files are not readable through public APIs
+
+```xml
+<application
+    android:allowBackup="false"
+    android:dataExtractionRules="@xml/data_extraction_rules"
+    android:fullBackupContent="@xml/full_backup_content">
+```
+
+```xml
+<!-- res/xml/data_extraction_rules.xml -->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" path="." />
+        <exclude domain="file" path="." />
+        <exclude domain="database" path="." />
+        <exclude domain="sharedpref" path="." />
+        <exclude domain="external" path="." />
+        <exclude domain="device_root" path="." />
+        <exclude domain="device_file" path="." />
+        <exclude domain="device_database" path="." />
+        <exclude domain="device_sharedpref" path="." />
+    </cloud-backup>
+    <device-transfer>
+        <!-- the same nine excludes -->
+    </device-transfer>
+</data-extraction-rules>
+```
 
 ---
 
@@ -581,3 +646,6 @@ See `testing.md` for the full testing guide. Quick rules:
 - ❌ Changing a version or disabling a check to make an incompatible plugin run
 - ❌ `@Suppress` or a disabled rule to get composables past ktlint or detekt — exempt `@Composable` in the config
 - ❌ Reading `isSystemInDarkTheme()` inside a component instead of the mode the app theme provides
+- ❌ Two `DataStore` instances for the same file, or reading `dataStore.data` without handling `IOException`
+- ❌ Trusting the migration test alone to catch schema changes — the build rewrites the current schema; check it in CI
+- ❌ Relying on `allowBackup="false"` alone to keep data on the device

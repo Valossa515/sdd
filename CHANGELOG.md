@@ -9,6 +9,32 @@ The `version` field in `.claude-plugin/plugin.json` must always match the
 latest release in this file (CI enforces it) — Claude Code plugin users only
 receive updates when that field is bumped.
 
+## [1.6.0] - 2026-11-17
+
+### Added
+
+- **Android persistence guidance** — Room schema files with the Room Gradle
+  plugin and a CI step that fails when the build changed the schema folder
+  (`git status`, so new `N.json` files are caught), with a schema-freeze rule
+  from the first public release; one `DataStore` per file as a singleton,
+  reads that handle `IOException`; backup off with `dataExtractionRules` and
+  `fullBackupContent`, because `allowBackup="false"` alone leaves
+  device-to-device transfer on for some devices from `targetSdk` 31
+- **Android testing** — constraint and cascade tests, migration tests on the
+  JVM with the schemas in the unit-test assets and the file-and-driver
+  `MigrationTestHelper` constructor, Hilt graph tests in the module that
+  owns the types, `DataStore` tests on a real file, and the Windows-only
+  `DataStore` rename failure with how to skip it and confirm in CI that the
+  tests ran
+
+### Changed
+
+- The `android` template lists the schema-freeze rule and backup off under
+  Persistence
+
+All found while building the persistence layer of an Android app with the
+`android` stack.
+
 ## [1.5.0] - 2026-11-17
 
 ### Changed

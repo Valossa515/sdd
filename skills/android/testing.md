@@ -47,6 +47,8 @@ dependencies {
     testImplementation(libs.androidx.test.core)
     testImplementation(libs.androidx.room.testing)
     testImplementation(libs.androidx.work.testing)
+    testImplementation(libs.hilt.android.testing)
+    kspTest(libs.hilt.compiler)
 
     // Compose UI tests on the JVM (Robolectric) — see "Compose UI Tests"
     testImplementation(platform(libs.androidx.compose.bom))
@@ -201,6 +203,86 @@ class ScanRunDaoTest {
     }
 }
 ```
+
+Test the constraints the schema promises, not only the happy path: a duplicate primary key and an orphan foreign key throw `SQLiteConstraintException`, and deleting a parent row removes the children when the foreign key cascades. If the DAOs have no delete operation, delete the parent with SQL in the test (`database.openHelper.writableDatabase.execSQL(...)`) instead of adding a DAO method only for the test.
+
+### Migration tests on the JVM
+
+Room's Gradle plugin puts the exported schemas only in the instrumented-test assets. For local Robolectric tests, add them to the unit-test assets with the non-deprecated AGP 9 API:
+
+```kotlin
+// core-data/build.gradle.kts
+android {
+    sourceSets.getByName("test").assets.directories.add("$projectDir/schemas")
+}
+```
+
+Use the `MigrationTestHelper` constructor that takes a file and a driver. Under Robolectric, the older `(instrumentation, Database::class.java)` constructor fails with "This driver is configured to open a database named ... but ... was requested".
+
+```kotlin
+@RunWith(RobolectricTestRunner::class)
+class AppDatabaseMigrationTest {
+
+    private val file = ApplicationProvider.getApplicationContext<Context>().getDatabasePath("migration-test.db")
+
+    @get:Rule
+    val helper = MigrationTestHelper(
+        instrumentation = InstrumentationRegistry.getInstrumentation(),
+        file = file,
+        driver = AndroidSQLiteDriver(),
+        databaseClass = AppDatabase::class,
+    )
+
+    @Test
+    fun `version 1 is created and validated from the exported schema`() {
+        helper.createDatabase(1).close()
+        helper.runMigrationsAndValidate(1, emptyList()).close()
+    }
+}
+```
+
+The test validates the schema JSON, but the build rewrites that JSON for the current version, so it does not catch an entity change without a version bump. A CI step does (see `SKILL.md` → Schema files).
+
+### Hilt graph
+
+Test the graph in the module that owns the types, with `@HiltAndroidTest` and `HiltTestApplication`. Inject every binding someone will use, including classes with an `@Inject` constructor that no module provides: Hilt only validates bindings that are requested.
+
+```kotlin
+@HiltAndroidTest
+@RunWith(RobolectricTestRunner::class)
+@Config(application = HiltTestApplication::class)
+class DataModuleTest {
+
+    @get:Rule val hiltRule = HiltAndroidRule(this)
+
+    @Inject lateinit var database: AppDatabase
+    @Inject lateinit var settings: SettingsDataSource
+
+    @Test
+    fun `graph provides the database and the settings source`() {
+        hiltRule.inject()
+        assertNotNull(database.scanRunDao())
+        assertNotNull(settings)
+    }
+}
+```
+
+### DataStore
+
+Test a `DataStore` source with a real `DataStore` on a temporary file, created with `PreferenceDataStoreFactory.create(scope) { file }`. Do not fake the store.
+
+On Windows, a second write to the same `DataStore` file fails in JVM tests with "Unable to rename ... .preferences_pb.tmp": the JVM cannot rename the temporary file over the existing one. Android and Linux are not affected. Skip only the tests that write more than once on Windows, explain why in the test, and let CI on Linux run them:
+
+```kotlin
+@Test
+fun `written values are read back`() = runTest {
+    // Windows JVM cannot rename DataStore's temp file over the existing one; CI (Linux) runs this test
+    assumeFalse(System.getProperty("os.name").startsWith("Windows"))
+    ...
+}
+```
+
+A skipped test does not fail the build, so confirm in CI that it ran. Publishing the test reports as a CI artifact (`*/build/reports/tests/`, with `if: always()`) shows the run, failure and skip counts per class.
 
 ---
 
@@ -422,4 +504,7 @@ showsEmptyStateBeforeTheFirstScan
 - ❌ `ui-test-manifest` in any configuration — use `createEmptyComposeRule()` with an Activity started by Robolectric
 - ❌ Comparing screenshot pixels to check a color — test the color function and the contrast instead
 - ❌ A manifest test that only forbids specific permissions — check an allowlist
+- ❌ The `(instrumentation, Database::class.java)` `MigrationTestHelper` constructor under Robolectric — use the file-and-driver constructor
+- ❌ A fake `DataStore` in the tests of a `DataStore` source
+- ❌ Making Room or DataStore `api` dependencies only to test the Hilt graph from `app`
 - ❌ Skipping the migration test when the Room version changes
