@@ -176,7 +176,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/valossa515/sdd/main/scripts/
 bash <(curl -fsSL https://raw.githubusercontent.com/valossa515/sdd/main/scripts/install.sh) dotnet
 
 # pin a released version (recommended for teams):
-bash <(curl -fsSL https://raw.githubusercontent.com/valossa515/sdd/main/scripts/install.sh) spring-boot . agent --ref v1.4.0
+bash <(curl -fsSL https://raw.githubusercontent.com/valossa515/sdd/main/scripts/install.sh) spring-boot . agent --ref v1.5.0
 ```
 
 Releases are listed on the [releases page](https://github.com/valossa515/sdd/releases) with
@@ -218,7 +218,7 @@ exactly the same files as the bash installer. From your project folder:
 | `-Stack` | any [supported stack](#supported-stacks), e.g. `dotnet`, `fastapi` | required |
 | `-Target` | path to your project | current folder |
 | `-Format` | `agent`, `kiro` | `agent` |
-| `-Ref` | tag or branch to install, e.g. `v1.4.0` (recommended for teams) | latest `main` |
+| `-Ref` | tag or branch to install, e.g. `v1.5.0` (recommended for teams) | latest `main` |
 
 From a local clone (`-ExecutionPolicy Bypass` applies to this one run only — Windows PowerShell
 blocks local scripts by default):
@@ -470,11 +470,14 @@ make install STACK=spring-boot TARGET=/path/to/your/project
 | `agents/*` | ✅ Yes | Agent role definitions |
 | `prompts/*` | ✅ Yes | Action prompt templates |
 | `specs/*` | ✅ Yes | Specification schemas |
-| `SKILLS.md` | ✅ Yes | Regenerated from template |
 | `.github/agents/*` | ✅ Yes | Copilot custom agents (auto-generated) |
-| Your project overrides in `SKILLS.md` | ⚠️ Overwritten | Back up before updating |
+| `SKILLS.md` | ⚠️ Kept | Only the `sdd-version` line changes; Project Overrides stay |
+| Context docs (`context.md`, `architecture.md`, ...) | ⚠️ Kept | Written by `@bootstrap`; only `sdd-version` changes if present |
+| Your plans and specs (`plans/`, `specs/features/`, `specs/acceptance/`, `specs/contracts/`) | ❌ Never touched | Project-owned |
 
-> **Tip:** Before upgrading, commit your current `.agent/` folder so you can diff the changes and restore any custom overrides.
+New skills or rows added to a stack template do not reach an existing `SKILLS.md`, because it is kept. Compare it with `templates/<stack>/SKILLS.md` after upgrading. To reset a project-owned file to the template, delete it and re-run the installer.
+
+> **Tip:** Commit your current `.agent/` folder before upgrading, so the diff shows exactly what changed.
 
 ## How to use
 

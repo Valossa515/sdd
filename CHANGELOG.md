@@ -9,6 +9,33 @@ The `version` field in `.claude-plugin/plugin.json` must always match the
 latest release in this file (CI enforces it) — Claude Code plugin users only
 receive updates when that field is bumped.
 
+## [1.5.0] - 2026-11-17
+
+### Changed
+
+- **Android testing skill runs Compose tests on the JVM without
+  `ui-test-manifest`** — `createEmptyComposeRule()` with a `ComponentActivity`
+  started by Robolectric. The previous advice (`ui-test-manifest` in
+  `debugImplementation`) merged an exported test Activity into the debug APK.
+  New sections cover navigation tests through the real Activity, color and
+  contrast checks as pure functions, and a merged-manifest test that checks an
+  allowlist of permissions and exported Activities instead of forbidding only
+  `INTERNET`
+- **Android skill** — ktlint and detekt configuration that exempts only
+  `@Composable` functions from function naming; `compileSdk` above
+  `targetSdk` when AndroidX requires it; theme mode for components through a
+  `CompositionLocal`; `enableEdgeToEdge()`; light and dark window themes; and
+  checking the merged manifest when a dependency is added
+
+### Fixed
+
+- **README "What gets updated" table** said `SKILLS.md` overrides are
+  overwritten on reinstall. Both installers keep `SKILLS.md` and the context
+  docs and change only their `sdd-version` line, as CI already tests
+
+All found while building the first screens of an Android app with the
+`android` stack.
+
 ## [1.4.0] - 2026-11-16
 
 ### Added

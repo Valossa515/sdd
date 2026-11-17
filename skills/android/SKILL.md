@@ -14,7 +14,7 @@ You are an expert Android engineer building apps in Kotlin with Jetpack Compose.
 - **Kotlin**: 2.x, coroutines and Flow throughout
 - **Android Gradle Plugin**: 9.x with **built-in Kotlin**, Gradle with Kotlin DSL (`build.gradle.kts`) and a version catalog (`gradle/libs.versions.toml`)
 - **JDK**: one version for the toolchain, the Gradle daemon and CI (see Gradle → JDK)
-- **SDK levels**: `minSdk`, `targetSdk` and `compileSdk` come from the project's convention (see `.agent/SKILLS.md` → Project Overrides); never raise or lower them inside a feature task
+- **SDK levels**: `minSdk`, `targetSdk` and `compileSdk` come from the project's convention (see `.agent/SKILLS.md` → Project Overrides); never raise or lower them inside a feature task. `compileSdk` may be higher than `targetSdk`: recent AndroidX libraries require a recent `compileSdk`, which only decides which APIs compile, while `targetSdk` decides runtime behaviour and follows the Play Store requirement. Record such a split as a decision
 - **UI**: Jetpack Compose via the Compose BOM, Material 3, Navigation Compose with type-safe routes
 - **DI**: Hilt 2.59.2+ (KSP 2.3.6+, the minimums for AGP 9)
 - **Persistence**: Room (KSP) for relational data, DataStore (Preferences) for settings
@@ -226,6 +226,25 @@ sealed interface CardReadResult {
 
 ## UI — Compose
 
+### Lint rules for composables
+
+Composables are named in PascalCase (`ScanResultScreen`), which the default function-naming rules of ktlint and detekt reject. Exempt only functions annotated with `@Composable`; every other function stays checked.
+
+```ini
+# .editorconfig (repository root)
+[*.{kt,kts}]
+ktlint_function_naming_ignore_when_annotated_with = Composable
+```
+
+```yaml
+# <module>/detekt.yml, applied with buildUponDefaultConfig = true
+naming:
+  FunctionNaming:
+    ignoreAnnotated: ['Composable']
+```
+
+Do not silence the rule with `@Suppress` or by disabling it. When detekt's `MagicNumber` flags color literals, give each one a named `const val` in the theme's `Color.kt`.
+
 Each screen has a stateful entry point that owns the ViewModel and a stateless content composable that is easy to preview and test.
 
 ```kotlin
@@ -284,6 +303,9 @@ fun ScanResultContent(
 - Meaning is never carried by color alone: pair color with an icon and text, and give icons a `contentDescription`
 - The stateless `*Content` composable takes `modifier: Modifier = Modifier` as its last optional parameter
 - One-off events (navigation, snackbars) are modelled as state that the UI consumes and acknowledges, not as a `SharedFlow` the UI might miss
+- Components that pick their own colors (statuses, risk levels) read the theme's mode from a `CompositionLocal` provided by the app theme, never from `isSystemInDarkTheme()` directly: otherwise a theme forced to light or dark is ignored
+- Call `enableEdgeToEdge()` in the Activity before `setContent`, and pad content with `safeDrawingPadding()`; from Android 15 with a recent `targetSdk` the system draws edge-to-edge anyway, so this keeps older versions consistent
+- Set a window theme for light and dark (`res/values/themes.xml` and `res/values-night/themes.xml`), so the window does not flash white before Compose draws in dark mode
 
 ---
 
@@ -477,6 +499,7 @@ Periodic work has a 15-minute minimum interval and the system may delay it. Anyt
 - Hardware the app can work without is declared `android:required="false"`, and the code checks for it at runtime
 - Runtime permissions are requested in context, right before the feature that needs them, with `rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission())`. A denial never blocks the rest of the app
 - Components are `android:exported="false"` unless another app must start them
+- Libraries add permissions and components to the merged manifest (AndroidX core, profileinstaller, startup, WorkManager, Room). Check the merged manifest whenever a dependency is added, and enforce an allowlist with a test (see `testing.md` → Manifest and Privacy Checks)
 
 ```xml
 <uses-permission android:name="android.permission.NFC" />
@@ -556,3 +579,5 @@ See `testing.md` for the full testing guide. Quick rules:
 - ❌ Applying `org.jetbrains.kotlin.android` or `kapt` on AGP 9
 - ❌ HTTP statuses in the spec of a screen, use case or worker — set `feature.interface`
 - ❌ Changing a version or disabling a check to make an incompatible plugin run
+- ❌ `@Suppress` or a disabled rule to get composables past ktlint or detekt — exempt `@Composable` in the config
+- ❌ Reading `isSystemInDarkTheme()` inside a component instead of the mode the app theme provides
