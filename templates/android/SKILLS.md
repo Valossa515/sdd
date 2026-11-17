@@ -105,6 +105,8 @@ core-YOURCAPABILITY/ ← platform adapters behind domain ports
 - **Database**: Room, schemas exported to `core-data/schemas`
 - **Settings**: Preferences DataStore
 - **Migrations**: one `Migration` + one migration test per version bump
+- **Schema freeze**: before the first public release version 1 may change (JSON committed); after it, a published `N.json` never changes
+- **Backup**: off — `allowBackup="false"`, `dataExtractionRules` and `fullBackupContent` excluding every domain
 
 ### Permissions
 <!-- List every permission the app declares and why. Anything not listed here must not be added. -->
