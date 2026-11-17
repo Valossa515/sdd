@@ -2,7 +2,7 @@
 name: android-testing
 description: Testing guide for Android projects. JVM unit tests for the pure Kotlin domain, ViewModel tests with MockK, Turbine and coroutines-test, Robolectric tests for adapters and Room, Compose UI tests, and WorkManager tests.
 stack: android
-versions: "Kotlin 2.x, JUnit 5 (JVM modules), JUnit 4 (Android modules), MockK, Turbine, kotlinx-coroutines-test, Robolectric, Compose UI Test, work-testing"
+versions: "Kotlin 2.x, AGP 9.x, JUnit 5 (JVM modules), JUnit 4 (Android modules), MockK, Turbine, kotlinx-coroutines-test, Robolectric, Compose UI Test, work-testing"
 ---
 
 # Android Testing
@@ -48,11 +48,13 @@ dependencies {
     testImplementation(libs.androidx.room.testing)
     testImplementation(libs.androidx.work.testing)
 
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
+    // Compose UI tests on the JVM (Robolectric) — see "Compose UI Tests"
+    testImplementation(platform(libs.androidx.compose.bom))
+    testImplementation(libs.androidx.compose.ui.test.junit4)
 }
 ```
+
+Do not add `ui-test-manifest`. In `debugImplementation` it merges an exported test `ComponentActivity` into the debug APK, and in `testImplementation` it does not reach the Robolectric manifest. The Compose section shows the setup that needs neither.
 
 ---
 
@@ -204,17 +206,24 @@ class ScanRunDaoTest {
 
 ## Compose UI Tests
 
-Test the stateless `*Content` composable: one test per `UiState`, plus the callbacks. No ViewModel, no Hilt.
+Test the stateless `*Content` composable: one test per `UiState`, plus the callbacks. No ViewModel, no Hilt. Compose tests run on the JVM with Robolectric, in `src/test`, so they run in `./gradlew build` and in CI without a device.
+
+`createComposeRule()` needs a host `ComponentActivity` declared in the manifest, which only `ui-test-manifest` provides. Instead, start a plain `ComponentActivity` with Robolectric and use `createEmptyComposeRule()`. The debug APK stays free of test components.
 
 ```kotlin
+@RunWith(RobolectricTestRunner::class)
 class ScanResultContentTest {
 
-    @get:Rule val composeRule = createComposeRule()
+    @get:Rule val composeRule = createEmptyComposeRule()
+
+    private fun setContent(content: @Composable () -> Unit) {
+        Robolectric.buildActivity(ComponentActivity::class.java).setup().get().setContent(content = content)
+    }
 
     @Test
-    fun showsRiskyAppsAndReportsClicks() {
+    fun `shows risky apps and reports clicks`() {
         var clicked: String? = null
-        composeRule.setContent {
+        setContent {
             AppTheme {
                 ScanResultContent(
                     uiState = ScanResultUiState.Content(risky = listOf(anAppRiskItem("com.example.decoy")), safeCount = 3),
@@ -230,8 +239,9 @@ class ScanResultContentTest {
     }
 
     @Test
-    fun showsEmptyStateBeforeTheFirstScan() {
-        composeRule.setContent {
+    @Config(qualifiers = "+night")
+    fun `shows empty state before the first scan in dark mode`() {
+        setContent {
             AppTheme { ScanResultContent(ScanResultUiState.Empty, onAppClick = {}, onScanClick = {}) }
         }
 
@@ -240,7 +250,53 @@ class ScanResultContentTest {
 }
 ```
 
-Prefer finders a user would recognise (`onNodeWithText`, `onNodeWithContentDescription`). Use `testTag` only when there is no stable text.
+Prefer finders a user would recognise (`onNodeWithText`, `onNodeWithContentDescription`). Use `testTag` only when there is no stable text. Run the same test in light and dark mode with `@Config(qualifiers = "+night")`.
+
+### Navigation
+
+Test the graph through the real Activity with `createAndroidComposeRule<MainActivity>()`: click by the label a user sees and check the destination by its title, one test per edge. Check the back stack by observable behaviour instead of adding `navigation-testing`: after a screen is popped, pressing back from the next one finishes the Activity.
+
+```kotlin
+@RunWith(RobolectricTestRunner::class)
+class AppNavHostTest {
+
+    @get:Rule val composeRule = createAndroidComposeRule<MainActivity>()
+
+    @Test
+    fun `onboarding leaves the back stack`() {
+        composeRule.onNodeWithText("Start").performClick()
+        composeRule.onNodeWithText("Home").assertIsDisplayed()
+
+        composeRule.activityRule.scenario.onActivity { it.onBackPressedDispatcher.onBackPressed() }
+
+        assertTrue(composeRule.activity.isFinishing)
+    }
+}
+```
+
+### Colors and contrast
+
+Color choices that carry meaning (risk levels, statuses) live in a pure function of the theme, so they are tested on the JVM without rendering. Assert that each meaningful color differs from the others and that every text/background pair meets WCAG AA (4.5:1). Do not compare pixels: it is slow and brittle.
+
+```kotlin
+class RiskLevelColorsTest {
+
+    @Test
+    fun `every level meets AA contrast in light and dark mode`() {
+        for (dark in listOf(false, true)) {
+            for (level in RiskLevelUi.entries) {
+                val colors = riskLevelColors(level, dark)
+                assertTrue("$level dark=$dark", contrast(colors.content, colors.container) >= 4.5)
+            }
+        }
+    }
+
+    private fun contrast(a: Color, b: Color): Double {
+        val (light, dark) = listOf(a.luminance(), b.luminance()).sortedDescending()
+        return (light + 0.05) / (dark + 0.05)
+    }
+}
+```
 
 ---
 
@@ -280,21 +336,47 @@ class PeriodicScanWorkerTest {
 
 ## Manifest and Privacy Checks
 
-Promises the product makes about permissions are enforced by tests against the merged manifest, not by convention.
+Promises the product makes about permissions and exported components are enforced by tests against the merged manifest, not by convention. Robolectric's `PackageManager` returns the merged manifest, so libraries that add permissions or components are caught too.
+
+Check an **allowlist**, not a denylist: a test that only forbids `INTERNET` lets every other new permission through.
 
 ```kotlin
 @RunWith(RobolectricTestRunner::class)
-class ManifestPermissionsTest {
+class MergedManifestTest {
+
+    private val context: Context = ApplicationProvider.getApplicationContext()
 
     @Test
-    fun `app does not request the internet permission`() {
-        val context: Context = ApplicationProvider.getApplicationContext()
-        val info = context.packageManager.getPackageInfo(context.packageName, PackageManager.GET_PERMISSIONS)
+    fun `requested permissions are within the explicit allowlist`() {
+        val allowed = setOf(
+            "android.permission.NFC",
+            "android.permission.POST_NOTIFICATIONS",
+            // Added by androidx.core; signature-level, only this app holds it
+            "${context.packageName}.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION",
+        )
 
-        assertFalse(info.requestedPermissions.orEmpty().contains(Manifest.permission.INTERNET))
+        val requested = context.packageManager
+            .getPackageInfo(context.packageName, PackageManager.GET_PERMISSIONS)
+            .requestedPermissions?.toSet().orEmpty()
+
+        val notAllowed = requested - allowed
+        assertTrue("Permissions outside the allowlist: $notAllowed", notAllowed.isEmpty())
+    }
+
+    @Test
+    fun `main activity is the only exported activity`() {
+        val exported = context.packageManager
+            .getPackageInfo(context.packageName, PackageManager.GET_ACTIVITIES)
+            .activities.orEmpty()
+            .filter { it.exported }
+            .map { it.name }
+
+        assertEquals(listOf(MainActivity::class.java.name), exported)
     }
 }
 ```
+
+When a dependency adds a permission or component, the test fails. Accept it only with a recorded decision (in `.agent/SKILLS.md` → Project Overrides) and update the allowlist in the same change.
 
 ---
 
@@ -337,4 +419,7 @@ showsEmptyStateBeforeTheFirstScan
 - ❌ Mocking `PackageManager`, `Context` or Room DAOs by hand — use Robolectric shadows and an in-memory database
 - ❌ Reading `System.currentTimeMillis()` or `Instant.now()` in code under test — inject a `Clock`
 - ❌ Real personal or card data in fixtures, snapshots or logs
+- ❌ `ui-test-manifest` in any configuration — use `createEmptyComposeRule()` with an Activity started by Robolectric
+- ❌ Comparing screenshot pixels to check a color — test the color function and the contrast instead
+- ❌ A manifest test that only forbids specific permissions — check an allowlist
 - ❌ Skipping the migration test when the Room version changes

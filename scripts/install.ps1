@@ -2,7 +2,7 @@
 #
 # Usage (one line, from your project folder):
 #   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/valossa515/sdd/main/scripts/install.ps1))) -Stack dotnet
-#   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/valossa515/sdd/main/scripts/install.ps1))) -Stack spring-boot -Ref v1.4.0
+#   & ([scriptblock]::Create((irm https://raw.githubusercontent.com/valossa515/sdd/main/scripts/install.ps1))) -Stack spring-boot -Ref v1.5.0
 #
 # Usage (from a local clone):
 #   powershell -ExecutionPolicy Bypass -File C:\tmp\sdd\scripts\install.ps1 -Stack dotnet -Target .
@@ -16,7 +16,7 @@ param(
   [Parameter(Position = 0)] [string] $Stack,
   [Parameter(Position = 1)] [string] $Target = (Get-Location).Path,
   [Parameter(Position = 2)] [ValidateSet('agent', 'kiro')] [string] $Format = 'agent',
-  [string] $Ref,     # tag or branch to clone, e.g. v1.4.0 (remote installs only)
+  [string] $Ref,     # tag or branch to clone, e.g. v1.5.0 (remote installs only)
   [string] $Source   # local SDD checkout; default: the repo this script is in, else a fresh clone
 )
 
