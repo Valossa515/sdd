@@ -175,6 +175,10 @@ Pick one JDK version and use it in three places, all reading the same catalog en
 
 Static analysis plugins such as detekt run inside the Gradle daemon, so compiling with the right toolchain is not enough: a daemon on a newer JDK than the plugin supports fails with an error that does not name the cause. Prefer the JDK bundled with the current Android Studio over the newest release.
 
+### `api` or `implementation` in library modules
+
+A dependency whose types appear in the module's public API (a supertype, a constructor parameter, a return type) is `api`; everything else is `implementation`. An adapter that implements a `core-domain` port and takes a `CoroutineDispatcher` exposes both, so `core-domain` and `kotlinx-coroutines-core` are `api` there. With `implementation`, a consumer of the library does not compile until it declares them itself.
+
 ### Before adding or upgrading a build plugin
 
 Check that the plugin supports the project's AGP, Kotlin, Gradle and JDK versions. If it does not run with them, stop and report it. Do not change another version, disable a check or add a workaround to make it pass.
@@ -538,11 +542,31 @@ Periodic work has a 15-minute minimum interval and the system may delay it. Anyt
 - Components are `android:exported="false"` unless another app must start them
 - Libraries add permissions and components to the merged manifest (AndroidX core, profileinstaller, startup, WorkManager, Room). Check the merged manifest whenever a dependency is added, and enforce an allowlist with a test (see `testing.md` → Manifest and Privacy Checks)
 
+- Library modules declare no permissions. A permission in a library manifest is merged silently into every app that uses it, which matters most for a module meant to become an SDK. Restricted permissions such as `QUERY_ALL_PACKAGES` go in the app manifest, the library README tells integrators to declare it (or a `<queries>` element), and a test checks the library's merged manifest (with `unitTests.isIncludeAndroidResources = true`, or Robolectric does not see it)
+- When lint flags a permission the app genuinely needs (`QueryAllPackagesPermission`), suppress it on that element with `tools:ignore` and an XML comment that gives the reason. No module-wide `lint.xml` for it
+
 ```xml
 <uses-permission android:name="android.permission.NFC" />
 <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 <uses-feature android:name="android.hardware.nfc" android:required="false" />
 ```
+
+---
+
+## Reading installed packages
+
+- Fetch in two steps: a light list with flags `0`, filtered there, then `getPackageInfo` with `GET_PERMISSIONS`, `GET_SERVICES` and `MATCH_DISABLED_COMPONENTS` for each package kept. Each call carries one app, and system apps, usually the majority, are never loaded in full
+- System apps are those with `FLAG_SYSTEM` or `FLAG_UPDATED_SYSTEM_APP`. An update to a preinstalled app must carry the original signature, so a sideloaded APK cannot pass as one
+- Exclude the calling app's own package
+- Include disabled services, and check that a fully disabled user app still appears in the light list
+- A package that disappears between the list and the detail (`NameNotFoundException`) is skipped. Other `PackageManager` errors are propagated
+- Version branches (`longVersionCode` from API 28, `getInstallSourceInfo` from 30, `PackageInfoFlags` from 33) live in one `internal` file of extension functions. `@Suppress("DEPRECATION")` is allowed only on the old branch of an `SDK_INT` check whose other branch uses the replacement
+
+## Dispatchers in adapters
+
+- An adapter that blocks (package queries, files, NFC I/O) takes a `CoroutineDispatcher` in its constructor and runs the work in `withContext(dispatcher)`. Hilt provides it through a qualifier; tests pass the `runTest` dispatcher
+- Loops over many items call `ensureActive()` on each item, so a cancelled scan stops early
+- A constructor that takes a `Context` keeps only what it needs (`packageManager`, `packageName`), never the `Context` itself
 
 ---
 

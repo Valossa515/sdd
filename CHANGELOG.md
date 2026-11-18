@@ -9,6 +9,34 @@ The `version` field in `.claude-plugin/plugin.json` must always match the
 latest release in this file (CI enforces it) — Claude Code plugin users only
 receive updates when that field is bumped.
 
+## [1.7.0] - 2026-11-18
+
+### Added
+
+- **Android: reading installed packages** — two-step fetch (light list, then
+  one `getPackageInfo` per kept app), system apps as `FLAG_SYSTEM` or
+  `FLAG_UPDATED_SYSTEM_APP`, the caller's own package excluded, disabled
+  services included, vanished packages skipped, and version branches in one
+  internal file where `@Suppress("DEPRECATION")` is allowed only on the old
+  branch
+- **Android: library modules declare no permissions** — restricted
+  permissions such as `QUERY_ALL_PACKAGES` go in the app manifest, with a
+  test on the library's merged manifest; `api` versus `implementation` for
+  types in a library's public API; injected dispatchers with `ensureActive()`
+  in loops
+- **Android testing** — `@Config(sdk)` lists that include `minSdk` and each
+  cutover, the known gaps of the `PackageManager` shadow, and a counting
+  dispatcher that wraps the `runTest` dispatcher to prove code runs on the
+  injected one (a second `TestCoroutineScheduler` is rejected by `runTest`)
+
+### Changed
+
+- The Robolectric adapter example passes a dispatcher to the adapter and
+  tests at `minSdk`
+
+All found while building the installed-apps inventory of an Android app with
+the `android` stack.
+
 ## [1.6.0] - 2026-11-17
 
 ### Added
