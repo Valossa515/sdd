@@ -128,6 +128,7 @@ test-strategy:
 - MUST ensure every file in the contract maps to a spec requirement
 - MUST NOT include files or layers that the spec doesn't need
 - MUST generate both the decisions .md and the .contract.toon together
+- MUST re-check `feature.estimate-lines` against the files in the contract. If the design pushes the feature above 500 lines of code and tests and the spec has neither `batches` nor `single-pr-reason`, send it back to the planner instead of approving one large pull request
 - MUST NOT exclude the feature's own SDD artifacts from a batch's scope — they ship with the batch; the PR line budget counts code and tests only
 
 ## What NOT to do

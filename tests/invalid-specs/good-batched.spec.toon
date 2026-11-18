@@ -1,0 +1,33 @@
+# Valid: estimate above the PR budget, split into batches
+
+feature:
+  id: FT-012
+  name: Large Feature
+  version: 1.0
+  status: draft
+  interface: library
+  estimate-lines: 900
+requirement:
+  summary: A feature used to test the PR line budget.
+  actor: Calling code
+  trigger: Collector.collect(app)
+
+inputs[1]{name,type,required,constraints}:
+  app,InstalledApp,true,Any user app
+
+outputs:
+  success:
+    description: Signals are returned
+    status: Success
+  errors[1]{code,status,when}:
+    NONE,Empty,no signal applies
+
+business-rules[1]{id,rule}:
+  BR-001,Only user apps are checked
+
+assumptions[1]:
+  The inventory already filtered system apps
+
+batches[2]{id,scope,estimate}:
+  BATCH-01,Platform adapter and its tests,450 lines
+  BATCH-02,Domain logic and its tests,450 lines

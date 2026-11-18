@@ -7,6 +7,7 @@ feature:
   name: Scan Installed Apps
   version: 1.0
   status: draft
+  estimate-lines: 350
   interface: ui
 
 requirement:

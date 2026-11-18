@@ -20,6 +20,9 @@
 
 set -euo pipefail
 
+# Lines of code and tests one pull request may carry (SDD artifacts excluded).
+PR_LINE_BUDGET=500
+
 [ "$#" -ge 1 ] || { echo "Usage: $0 <file-or-directory> [...]"; exit 2; }
 
 RED='\033[0;31m'
@@ -202,6 +205,25 @@ validate_feature() {
   done < <(table_rows "$file" "errors")
 
   check_ids "$file" "$rel" "business-rules" 1 '^BR-[0-9]+$' "business rule"
+
+  # feature.estimate-lines: lines of code and tests the feature is expected to
+  # add or change (SDD artifacts excluded). Above the PR budget, the spec must
+  # be split into batches or say why it ships as one PR.
+  local estimate has_batches waiver
+  estimate=$(grep -m1 -E '^[ ]+estimate-lines:' "$file" | sed 's/.*estimate-lines:[ ]*//' | tr -d ' ' || true)
+  has_batches=0
+  grep -qE '^batches\[[0-9]+\]\{' "$file" && has_batches=1
+  waiver=$(grep -m1 -E '^[ ]+single-pr-reason:' "$file" | sed 's/.*single-pr-reason:[ ]*//' || true)
+  if [ -z "$estimate" ]; then
+    warn "$rel" "no 'feature.estimate-lines' (planner declares the estimated lines of code and tests)"
+  elif ! echo "$estimate" | grep -qE '^[1-9][0-9]*$'; then
+    fail "$rel" "invalid 'feature.estimate-lines' '$estimate' (expected a positive integer)"
+  elif [ "$estimate" -gt "$PR_LINE_BUDGET" ] && [ "$has_batches" -eq 0 ] && [ -z "$waiver" ]; then
+    fail "$rel" "estimate-lines $estimate exceeds the PR budget of $PR_LINE_BUDGET: add 'batches' or 'feature.single-pr-reason'"
+  fi
+  if [ "$has_batches" -eq 1 ]; then
+    check_ids "$file" "$rel" "batches" 1 '^BATCH-[0-9]+$' "batch"
+  fi
 
   # If no assumptions block, remind (schema says assumptions must be explicit)
   grep -qE '^assumptions\[[0-9]+\]' "$file" || \
