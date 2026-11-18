@@ -9,6 +9,16 @@ The `version` field in `.claude-plugin/plugin.json` must always match the
 latest release in this file (CI enforces it) — Claude Code plugin users only
 receive updates when that field is bumped.
 
+## [1.7.1] - 2026-11-18
+
+### Fixed
+
+- **Android testing** — the `@Config(sdk)` rule said "one level on each side
+  of every cutover", which contradicted its own example. It now asks for
+  `minSdk`, the first level of each newer branch and `targetSdk`
+- **Android skill** — names `installingPackageName` as the field that
+  replaces `getInstallerPackageName` from API 30
+
 ## [1.7.0] - 2026-11-18
 
 ### Added

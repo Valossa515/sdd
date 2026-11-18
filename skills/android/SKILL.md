@@ -560,7 +560,7 @@ Periodic work has a 15-minute minimum interval and the system may delay it. Anyt
 - Exclude the calling app's own package
 - Include disabled services, and check that a fully disabled user app still appears in the light list
 - A package that disappears between the list and the detail (`NameNotFoundException`) is skipped. Other `PackageManager` errors are propagated
-- Version branches (`longVersionCode` from API 28, `getInstallSourceInfo` from 30, `PackageInfoFlags` from 33) live in one `internal` file of extension functions. `@Suppress("DEPRECATION")` is allowed only on the old branch of an `SDK_INT` check whose other branch uses the replacement
+- Version branches (`longVersionCode` from API 28, `getInstallSourceInfo().installingPackageName` from 30 in place of `getInstallerPackageName`, `PackageInfoFlags` from 33) live in one `internal` file of extension functions. `@Suppress("DEPRECATION")` is allowed only on the old branch of an `SDK_INT` check whose other branch uses the replacement
 
 ## Dispatchers in adapters
 

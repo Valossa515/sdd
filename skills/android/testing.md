@@ -167,7 +167,7 @@ class PackageManagerAppInventoryTest {
 }
 ```
 
-Behaviour that depends on the API level is tested with `@Config(sdk = [...])`. The list always includes `minSdk`, because the oldest branch only runs there, and one level on each side of every cutover the adapter checks with `Build.VERSION.SDK_INT`. Each extra level downloads one more Robolectric image in CI, so do not add levels that no branch depends on.
+Behaviour that depends on the API level is tested with `@Config(sdk = [...])`. The list has `minSdk`, because the oldest branch only runs there, the first level of each newer branch (the cutover the adapter checks with `Build.VERSION.SDK_INT`) and `targetSdk`. The level just below a cutover runs the same branch as the level before it, so it adds nothing. Each extra level downloads one more Robolectric image in CI, so do not add levels that no branch depends on.
 
 Known gaps of the `PackageManager` shadow. Write the test around them and record what stays for the end-to-end test:
 
