@@ -41,7 +41,7 @@ A requirement is **Ready** when it contains enough detail for an agent (or devel
 
 | # | Check | Required |
 |---|-------|----------|
-| 13 | Scope fits in a single PR (estimated < 500 lines changed) | ✅ |
+| 13 | Scope fits in a single PR (`feature.estimate-lines` ≤ 500 lines of code and tests), or the spec has `batches` or `single-pr-reason` | ✅ |
 | 14 | Dependencies on other work are resolved or documented | ✅ |
 | 15 | The requirement is independently deliverable | ⚠️ |
 

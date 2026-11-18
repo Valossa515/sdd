@@ -86,6 +86,14 @@ assert_absent   "interface: command spec accepted"      "$OUTPUT" "good-command.
 assert_contains "interface: ui spec checked"            "$OUTPUT" "good-ui.spec.toon"
 assert_absent   "interface: ui spec accepted"           "$OUTPUT" "good-ui.spec.toon —"
 
+# PR line budget (feature.estimate-lines)
+assert_contains "budget: large spec without batches rejected" "$OUTPUT" "estimate-lines 900 exceeds the PR budget of 500"
+assert_contains "budget: non-numeric estimate rejected"  "$OUTPUT" "invalid 'feature.estimate-lines' 'muitas'"
+assert_contains "budget: batched spec checked"           "$OUTPUT" "good-batched.spec.toon"
+assert_absent   "budget: batched spec accepted"          "$OUTPUT" "good-batched.spec.toon —"
+assert_contains "budget: waived spec checked"            "$OUTPUT" "good-waived.spec.toon"
+assert_absent   "budget: waived spec accepted"           "$OUTPUT" "good-waived.spec.toon —"
+
 # acceptance defects
 assert_contains "acceptance: dangling feature-ref"      "$OUTPUT" "feature-ref 'FT-999' does not match"
 assert_contains "acceptance: duplicate AC id rejected"  "$OUTPUT" "duplicate criterion id 'AC-001'"

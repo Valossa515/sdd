@@ -6,6 +6,7 @@ feature:
   name: Create Order
   version: 1.0
   status: draft
+  estimate-lines: 700
 
 requirement:
   summary: Allow an authenticated user to create an order with one or more items so that stock is reserved and the purchase can proceed to payment.
@@ -36,5 +37,5 @@ assumptions[2]:
   Prices are stored in cents (integer)
 
 batches[2]{id,scope,estimate}:
-  BATCH-01,Core order creation (happy path),1-2 days
-  BATCH-02,Error handling and edge cases,1 day
+  BATCH-01,Core order creation (happy path),400 lines
+  BATCH-02,Error handling and edge cases,300 lines

@@ -5,6 +5,7 @@ feature:
   name: Build The Project
   version: 1.0
   status: draft
+  estimate-lines: 200
   interface: command
 
 requirement:

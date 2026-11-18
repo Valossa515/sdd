@@ -5,6 +5,7 @@ feature:
   name: Show Scan Result
   version: 1.0
   status: draft
+  estimate-lines: 200
   interface: ui
 
 requirement:

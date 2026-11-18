@@ -100,16 +100,26 @@ Describe the technical design. Reference skills and conventions.
 
 ## Decomposition Rules
 
-If a requirement is too large for a single PR (> 500 lines estimated), split it into **batches**:
+Estimate the lines of code and tests the feature adds or changes, with the feature's own SDD artifacts left out, and record it in the plan and in `feature.estimate-lines`. Count the tests: they are often half of the lines, or more when they are parameterized or run on several API levels.
 
-| Criteria | Action |
-|----------|--------|
-| Multiple endpoints | One batch per endpoint |
-| Multiple entities | One batch per entity + its endpoint |
-| CRUD operations | One batch for create+read, one for update+delete |
-| Complex logic | Isolate the complex part into its own batch |
+One pull request carries at most **500 lines**. Above that, split the feature into **batches**, one pull request each:
 
-Each batch must be independently deliverable and testable.
+| Feature has | Split |
+|-------------|-------|
+| Multiple endpoints (`http`) | One batch per endpoint |
+| Multiple entities (`http`) | One batch per entity + its endpoint |
+| CRUD operations (`http`) | One batch for create+read, one for update+delete |
+| Several screens (`ui`) | One batch per screen, with its state and tests |
+| A screen and the logic behind it (`ui`) | The use case or adapter first, the screen after |
+| A platform adapter and domain logic (`library`) | The adapter and its tests, then the logic that uses it |
+| Several independent rules or collectors (`library`) | One batch per rule or group of related rules |
+| A worker and what it triggers (`background`) | What it triggers first, the worker and its schedule after |
+| A command with several subcommands (`command`) | One batch per subcommand |
+| Complex logic (any) | Isolate the complex part into its own batch |
+
+Each batch must build, pass its tests and be reviewable on its own.
+
+If no cut ships on its own (for example, most of the lines are one parameterized test), keep one pull request and record why in `feature.single-pr-reason`. Say it in the plan as well, so the person approving the plan sees it. `scripts/validate-spec.sh` rejects a spec above 500 lines that has neither `batches` nor `single-pr-reason`.
 
 ## Quick Command
 

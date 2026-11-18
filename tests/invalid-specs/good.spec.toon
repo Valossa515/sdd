@@ -6,6 +6,7 @@ feature:
   name: Reference Feature
   version: 1.0
   status: draft
+  estimate-lines: 200
 
 requirement:
   summary: Minimal valid feature used as a fixture for the validator tests.

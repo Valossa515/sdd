@@ -22,6 +22,7 @@ feature:
   name: Create Order
   version: 1.0
   status: draft
+  estimate-lines: 700
 
 requirement:
   summary: One paragraph describing the feature from the user's perspective.
@@ -52,8 +53,26 @@ assumptions[2]:
   Prices are stored in cents (integer)
 
 batches[2]{id,scope,estimate}:
-  BATCH-01,Core order creation (happy path),1-2 days
-  BATCH-02,Error handling and edge cases,1 day
+  BATCH-01,Core order creation (happy path),400 lines
+  BATCH-02,Error handling and edge cases,300 lines
+```
+
+## Size and batches
+
+`feature.estimate-lines` is the planner's estimate of the lines of code and tests the feature adds or changes. The feature's own SDD artifacts (plan, architecture, spec, acceptance, contract, test plan) do not count.
+
+One pull request carries at most **500 lines**. Above that, the spec needs one of:
+
+- `batches`: each batch is one pull request that builds, passes its tests and can be reviewed on its own. The `estimate` column holds lines
+- `feature.single-pr-reason`: why the feature ships as one pull request anyway, for example when most of the lines are one parameterized test and no cut ships on its own
+
+```toon
+feature:
+  id: FT-011
+  name: Installed Apps Inventory
+  interface: library
+  estimate-lines: 600
+  single-pr-reason: Most lines are one parameterized test; there is no cut that ships on its own
 ```
 
 ## Interface (features that are not HTTP endpoints)
@@ -109,13 +128,15 @@ business-rules[1]{id,rule}:
 | `outputs.errors` | Expected error responses | ✅ |
 | `business-rules` | Explicit business rules with unique IDs | ✅ |
 | `assumptions` | Assumptions made during planning | ⚠️ |
-| `batches` | Decomposition for large features | ⚠️ |
+| `feature.estimate-lines` | Estimated lines of code and tests, SDD artifacts excluded | ⚠️ |
+| `batches` | Decomposition, one pull request per batch | ✅ when `estimate-lines` > 500, unless `single-pr-reason` |
+| `feature.single-pr-reason` | Why a feature above 500 lines ships as one pull request | ⚠️ |
 
 ## Validation Rules
 
 1. Every input must have `name`, `type`, and `required`
 2. Every error must have `code`, `status`, and `when`. `status` follows `feature.interface`: 3 digits for `http`, an integer for `command`, an identifier for `ui`, `library` and `background`
 3. Business rules must have unique IDs (BR-NNN)
-4. If the feature estimate > 2 days, `batches` is required
+4. `feature.estimate-lines`, when present, is a positive integer. Above 500, `batches` or `feature.single-pr-reason` is required. Batch ids follow `BATCH-NN` and are unique
 5. Assumptions must always be flagged explicitly
 6. `feature.interface`, when present, must be one of the five values above

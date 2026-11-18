@@ -9,6 +9,28 @@ The `version` field in `.claude-plugin/plugin.json` must always match the
 latest release in this file (CI enforces it) — Claude Code plugin users only
 receive updates when that field is bumped.
 
+## [1.8.0] - 2026-11-18
+
+### Added
+
+- **`feature.estimate-lines`** — the planner records the estimated lines of
+  code and tests (SDD artifacts excluded). Above the 500-line PR budget,
+  `validate-spec.sh` requires `batches` or `feature.single-pr-reason`, and
+  checks batch ids (`BATCH-NN`). Specs without the field get a warning, not
+  an error, so existing specs stay valid
+- **Decomposition rules for every interface** — the planner's table now
+  covers `ui`, `library`, `background` and `command` features (one screen per
+  batch, adapter before the logic that uses it, what a worker triggers before
+  the worker), not only HTTP endpoints and CRUD
+- The architect re-checks the estimate against the files in the contract and
+  sends an oversized spec back to the planner
+
+### Changed
+
+- `batches.estimate` holds lines instead of days, and the schema's
+  "estimate > 2 days" rule, which nothing enforced, is replaced by the line
+  budget. The Definition of Ready item 13 points to the same fields
+
 ## [1.7.1] - 2026-11-18
 
 ### Fixed
