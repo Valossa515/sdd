@@ -176,7 +176,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/valossa515/sdd/main/scripts/
 bash <(curl -fsSL https://raw.githubusercontent.com/valossa515/sdd/main/scripts/install.sh) dotnet
 
 # pin a released version (recommended for teams):
-bash <(curl -fsSL https://raw.githubusercontent.com/valossa515/sdd/main/scripts/install.sh) spring-boot . agent --ref v1.6.0
+bash <(curl -fsSL https://raw.githubusercontent.com/valossa515/sdd/main/scripts/install.sh) spring-boot . agent --ref v1.7.0
 ```
 
 Releases are listed on the [releases page](https://github.com/valossa515/sdd/releases) with
@@ -218,7 +218,7 @@ exactly the same files as the bash installer. From your project folder:
 | `-Stack` | any [supported stack](#supported-stacks), e.g. `dotnet`, `fastapi` | required |
 | `-Target` | path to your project | current folder |
 | `-Format` | `agent`, `kiro` | `agent` |
-| `-Ref` | tag or branch to install, e.g. `v1.6.0` (recommended for teams) | latest `main` |
+| `-Ref` | tag or branch to install, e.g. `v1.7.0` (recommended for teams) | latest `main` |
 
 From a local clone (`-ExecutionPolicy Bypass` applies to this one run only — Windows PowerShell
 blocks local scripts by default):

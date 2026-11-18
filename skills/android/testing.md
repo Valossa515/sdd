@@ -149,6 +149,7 @@ Adapters that wrap platform APIs are tested against Robolectric shadows, so the 
 
 ```kotlin
 @RunWith(RobolectricTestRunner::class)
+@Config(sdk = [26, 28, 30, 33, 36]) // minSdk, each API cutover in the adapter, targetSdk
 class PackageManagerAppInventoryTest {
 
     private val context: Context = ApplicationProvider.getApplicationContext()
@@ -156,17 +157,53 @@ class PackageManagerAppInventoryTest {
 
     @Test
     fun `returns user apps and skips system apps`() = runTest {
-        shadowPackageManager.installPackage(aPackageInfo("com.example.user", system = false))
-        shadowPackageManager.installPackage(aPackageInfo("com.example.system", system = true))
+        shadowPackageManager.installPackage(aPackageInfo("com.example.user", flags = 0))
+        shadowPackageManager.installPackage(aPackageInfo("com.example.system", flags = ApplicationInfo.FLAG_SYSTEM))
 
-        val apps = PackageManagerAppInventory(context).installedApps()
+        val apps = PackageManagerAppInventory(context, StandardTestDispatcher(testScheduler)).installedApps()
 
         assertEquals(listOf("com.example.user"), apps.map { it.packageName })
     }
 }
 ```
 
-Behaviour that depends on the API level is tested once per branch with `@Config(sdk = [...])`.
+Behaviour that depends on the API level is tested with `@Config(sdk = [...])`. The list always includes `minSdk`, because the oldest branch only runs there, and one level on each side of every cutover the adapter checks with `Build.VERSION.SDK_INT`. Each extra level downloads one more Robolectric image in CI, so do not add levels that no branch depends on.
+
+Known gaps of the `PackageManager` shadow. Write the test around them and record what stays for the end-to-end test:
+
+- The test's own package is installed and is a user app. An adapter that excludes the calling package (`context.packageName`) covers it
+- Permissions come back even without `GET_PERMISSIONS`, so a test cannot prove that flag. `GET_SERVICES` and `MATCH_DISABLED_COMPONENTS` are honoured
+- Package visibility (Android 11+) is not applied. Cover `QUERY_ALL_PACKAGES` or `<queries>` with a manifest test
+- `getInstallSourceInfo` throws `NameNotFoundException` for a package with no install source set; set one in the fixture
+- `applicationInfo` is filled in when a fixture leaves it null, so a null check on it cannot be tested; list it as excluded in the contract
+
+### Code that must run on an injected dispatcher
+
+`runTest` rejects a second `TestCoroutineScheduler`, and `advanceUntilIdle()` on a standalone scheduler needs an experimental opt-in. To prove that an adapter switches to the dispatcher it receives, wrap the `runTest` dispatcher in one that counts dispatches:
+
+```kotlin
+/** Forwards to the runTest dispatcher and counts dispatches. Zero means the code never switched to it. */
+private class CountingDispatcher(private val delegate: CoroutineDispatcher) : CoroutineDispatcher() {
+    var dispatches = 0
+        private set
+
+    override fun dispatch(context: CoroutineContext, block: Runnable) {
+        dispatches++
+        delegate.dispatch(context, block)
+    }
+}
+
+@Test
+fun `reads on the injected dispatcher`() = runTest {
+    val dispatcher = CountingDispatcher(StandardTestDispatcher(testScheduler))
+
+    PackageManagerAppInventory(context, dispatcher).installedApps()
+
+    assertTrue(dispatcher.dispatches > 0)
+}
+```
+
+Confirm the test fails when the production code uses a hard-coded dispatcher or `Dispatchers.Unconfined`.
 
 ---
 
@@ -508,3 +545,5 @@ showsEmptyStateBeforeTheFirstScan
 - ❌ A fake `DataStore` in the tests of a `DataStore` source
 - ❌ Making Room or DataStore `api` dependencies only to test the Hilt graph from `app`
 - ❌ Skipping the migration test when the Room version changes
+- ❌ A second `TestCoroutineScheduler` to check which dispatcher ran the code — wrap the `runTest` dispatcher and count dispatches
+- ❌ Leaving `minSdk` out of the `@Config(sdk)` list of an adapter with version branches
